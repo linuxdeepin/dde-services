@@ -3,11 +3,11 @@
     <name>oom</name>
     <message>
         <source>%s process consuming too much memory has been terminated to ensure system stability and performance</source>
-        <translation type="unfinished"/>
+        <translation>システムの安定性とパフォーマンスを確保するために、メモリを多く消費しているプロセス %s を強制終了しました。</translation>
     </message>
     <message>
         <source>Process terminated</source>
-        <translation type="unfinished"/>
+        <translation>プロセスを強制終了しました</translation>
     </message>
 </context>
 </TS>
