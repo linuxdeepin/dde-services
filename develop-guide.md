@@ -461,11 +461,11 @@ QDBusService::lockTimer(bool)
 ```cmake
 function (install_dbus_service arg)
     if (${ARGC} EQUAL 1)
-        file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}.service CONTENT "[D-BUS Service]\nName=${ARGV0}\nExec=/usr/bin/deepin-service-manager -n ${ARGV0}\nSystemdService=deepin-service-plugin@${ARGV0}.service")
+        file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}.service CONTENT "[D-BUS Service]\nName=${ARGV0}\nExec=/usr/bin/deepin-service-manager -n ${ARGV0}\nSystemdService=dde-services@${ARGV0}.service")
         install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}.service DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/services)
     endif()
     if (${ARGC} EQUAL 2)
-        file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}.service CONTENT "[D-BUS Service]\nName=${ARGV0}\nExec=/usr/bin/deepin-service-manager -n ${ARGV0}\nUser=root\nSystemdService=deepin-service-plugin@${ARGV0}.service")
+        file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}.service CONTENT "[D-BUS Service]\nName=${ARGV0}\nExec=/usr/bin/deepin-service-manager -n ${ARGV0}\nUser=root\nSystemdService=dde-services@${ARGV0}.service")
         install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${ARGV0}.service DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/system-services)
     endif()
 endfunction ()
@@ -486,7 +486,7 @@ install_dbus_service(org.deepin.ServiceName root)
 Name=org.deepin.service.demo
 Exec=/usr/bin/deepin-service-manager -n org.deepin.service.demo
 User=root
-SystemdService=deepin-service-plugin@org.deepin.service.demo.service
+SystemdService=dde-services@org.deepin.service.demo.service
 ```
 
 若需要注册 system 级别 DBus，还需要安装 conf 文件让 DBus 服务能够有权限进行注册，以下是一个例子：
@@ -532,7 +532,7 @@ sudo systemctl restart deepin-service-group@app.service
 对于非常驻插件，可以单独进程启动：
 
 ```bash
-sudo systemctl restart deepin-service-plugin@org.deepin.service.demo.service
+sudo systemctl restart dde-services@org.deepin.service.demo.service
 ```
 
 ### 查看日志
@@ -546,7 +546,7 @@ sudo journalctl -x -e -u deepin-service-group@app.service
 若是临时应用，可按服务名称查看：
 
 ```bash
-sudo journalctl -x -e -u deepin-service-plugin@org.deepin.service.demo.service
+sudo journalctl -x -e -u dde-services@org.deepin.service.demo.service
 ```
 
 ## demo 请参考[这里](src/demo)
@@ -557,7 +557,7 @@ sudo journalctl -x -e -u deepin-service-plugin@org.deepin.service.demo.service
   - 添加插件和独立应用的区别
 - 2023/03/16:
   - 支持插件以临时进程进行启动
-  - 服务名称改名：deepin-service-plugin -> deepin-service-group
+  - 服务名称改名：dde-services -> deepin-service-group
   - 优化注意事项，建议详细查看注意事项
   - 新增日志查看方式
   - 优化配置代码，字段说明提取到外面，方便复制
