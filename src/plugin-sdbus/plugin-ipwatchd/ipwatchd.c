@@ -238,6 +238,7 @@ int ipwd_check_context_verify ()
 
     if (check_context.misc[0] == '\0') {
         IPWD_S_DEV dev;
+        memset(&dev, 0, sizeof(dev));
         for (i = 0; i < devices.devnum; i++) {
             memset(dev.device, 0, sizeof(dev.device));
             strcpy(dev.device, devices.dev[i].device);
