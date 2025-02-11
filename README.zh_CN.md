@@ -1,4 +1,4 @@
-# Deepin Service Plugins
+# DDE Services
 
 ------------
 Deepin 平台上的服务管理的插件模块。
@@ -16,8 +16,8 @@ Deepin 平台上的服务管理的插件模块。
 ### 从源代码构建
 
 ```bash
-git clone https://github.com/linuxdeepin/deepin-service-plugins.git
-cd deepin-service-plugins
+git clone https://github.com/linuxdeepin/dde-services.git
+cd dde-services
 cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build
 ```

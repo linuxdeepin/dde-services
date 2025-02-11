@@ -1,4 +1,4 @@
-# Deepin Service Plugins
+# DDE Services
 
 ------------
 Manage DBus service on Deepin.
@@ -16,8 +16,8 @@ Manage DBus service on Deepin.
 ### Build from source code
 
 ```bash
-git clone https://github.com/linuxdeepin/deepin-service-plugins.git
-cd deepin-service-plugins
+git clone https://github.com/linuxdeepin/dde-services.git
+cd dde-services
 cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build
 ```
@@ -46,4 +46,4 @@ We encourage you to report issues and contribute changes
 
 ## License
 
-Deepin Service plugins is licensed under [LGPL-3.0-or-later](LICENSE).
+DDE Services is licensed under [LGPL-3.0-or-later](LICENSE).

@@ -1,3 +1,9 @@
+dde-services (1.0.2) unstable; urgency=medium
+
+  * feat: 项目调整，名称变更，删除oom模块
+
+ -- fuleyi <fuleyi@uniontech.com>  Tue, 11 Feb 2025 10:48:32 +0800
+
 deepin-service-plugins (1.0.1) unstable; urgency=medium
 
   * chore: fix license check

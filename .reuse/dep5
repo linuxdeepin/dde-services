@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: deepin-service-plugins
+Upstream-Name: dde-services
 Upstream-Contact: fuleyi <fuleyi@uniontech.com>
-Source: https://github.com/linuxdeepin/deepin-service-plugins
+Source: https://github.com/linuxdeepin/dde-services
 
 # Sample paragraph, commented out:
 #
