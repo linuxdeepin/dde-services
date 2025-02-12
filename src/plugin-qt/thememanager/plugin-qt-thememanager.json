@@ -1,0 +1,14 @@
+{
+    "name": "org.deepin.service.thememanager",
+    "libPath": "libplugin-qt-thememanager.so",
+    "group": "core",
+    "policyStartType": "Resident",
+    "pluginType": "qt",
+    "startDelay": 0,
+    "policy": [
+      {
+        "path": "/org/deepin/service/thememanager"
+      }
+    ]
+  }
+  
