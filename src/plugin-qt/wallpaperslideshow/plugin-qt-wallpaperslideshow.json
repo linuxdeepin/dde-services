@@ -1,0 +1,14 @@
+{
+    "name": "org.deepin.service.wallpaperslideshow",
+    "libPath": "libplugin-qt-wallpaperslideshow.so",
+    "group": "dde",
+    "policyStartType": "Resident",
+    "pluginType": "qt",
+    "startDelay": 0,
+    "policy": [
+      {
+        "path": "/org/deepin/service/wallpaperslideshow"
+      }
+    ]
+  }
+  
