@@ -1,0 +1,12 @@
+<interface name='org.deepin.dde.WallpaperSlideshow'>
+
+    <method name='GetWallpaperSlideShow'>
+        <arg type='s' name='monitorName' direction='in' />
+        <arg type='s' name='slideShow' direction='out' />
+    </method>
+    <method name='SetWallpaperSlideShow'>
+        <arg type='s' name='monitorName' direction='in' />
+        <arg type='s' name='slideShow' direction='in' />
+    </method>
+    <property access='readwrite' type='s' name='WallpaperSlideShow' />
+</interface>
