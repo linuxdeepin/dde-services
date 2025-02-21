@@ -16,7 +16,7 @@
 #include <unistd.h>
 
 const static QString wallpaperJsonPath = QString("%1/dde-appearance/").arg(utils::GetUserConfigDir());
-const static QStringList SolidWallpaperDir = { "/usr/share/wallpapers/custom-solidwallpapers", "/usr/share/wallpapers/deepin-solidwallpapers"};
+const static QStringList SolidWallpaperDir = { "/var/cache/wallpapers/custom-solidwallpapers", "/usr/share/wallpapers/deepin-solidwallpapers"};
 
 utils::utils()
 {
