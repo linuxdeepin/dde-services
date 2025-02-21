@@ -1,3 +1,10 @@
+dde-services (1.0.4) unstable; urgency=medium
+
+  * chore: update custom solidwallpapers path
+  * chore: adapt wallpaper slideshow
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 21 Feb 2025 16:01:54 +0800
+
 dde-services (1.0.3) unstable; urgency=medium
 
   * feat: 新增thememanager的qt服务
