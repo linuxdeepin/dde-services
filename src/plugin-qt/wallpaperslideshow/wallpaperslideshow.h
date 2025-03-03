@@ -26,6 +26,7 @@ public:
 public slots:
     void SetWallpaperSlideShow(const QString &monitorName, const QString &slideShow);
     QString GetWallpaperSlideShow(const QString &monitorName);
+    void onPropertyChanged(const QString &name, const QVariant &value);
 
 private:
     QScopedPointer<SlideshowManager> m_manager;
