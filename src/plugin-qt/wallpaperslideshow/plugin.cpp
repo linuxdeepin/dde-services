@@ -4,13 +4,10 @@
 
 #include "wallpaperslideshow.h"
 #include "wallpaperslideshowadaptor.h"
+#include "commondefine.h"
 
 #include <QDBusConnection>
 #include <DGuiApplicationHelper>
-
-#define WALLPAPER_SLIDESHOW_SERVICE "org.deepin.dde.WallpaperSlideshow"
-#define WALLPAPER_SLIDESHOW_PATH "/org/deepin/dde/WallpaperSlideshow"
-#define WALLPAPER_SLIDESHOW_INTERFACE "org.deepin.dde.WallpaperSlideshow"
 
 DGUI_USE_NAMESPACE
 

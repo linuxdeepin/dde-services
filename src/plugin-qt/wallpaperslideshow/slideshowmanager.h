@@ -43,6 +43,9 @@ private:
     void init();
     void loadConfig();
 
+signals:
+    void propertyChanged(const QString &name, const QVariant &value);
+
 private:
     QScopedPointer<DConfig>                          m_settingDconfig;
     QMap<QString,QSharedPointer<WallpaperScheduler>> m_wsSchedulerMap;

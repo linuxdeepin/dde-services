@@ -63,6 +63,7 @@ bool SlideshowManager::setWallpaperSlideShow(const QString &value)
     qInfo() << "value: GSKEYWALLPAPERSLIDESHOW" << m_settingDconfig->value(GSKEYWALLPAPERSLIDESHOW);
     m_settingDconfig->setValue(GSKEYWALLPAPERSLIDESHOW, value);
     m_wallpaperSlideShow = value;
+    emit propertyChanged(WALLPAPERSLIDESHOWNAME, value);
     updateWSPolicy(value);
     return true;
 }
