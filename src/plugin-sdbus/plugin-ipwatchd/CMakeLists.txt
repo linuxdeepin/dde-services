@@ -8,7 +8,6 @@ set(Plugin_NAME "plugin-ipwatchd")
 project(${Plugin_NAME})
 
 find_package(PkgConfig REQUIRED)
-find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
 pkg_check_modules(Systemd REQUIRED IMPORTED_TARGET libsystemd)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(PCAP REQUIRED libpcap)
