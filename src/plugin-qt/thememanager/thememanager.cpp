@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QDBusInterface>
 #include <QDBusReply>
+#include <QRegularExpression>
 
 #include <pwd.h>
 
@@ -99,14 +100,14 @@ void ThemeManager::initCoordinate()
 
 void ThemeManager::iso6709Parsing(QString city, QString coordinates)
 {
-    QRegExp pattern("(\\+|-)\\d+\\.?\\d*");
+    QRegularExpression pattern(R"((\+|-)\d+\.?\d*)");
 
     QVector<QString> resultVet;
 
-    int pos = 0;
-    while ((pos = pattern.indexIn(coordinates, pos)) != -1 && resultVet.size() <= 2) {
-        resultVet.push_back(coordinates.mid(pos, pattern.matchedLength()));
-        pos += pattern.matchedLength();
+    QRegularExpressionMatchIterator iter = pattern.globalMatch(coordinates);
+    while (iter.hasNext() && resultVet.size() < 2) {
+        QRegularExpressionMatch match = iter.next();
+        resultVet.push_back(match.captured(0));
     }
 
     if (resultVet.size() < 2) {

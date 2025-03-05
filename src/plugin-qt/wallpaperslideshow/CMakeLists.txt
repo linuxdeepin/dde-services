@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 
 set(BIN_NAME "plugin-qt-wallpaperslideshow")
 
@@ -14,11 +14,10 @@ set(CMAKE_AUTORCC ON)
 include(GNUInstallDirs)
 file(GLOB_RECURSE SRCS "*.h" "*.cpp")
 
-find_package(Qt5 COMPONENTS Core DBus REQUIRED)
-find_package(DtkCore REQUIRED)
-find_package(DtkGui REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus)
+find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Gui Core)
 
-qt5_add_dbus_adaptor(ADAPTER_SOURCES
+qt_add_dbus_adaptor(ADAPTER_SOURCES
                      org.deepin.dde.WallpaperSlideshow.xml
                      wallpaperslideshow.h
                      WallpaperSlideshow)
@@ -29,15 +28,15 @@ add_library(${BIN_NAME} MODULE
 )
 
 target_include_directories(${BIN_NAME} PUBLIC
-  Qt5::Core
-  Qt5::DBus
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::DBus
 )
 
 target_link_libraries(${BIN_NAME} PRIVATE
-  Qt5::Core
-  Qt5::DBus
-  ${DtkCore_LIBRARIES}
-  ${DtkGui_LIBRARIES}
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::DBus
+  Dtk${DTK_VERSION_MAJOR}::Core
+  Dtk${DTK_VERSION_MAJOR}::Gui
 )
 
 install(TARGETS ${BIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
