@@ -20,6 +20,5 @@ Architecture: any
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
- deepin-service-manager (>= 1.0.5),
- qttools5-dev-tools
+ deepin-service-manager (>= 1.0.5)
 Description: deepin desktop-environment plugins service
