@@ -45,9 +45,8 @@ bool SlideshowManager::doSetWallpaperSlideShow(const QString &monitorName,const 
     docTmp.setObject(cfgObj);
     QString value = docTmp.toJson(QJsonDocument::Compact);
 
-    setWallpaperSlideShow(value);
-
     m_curMonitorSpace = key;
+    setWallpaperSlideShow(value);
     return true;
 }
 
