@@ -1,3 +1,11 @@
+dde-services (1.0.6) unstable; urgency=medium
+
+  * fix: Unable to rotate newly added images
+  * fix: m_curMonitorSpace should be initialized in advance
+  * fix: 修复系统预装QT应用问题
+
+ -- zhangkun <zhangkun2@uniontech.com>  Wed, 12 Mar 2025 13:38:55 +0800
+
 dde-services (1.0.5) unstable; urgency=medium
 
   * chore: adapt to Qt6.8
