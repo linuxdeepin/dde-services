@@ -75,11 +75,10 @@ void WallpaperScheduler::handleChangeTimeOut()
 
 
 WallpaperLoop::WallpaperLoop(Backgrounds::BackgroundType wallpaperType)
-    :prepareUpdate(true)
-    ,rander(QRandomGenerator::global())
+    :rander(QRandomGenerator::global())
     ,m_wallpaperType(wallpaperType)
 {
-
+    updateLoopList();
 }
 
 QStringList WallpaperLoop::getShowed()
@@ -90,16 +89,6 @@ QStringList WallpaperLoop::getShowed()
 QStringList WallpaperLoop::getNotShowed()
 {
     QStringList retList;
-    if(prepareUpdate)
-    {
-       QVector<Background> bgs = backgrounds.getBackground(m_wallpaperType);
-       for(auto iter : bgs)
-       {
-           allList.push_back(utils::deCodeURI(iter.getId()));
-       }
-       prepareUpdate = false;
-    }
-
     for(auto iter : allList)
     {
         if(!showedList.contains(iter))
@@ -142,17 +131,20 @@ QString WallpaperLoop::getNextShow()
     return nextWallpaper;
 }
 
+void WallpaperLoop::updateLoopList()
+{
+    allList.clear();
+    QStringList bgs = Backgrounds::instance()->getBackground(m_wallpaperType);
+    for(const auto &background : bgs)
+    {
+        allList.push_back(utils::deCodeURI(background));
+    }
+}
+
 void WallpaperLoop::reset()
 {
     showedList.clear();
 }
-
-void WallpaperLoop::clearList()
-{
-    showedList.clear();
-    allList.clear();
-}
-
 void WallpaperLoop::addToShow(QString file)
 {
     file = utils::deCodeURI(file);
@@ -163,8 +155,8 @@ void WallpaperLoop::addToShow(QString file)
 void WallpaperLoop::updateWallpaperType(Backgrounds::BackgroundType type)
 {
     m_wallpaperType = type;
-    prepareUpdate = true;
-    clearList();
+    reset();
+    updateLoopList();
 }
 
 WallpaperLoopConfigManger::WallpaperLoopConfigManger()

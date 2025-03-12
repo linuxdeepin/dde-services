@@ -11,7 +11,6 @@
 #include <QMutex>
 #include <QVector>
 
-#include "background.h"
 #include <qvector.h>
 
 class Backgrounds: public QObject
@@ -26,17 +25,19 @@ public:
         BT_All
     };
 
-    Backgrounds(QObject *parent = nullptr);
+    static Backgrounds* instance(QObject *parent = nullptr);
+
     ~Backgrounds();
 
     void refreshBackground();
+    void clear();
     void sortByTime(QFileInfoList listFileInfo);
     QStringList getCustomBgFilesInDir(QString dir);
     QStringList getBgFilesInDir(QString dir);
     bool isFileInDirs(QString file, QStringList dirs);
     bool isBackgroundFile(QString file);
-    QVector<Background> listBackground();
-    QVector<Background> getBackground(BackgroundType type);
+    QStringList listBackground();
+    QStringList getBackground(BackgroundType type);
 
     static BackgroundType getBackgroundType(QString id);
 
@@ -44,12 +45,13 @@ private:
     void init();
     QStringList getSysBgFIles();
     QStringList getCustomBgFiles();
+    Backgrounds(QObject *parent = nullptr);
 
 private:
-    QVector<Background> backgrounds;
-    QVector<Background> solidBackgrounds;
-    QVector<Background> customBackgrounds;
-    QVector<Background> sysBackgrounds;
+    QStringList backgrounds;
+    QStringList solidBackgrounds;
+    QStringList customBackgrounds;
+    QStringList sysBackgrounds;
 
     static QStringList systemWallpapersDir;
     static QStringList uiSupportedFormats;

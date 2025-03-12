@@ -16,6 +16,12 @@
 QStringList Backgrounds::systemWallpapersDir = { "/usr/share/wallpapers/deepin", "/usr/share/wallpapers/deepin-solidwallpapers"};
 QStringList Backgrounds::uiSupportedFormats = { "jpeg", "png", "bmp", "tiff", "gif" };
 
+Backgrounds* Backgrounds::instance(QObject *parent)
+{
+    static Backgrounds *instance = new Backgrounds(parent);
+    return instance;
+}
+
 Backgrounds::Backgrounds(QObject *parent)
     : QObject(parent)
 {
@@ -33,14 +39,13 @@ void Backgrounds::init()
 
 void Backgrounds::refreshBackground()
 {
+    clear();
     QStringList files = getCustomBgFiles();
     for (auto file : files) {
         if (!QFile::exists(file)) {
             continue;
         }
-        Background bg;
-        bg.setId(utils::enCodeURI(file, SCHEME_FILE));
-        bg.setDeletable(true);
+        const QString &bg = utils::enCodeURI(file, SCHEME_FILE);
         backgrounds.push_back(bg);
 
         if (utils::isSolidWallpaper(file)) {
@@ -56,9 +61,7 @@ void Backgrounds::refreshBackground()
         if (!QFile::exists(file)) {
             continue;
         }
-        Background bg;
-        bg.setId(utils::enCodeURI(file, SCHEME_FILE));
-        bg.setDeletable(false);
+        const QString &bg = utils::enCodeURI(file, SCHEME_FILE);
         backgrounds.push_back(bg);
 
         if (utils::isSolidWallpaper(file)) {
@@ -68,6 +71,15 @@ void Backgrounds::refreshBackground()
         }
     }
 }
+
+void Backgrounds::clear()
+{
+    backgrounds.clear();
+    solidBackgrounds.clear();
+    customBackgrounds.clear();
+    sysBackgrounds.clear();
+}
+
 QStringList Backgrounds::getSysBgFIles()
 {
     QStringList files;
@@ -155,7 +167,7 @@ bool Backgrounds::isBackgroundFile(QString file)
     return false;
 }
 
-QVector<Background> Backgrounds::listBackground()
+QStringList Backgrounds::listBackground()
 {
     if (backgrounds.length() == 0)
         refreshBackground();
@@ -163,7 +175,7 @@ QVector<Background> Backgrounds::listBackground()
     return backgrounds;
 }
 
-QVector<Background> Backgrounds::getBackground(BackgroundType type)
+QStringList Backgrounds::getBackground(BackgroundType type)
 {
     listBackground();
     switch (type) {

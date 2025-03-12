@@ -178,8 +178,9 @@ void SlideshowManager::autoChangeBg(QString monitorSpace, QDateTime date)
     }
 
     QString file = m_wsLoopMap[monitorSpace]->getNext();
-    if (file.isEmpty()) {
-        qDebug() << "file is empty";
+
+    if (file.isEmpty() || !QFile::exists(file)) {
+        qWarning() << "auto change bg error, file not exist: " << file;
         return;
     }
 
@@ -322,6 +323,12 @@ void SlideshowManager::handlePrepareForSleep(bool sleep)
 void SlideshowManager::onWallpaperChanged()
 {
     const auto wallpaper = m_dbusProxy->getCurrentWorkspaceBackground();
+    Backgrounds::instance()->refreshBackground();
+
+    for (auto it = m_wsLoopMap.begin(); it != m_wsLoopMap.end(); ++it) {
+        it.value()->updateLoopList();
+    }
+
     auto wallpaperType = Backgrounds::getBackgroundType(wallpaper);
     if (wallpaperType != m_wallpaperType) {
         qInfo() << "wallpaperSlideshow type changed: old is " << m_wallpaperType << "new: " << wallpaperType;

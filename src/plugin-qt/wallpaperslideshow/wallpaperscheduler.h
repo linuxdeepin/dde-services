@@ -47,20 +47,18 @@ public:
     QStringList getShowed();
     QString     getNext();
     void        addToShow(QString file);
+    void        updateLoopList();
     void        updateWallpaperType(Backgrounds::BackgroundType type);
 
 private:
     QStringList getNotShowed();
     QString     getNextShow();
     void        reset();
-    void        clearList();
 
 private:
     QStringList         showedList;
-    bool                prepareUpdate;
     QStringList         allList;
     QSharedPointer<QRandomGenerator>    rander;
-    Backgrounds         backgrounds;
     Backgrounds::BackgroundType m_wallpaperType;
 };
 
