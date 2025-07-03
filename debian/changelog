@@ -1,3 +1,9 @@
+dde-services (1.0.7) unstable; urgency=medium
+
+  * refactor: optimize build system security flags
+
+ -- WuJiangYu <wujiangyu@uniontech.com>  Thu, 03 Jul 2025 19:52:04 +0800
+
 dde-services (1.0.6) unstable; urgency=medium
 
   * fix: Unable to rotate newly added images
