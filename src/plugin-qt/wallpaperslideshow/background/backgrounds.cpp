@@ -89,6 +89,13 @@ QStringList Backgrounds::getSysBgFIles()
     return files;
 }
 
+void Backgrounds::sortByTime(QFileInfoList listFileInfo)
+{
+    std::sort(listFileInfo.begin(), listFileInfo.end(), [=](const QFileInfo &f1, const QFileInfo &f2) {
+        return f1.lastModified().toSecsSinceEpoch() < f2.lastModified().toSecsSinceEpoch();
+    });
+}
+
 QStringList Backgrounds::getCustomBgFiles()
 {
     struct passwd *user = getpwuid(getuid());
