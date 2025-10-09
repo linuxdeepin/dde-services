@@ -7,6 +7,7 @@
 #include "commondefine.h"
 #include "utils.h"
 
+#include <QDBusPendingReply>
 #include <QJsonParseError>
 #include <QJsonObject>
 #include <DDBusSender>
@@ -253,38 +254,44 @@ bool SlideshowManager::changeBgAfterLogin(QString monitorSpace)
 {
     QString runDir = utils::GetUserRuntimeDir();
 
-    QFile file("/proc/self/sessionid");
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "open /proc/self/sessionid fail";
-        return false;
-    }
+    QDBusPendingReply<QString> currentSessionPath = DDBusSender()
+        .service("org.deepin.dde.SessionManager1")
+        .path("/org/deepin/dde/Session1")
+        .interface("org.deepin.dde.Session1")
+        .method("GetSessionPath")
+        .call();
 
-    QString currentSessionId = file.readAll();
-    currentSessionId = currentSessionId.simplified();
-
-    bool needChangeBg = false;
     runDir = runDir + "/dde-daemon-wallpaper-slideshow-login" + "/" + monitorSpace;
-    QFile fileTemp(runDir);
+    QFileInfo fileInfo(runDir);
+    QDir().mkpath(fileInfo.absolutePath());
 
-    if (!file.exists()) {
-        needChangeBg = true;
-    } else if (!fileTemp.open(QIODevice::ReadOnly)) {
-        qWarning() << "open " << runDir << " fail";
-        return false;
+    if (!fileInfo.exists()) {
+        // 文件不存在，创建并写入当前会话路径
+        QFile fileTemp(runDir);
+        if (fileTemp.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            fileTemp.write(currentSessionPath.value().toLatin1());
+            fileTemp.close();
+            autoChangeBg(monitorSpace, QDateTime::currentDateTimeUtc());
+        } else {
+            qWarning() << "failed to create file: " << runDir;
+            return false;
+        }
     } else {
-        if (currentSessionId != fileTemp.readAll().simplified()) {
-            needChangeBg = true;
+        // 文件存在，读取并比较
+        QFile fileTemp(runDir);
+        if (fileTemp.open(QIODevice::ReadWrite | QIODevice::Text)) {
+            const QString &recordSessionPath = fileTemp.readAll().simplified();
+            if (recordSessionPath != currentSessionPath) {
+                autoChangeBg(monitorSpace, QDateTime::currentDateTimeUtc());
+                fileTemp.resize(0);
+                fileTemp.write(currentSessionPath.value().toLatin1());
+            }
+            fileTemp.close();
+        } else {
+            qWarning() << "failed to open file: " << runDir;
+            return false;
         }
     }
-
-    if (needChangeBg) {
-        autoChangeBg(monitorSpace, QDateTime::currentDateTimeUtc());
-        fileTemp.write(currentSessionId.toLatin1());
-    }
-
-    file.close();
-    fileTemp.close();
-
     return true;
 }
 
