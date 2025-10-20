@@ -54,6 +54,11 @@ QString AppearanceDBusProxy::getCurrentWorkspaceBackground()
     return QDBusPendingReply<QString>(m_appearanceInterface->asyncCall(QStringLiteral("GetCurrentWorkspaceBackground")));
 }
 
+QString AppearanceDBusProxy::getCurrentWorkspaceBackgroundForMonitor(const QString &monitor)
+{
+    return QDBusPendingReply<QString>(m_appearanceInterface->asyncCall(QStringLiteral("GetCurrentWorkspaceBackgroundForMonitor"), QVariant::fromValue(monitor)));
+}
+
 void AppearanceDBusProxy::SetGreeterBackground(const QString &url)
 {
     m_appearanceInterface->asyncCall(QStringLiteral("Set"), QStringLiteral("greeterbackground"), QVariant::fromValue(url));

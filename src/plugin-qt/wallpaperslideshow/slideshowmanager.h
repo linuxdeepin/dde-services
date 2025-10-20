@@ -42,6 +42,7 @@ private slots:
 private:
     void init();
     void loadConfig();
+    bool isValidScreen(const QString &screenName);
 
 signals:
     void propertyChanged(const QString &name, const QVariant &value);
@@ -52,6 +53,5 @@ private:
     QMap<QString,QSharedPointer<WallpaperLoop>>      m_wsLoopMap;
     QSharedPointer<AppearanceDBusProxy>              m_dbusProxy;
     QString                                          m_wallpaperSlideShow;
-    QString                                          m_curMonitorSpace;
-    Backgrounds::BackgroundType                      m_wallpaperType;
+    QMap<QString, Backgrounds::BackgroundType>       m_wallpaperType;
 };
