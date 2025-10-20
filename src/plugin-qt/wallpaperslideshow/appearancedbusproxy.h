@@ -17,6 +17,7 @@ public:
     explicit AppearanceDBusProxy(QObject *parent = nullptr);
     void SetCurrentWorkspaceBackgroundForMonitor(const QString &url, const QString &screenName);
     QString getCurrentWorkspaceBackground();
+    QString getCurrentWorkspaceBackgroundForMonitor(const QString &monitor);
     void SetGreeterBackground(const QString &url);
 
 public Q_SLOTS:

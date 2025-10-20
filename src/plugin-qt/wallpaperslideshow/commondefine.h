@@ -19,6 +19,8 @@ const QString APPEARANCE_INTERFACE = "org.deepin.dde.Appearance1";
 #define WALLPAPER_SLIDESHOW_PATH "/org/deepin/dde/WallpaperSlideshow"
 #define WALLPAPER_SLIDESHOW_INTERFACE "org.deepin.dde.WallpaperSlideshow"
 
+#define WS_CONFIG_PATH  utils::GetUserConfigDir() + "/deepin/dde-daemon/appearance/wallpaper-slideshow.json"
+
 #define SCHEME_FILE             "file://"
 
 #define WSPOLICYLOGIN           "login"
