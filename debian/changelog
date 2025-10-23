@@ -1,3 +1,9 @@
+dde-services (1.0.11) unstable; urgency=medium
+
+  * feat: refactor wallpaper slideshow for multi-monitor support
+
+ -- wujiangyu <wujiangyu@uniontech.com>  Thu, 23 Oct 2025 16:00:46 +0800
+
 dde-services (1.0.10) unstable; urgency=medium
 
   * refactor: replace session ID with D-Bus session path for login
