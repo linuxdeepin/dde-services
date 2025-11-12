@@ -63,6 +63,47 @@ int sd_bus_message_get_data(sd_bus_message *msg, ...) {
     return r;
 }
 
+int sd_bus_read_dict(sd_bus_message *msg, GHashTable **map) {
+  int r = 0;
+
+  *map = g_hash_table_new(g_str_hash, g_str_equal);
+  r = sd_bus_message_enter_container(msg, SD_BUS_TYPE_ARRAY, "{sv}");
+  if (r < 0)
+    return r;
+
+  while ((r = sd_bus_message_enter_container(msg, SD_BUS_TYPE_DICT_ENTRY,
+                                             "sv")) > 0) {
+    const char *key;
+    const char *value;
+    const char *contents;
+
+    r = sd_bus_message_read_basic(msg, SD_BUS_TYPE_STRING, &key);
+    if (r < 0)
+      return r;
+
+    r = sd_bus_message_peek_type(msg, NULL, &contents);
+    if (r < 0)
+      return r;
+
+    r = sd_bus_message_enter_container(msg, SD_BUS_TYPE_VARIANT, contents);
+    if (r < 0)
+      return r;
+
+    r = sd_bus_message_read_basic(msg, SD_BUS_TYPE_STRING, &value);
+    if (r < 0)
+      return r;
+    g_hash_table_insert(*map, (gpointer)key, (gpointer)value);
+    r = sd_bus_message_exit_container(msg);
+    if (r < 0)
+      return r;
+
+    r = sd_bus_message_exit_container(msg);
+    if (r < 0)
+      return r;
+  }
+  return sd_bus_message_exit_container(msg);
+}
+
 int sd_bus_message_get_datav(sd_bus_message *msg, va_list ap) {
     char type = 0;
     const char *contents = NULL;
