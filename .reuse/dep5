@@ -10,7 +10,7 @@ Source: https://github.com/linuxdeepin/dde-services
 # License: ...
 
 # Config files
-Files: .clang-format *.in *.json *.conf *.xml *.service
+Files: .clang-format *.in *.json *.conf *.xml *.service *.desktop
 Copyright: None
 License: CC0-1.0
 
