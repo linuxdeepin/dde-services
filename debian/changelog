@@ -1,3 +1,9 @@
+dde-services (1.0.12) unstable; urgency=medium
+
+  * feat: implement sd_bus_read_dict function
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 13 Nov 2025 19:49:03 +0800
+
 dde-services (1.0.11) unstable; urgency=medium
 
   * feat: refactor wallpaper slideshow for multi-monitor support
