@@ -85,6 +85,11 @@ int ipwd_read_config (const char *filename)
 	devices.devnum = 0;
 
         ipconflict_dev_info = (IPCONFLICT_DEV_INFO *)malloc(sizeof(IPCONFLICT_DEV_INFO));
+        if (ipconflict_dev_info == NULL)
+        {
+			ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to allocate memory for ipconflict_dev_info - malloc failed");
+			return (IPWD_RV_ERROR);
+        }
         memset(ipconflict_dev_info->ip, 0, IPWD_MAX_DEVICE_ADDRESS_LEN);
         memset(ipconflict_dev_info->mac, 0, IPWD_MAX_DEVICE_ADDRESS_LEN);
         memset(ipconflict_dev_info->remote_mac, 0, IPWD_MAX_DEVICE_ADDRESS_LEN);

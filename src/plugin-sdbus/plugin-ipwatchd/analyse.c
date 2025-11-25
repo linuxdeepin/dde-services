@@ -148,6 +148,10 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
                 ipwd_message (IPWD_MSG_TYPE_INFO, "IP conflict with: %s %s-%s",
                              check_context.ip, check_context.dev.mac, rcv_smac);
                 check_context.conflic_mac = (char*)malloc(IPWD_MAX_DEVICE_ADDRESS_LEN);
+                if (check_context.conflic_mac == NULL) {
+                    ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to allocate memory for conflic_mac - malloc failed");
+                    return;
+                }
                 memcpy(check_context.conflic_mac,rcv_smac,IPWD_MAX_DEVICE_ADDRESS_LEN);
             }
         }
@@ -255,6 +259,10 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
                 if (exist == 0)
                 {
                     IPCONFLICT_DEV_INFO *newdevinfo = (IPCONFLICT_DEV_INFO *)malloc(sizeof(IPCONFLICT_DEV_INFO));
+                    if (newdevinfo == NULL) {
+                        ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to allocate memory for IPCONFLICT_DEV_INFO - malloc failed");
+                        return;
+                    }
                     memcpy (newdevinfo->ip, devices.dev[i].ip, IPWD_MAX_DEVICE_ADDRESS_LEN);
                     memcpy (newdevinfo->mac, devices.dev[i].mac, IPWD_MAX_DEVICE_ADDRESS_LEN);
                     memcpy (newdevinfo->remote_mac, rcv_smac, IPWD_MAX_DEVICE_ADDRESS_LEN);
