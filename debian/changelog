@@ -1,3 +1,9 @@
+dde-services (1.0.13) unstable; urgency=medium
+
+  * fix: add null pointer checks after malloc calls
+
+ -- zhaoyingzhen <zhaoyingzhen@uniontech.com>  Thu, 27 Nov 2025 17:37:19 +0800
+
 dde-services (1.0.12) unstable; urgency=medium
 
   * feat: implement sd_bus_read_dict function
