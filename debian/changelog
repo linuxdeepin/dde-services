@@ -1,3 +1,10 @@
+dde-services (1.0.14) unstable; urgency=medium
+
+  * feat: add xsettings plugin implementation
+  * feat: add cursor size scaling with system scale factor
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 04 Dec 2025 19:13:45 +0800
+
 dde-services (1.0.13) unstable; urgency=medium
 
   * fix: add null pointer checks after malloc calls
