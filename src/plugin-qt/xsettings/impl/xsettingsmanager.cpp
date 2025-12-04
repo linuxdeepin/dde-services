@@ -206,13 +206,18 @@ void XSettingsManager::setString(const QString &prop, const QString &v)
 
 void XSettingsManager::handleDConfigChangedCb(const QString &key)
 {
-    static const QStringList excludedkeys = { "xft-dpi", "scale-factor", "gtk-cursor-theme-size", "window-scale" };
+    static const QStringList excludedkeys = { "xft-dpi", "scale-factor", "window-scale" };
     if (excludedkeys.contains(key)) {
         return;
     }
-    if (key == "gtk-cursor-theme-name") {
+    if (key == "gtk-cursor-theme-name" || key == "gtk-cursor-theme-size") {
         updateXResources();
+    } else if (key == "gtk-cursor-theme-size-base") {
+        int cursorSizeBase = m_settingDconfig->value(key).toInt();
+        m_settingDconfig->setValue("gtk-cursor-theme-size", cursorSizeBase);
+        return;
     }
+
     QSharedPointer<DconfInfo> dconfInfo = m_dconfInfos.getByDconfKey(key);
     if (dconfInfo.isNull()) {
         return;
@@ -510,7 +515,6 @@ void XSettingsManager::setGSettingsByXProp(const QString &prop, XsValue value)
 
 void XSettingsManager::setSingleScaleFactor(double scale, bool emitSignal)
 {
-    int cursorSize = static_cast<int>(BASE_CURSORSIZE * scale);
     int windowScale = qFloor((scale + 0.3) * 10) / 10;
     if (windowScale < 1) {
         windowScale = 1;
@@ -523,7 +527,12 @@ void XSettingsManager::setSingleScaleFactor(double scale, bool emitSignal)
         if (windowScale != oldWindowScale) {
             m_settingDconfig->setValue(dcKeyWindowScale, windowScale);
         }
-
+        bool ok = false;
+        int baseCursorSizeInt = m_settingDconfig->value("gtk-cursor-theme-size-base").toInt(&ok);
+        if (!ok || baseCursorSizeInt <= 0) {
+            baseCursorSizeInt = BASE_CURSORSIZE;
+        }
+        int cursorSize = static_cast<int>(baseCursorSizeInt * scale);
         m_settingDconfig->setValue(dcKeyGtkCursorThemeSize, cursorSize);
     }
 
