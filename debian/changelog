@@ -1,3 +1,9 @@
+dde-services (1.0.15) unstable; urgency=medium
+
+  * fix: correct DPI scaling value in XSettings
+
+ -- zhangkun <zhangkun2@uniontech.com>  Mon, 08 Dec 2025 10:59:12 +0800
+
 dde-services (1.0.14) unstable; urgency=medium
 
   * feat: add xsettings plugin implementation
