@@ -253,10 +253,11 @@ void XSettingsManager::updateDPI()
         bOk = false;
         int tempXftDpi = m_settingDconfig->value(dcKeyXftDpi).toInt(&bOk);
         if (bOk) {
+            scaledDpi = static_cast<int>((DPI_FALLBACK * 1024) * scale);
             if (tempXftDpi != scaledDpi) {
                 m_settingDconfig->setValue(dcKeyXftDpi, scaledDpi);
                 XsSetting setting;
-                setting.prop = dcKeyXftDpi;
+                setting.prop = "Xft/DPI";
                 setting.value = scaledDpi;
                 setting.type = HeadTypeInteger;
 
