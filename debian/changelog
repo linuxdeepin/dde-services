@@ -1,3 +1,10 @@
+dde-services (1.0.16) unstable; urgency=medium
+
+  * feat: convert xsettings from plugin to standalone application
+  * fix: correct Xft/DPI property name in XSettings update
+
+ -- YeShanShan <yeshanshan@uniontech.com>  Thu, 11 Dec 2025 20:31:28 +0800
+
 dde-services (1.0.15) unstable; urgency=medium
 
   * fix: correct DPI scaling value in XSettings
