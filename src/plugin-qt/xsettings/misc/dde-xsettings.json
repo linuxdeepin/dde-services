@@ -1,0 +1,9 @@
+{
+  "name": "org.deepin.dde.XSettings1",
+  "startType": "Resident",
+  "policy": [
+    {
+      "path": "/org/deepin/dde/XSettings1"
+    }
+  ]
+}
