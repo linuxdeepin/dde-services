@@ -1,4 +1,20 @@
-[D-BUS Service]
-Name=org.deepin.dde.XSettings1
-Exec=/usr/bin/deepin-service-manager -n org.deepin.dde.XSettings1
-SystemdService=deepin-service-plugin@org.deepin.dde.XSettings1.service
+[Unit]
+Description=dde-xsettings
+Requisite=dde-session-initialized.target dde-session-pre.target
+RefuseManualStart=no
+RefuseManualStop=no
+CollectMode=inactive-or-failed
+
+PartOf=dde-session-pre.target
+Before=dde-session-pre.target
+
+Before=dde-session@x11.service
+
+[Service]
+Type=dbus
+BusName=org.deepin.dde.XSettings1
+ExecStart=/usr/bin/dde-xsettings
+Restart=on-failure
+RestartSec=3
+Slice=session.slice
+NotifyAccess=main
