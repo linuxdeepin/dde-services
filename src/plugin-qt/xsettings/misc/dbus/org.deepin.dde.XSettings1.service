@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.deepin.dde.XSettings1
+Exec=/usr/bin/deepin-service-manager -n org.deepin.dde.XSettings1
+SystemdService=org.deepin.dde.XSettings1.service

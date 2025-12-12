@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
-set(BIN_NAME "dde-xsettings")
+set(BIN_NAME "plugin-dde-xsettings")
 
 project(${BIN_NAME})
 
@@ -19,7 +19,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
 pkg_check_modules(XCB REQUIRED IMPORTED_TARGET xcb)
 
-add_executable(${BIN_NAME}
+add_library(${BIN_NAME} MODULE
     ${SRCS}
 )
 
@@ -36,12 +36,12 @@ macro(install_user_symlink filepath wantsdir)
     install(FILES ${PROJECT_BINARY_DIR}/link/${wantsdir}/${filepath} DESTINATION lib/systemd/user/${wantsdir}/)
 endmacro(install_user_symlink)
 
-install(TARGETS ${BIN_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/dde-xsettings.json DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/deepin-service-manager/other)
+install(TARGETS ${BIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/plugin-dde-xsettings.json DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/deepin-service-manager/user)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.XSettings.json DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dsg/configs/org.deepin.dde.daemon)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/dbus/org.deepin.dde.XSettings.service DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/services)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.dde.XSettings.service
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/dbus/org.deepin.dde.XSettings1.service DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/services)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.dde.XSettings1.service
     DESTINATION lib/systemd/user/
-    RENAME org.deepin.dde.XSettings.service
+    RENAME org.deepin.dde.XSettings1.service
 )
-install_user_symlink(org.deepin.dde.XSettings.service dde-session-pre.target.wants)
+install_user_symlink(org.deepin.dde.XSettings1.service dde-session-pre.target.wants)
