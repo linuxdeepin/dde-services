@@ -1,9 +1,5 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: LGPL-3.0-or-later
-
 /* IPwatchD - IP conflict detection tool for Linux
- * Copyright (C) 2007-2010 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+ * Copyright (C) 2007-2018 Jaroslav Imrich <jariq(at)jariq(dot)sk>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,13 +22,13 @@
 
 
 #include "ipwatchd.h"
+#include "hooks/ipwatchd_hooks.h"
 
 
 extern IPWD_S_DEVS devices;
 extern IPWD_S_CONFIG config;
 extern int testing_flag;
-extern IPWD_S_CHECK_CONTEXT check_context;
-extern IPCONFLICT_DEV_INFO *ipconflict_dev_info;
+
 
 //! Callback for "pcap_loop" with standard parameters. Called when ARP packet is received (detection of conflict is done here).
 /*!
@@ -52,6 +48,7 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 	/* Get addresses from packet */
 	IPWD_S_ARP_HEADER *arpaddr;
 	arpaddr = (IPWD_S_ARP_HEADER *) (packet + IPWD_ARP_HEADER_SIZE);
+
 	/* Source IP address */
 	char rcv_sip[IPWD_MAX_DEVICE_ADDRESS_LEN];
 	char *p_rcv_sip = NULL;
@@ -112,6 +109,12 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 
 	ipwd_message (IPWD_MSG_TYPE_DEBUG, "Received ARP packet: S:%s-%s D:%s-%s", rcv_sip, rcv_smac, rcv_dip, rcv_dmac);
 
+	/* Call hook for ARP packet processing */
+	if (ipwd_hook_on_arp_packet(rcv_sip, rcv_smac, rcv_dip, rcv_dmac) != 0)
+	{
+		return; /* Hook handled the packet, skip further processing */
+	}
+
 	/* Update devices structure with actual IP and MAC addresses of interfaces */
 	for (i = 0; i < devices.devnum; i++)
 	{
@@ -128,33 +131,10 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 		/* Ignore packets coming from local interfaces */
 		if (strcasecmp (rcv_smac, devices.dev[i].mac) == 0)
 		{
-			if (strcasecmp (rcv_sip, devices.dev[i].ip) == 0)
-			{
-				ipwd_message (IPWD_MSG_TYPE_DEBUG, "ARP packet ignored because it comes from local interface.");
-			}
-			else
-			{
-				/* Happens when there is more than one interface connected to the same subnet */
-				ipwd_message (IPWD_MSG_TYPE_DEBUG, "ARP packet ignored because it comes from local machine.");
-			}
-
 			return;
 		}
 	}
 
-        /* Check ip conflict */
-        if (check_context.wait_reply) {
-            if (strcasecmp (rcv_sip, check_context.ip) == 0 && strcasecmp (rcv_smac, check_context.dev.mac) != 0) {
-                ipwd_message (IPWD_MSG_TYPE_INFO, "IP conflict with: %s %s-%s",
-                             check_context.ip, check_context.dev.mac, rcv_smac);
-                check_context.conflic_mac = (char*)malloc(IPWD_MAX_DEVICE_ADDRESS_LEN);
-                if (check_context.conflic_mac == NULL) {
-                    ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to allocate memory for conflic_mac - malloc failed");
-                    return;
-                }
-                memcpy(check_context.conflic_mac,rcv_smac,IPWD_MAX_DEVICE_ADDRESS_LEN);
-            }
-        }
 	/* Search through devices structure */
 	for (i = 0; i < devices.devnum; i++)
 	{
@@ -167,31 +147,9 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 			/* Check if received packet causes conflict with IP address of this interface */
 			if (!((strcasecmp (rcv_sip, devices.dev[i].ip) == 0) && (strcasecmp (rcv_smac, devices.dev[i].mac) != 0)))
 			{
-                            IPCONFLICT_DEV_INFO *pre = ipconflict_dev_info;
-                            IPCONFLICT_DEV_INFO *info = pre->next;
-                            while (info)
-                            {
-                                if (strcasecmp(info->ip, devices.dev[i].ip) == 0
-                                    && strcasecmp(info->mac , devices.dev[i].mac) == 0
-                                    && strcasecmp(info->remote_mac, rcv_smac) == 0)
-                                {
-                                    if (info->signal_count > 0)
-                                    {
-                                        info->signal_count--;
-                                    }
-                                    else
-                                    {
-                                        emit_is_conflict(devices.dev[i].ip, devices.dev[i].mac, rcv_smac, 0);
-                                        pre->next = info->next;
-                                        free(info);
-                                    }
-                                    break;
-                                }
-                                pre = info;
-                                info = info->next;
-                            }
-                            ipwd_message (IPWD_MSG_TYPE_DEBUG, "Packet does not conflict with: %s %s-%s", devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac);
-                            continue;
+				/* Call hook for potential conflict resolution */
+				ipwd_hook_on_conflict_resolved(devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac, rcv_smac);
+				continue;
 			}
 		}
 
@@ -231,46 +189,10 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 			ipwd_message (IPWD_MSG_TYPE_ALERT, "MAC address %s causes IP conflict with address %s set on interface %s - passive mode - reply not sent", rcv_smac, devices.dev[i].ip, devices.dev[i].device);
 		}
 
-                emit_is_conflict(devices.dev[i].ip, devices.dev[i].mac, rcv_smac, 1);
+		/* Call hook for conflict notification */
+		ipwd_hook_on_conflict(devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac, rcv_smac, 
+		                      devices.dev[i].mode == IPWD_PROTECTION_MODE_ACTIVE);
 
-                /* Add ipConflict info to list record*/
-                int exist = 0;
-                IPCONFLICT_DEV_INFO *tail = ipconflict_dev_info;
-                IPCONFLICT_DEV_INFO *info = ipconflict_dev_info->next;
-                while (info)
-                {
-                    if (strcasecmp(info->ip, devices.dev[i].ip) == 0
-                        && strcasecmp(info->mac , devices.dev[i].mac) == 0
-                        && strcasecmp(info->remote_mac, rcv_smac) == 0)
-                    {
-                        if (info->signal_count < 3)
-                        {
-                            info->signal_count = 3;
-                        }
-                        exist = 1;
-                    }
-                    if (info != NULL)
-                    {
-                        tail = info;
-                    }
-                    info = info->next;
-                }
-
-                if (exist == 0)
-                {
-                    IPCONFLICT_DEV_INFO *newdevinfo = (IPCONFLICT_DEV_INFO *)malloc(sizeof(IPCONFLICT_DEV_INFO));
-                    if (newdevinfo == NULL) {
-                        ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to allocate memory for IPCONFLICT_DEV_INFO - malloc failed");
-                        return;
-                    }
-                    memcpy (newdevinfo->ip, devices.dev[i].ip, IPWD_MAX_DEVICE_ADDRESS_LEN);
-                    memcpy (newdevinfo->mac, devices.dev[i].mac, IPWD_MAX_DEVICE_ADDRESS_LEN);
-                    memcpy (newdevinfo->remote_mac, rcv_smac, IPWD_MAX_DEVICE_ADDRESS_LEN);
-                    ipwd_message (IPWD_MSG_TYPE_DEBUG, "Conflicted ip:%s mac %s remote_mac %s", newdevinfo->ip, newdevinfo->mac, newdevinfo->remote_mac);
-                    newdevinfo->signal_count = 3;
-                    newdevinfo->next = NULL;
-                    tail->next = newdevinfo;
-                }
 		if (config.script != NULL)
 		{
 			/* Run user-defined script in form: script "dev" "ip" "mac" */
@@ -284,8 +206,6 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 
 			snprintf (command, command_len, "%s \"%s\" \"%s\" \"%s\"", config.script, devices.dev[i].device, devices.dev[i].ip, rcv_smac);
 
-			ipwd_message (IPWD_MSG_TYPE_DEBUG, "Running user-defined script: %s", command);
-
 			rv = system (command);
 			if (rv == -1)
 			{
@@ -294,10 +214,6 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 
 			free (command);
 			command = NULL;
-		}
-		else
-		{
-			ipwd_message (IPWD_MSG_TYPE_DEBUG, "No user-defined script specified");
 		}
 
 		if (testing_flag == 1)
