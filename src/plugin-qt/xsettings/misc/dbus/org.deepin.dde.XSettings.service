@@ -1,4 +1,0 @@
-[D-BUS Service]
-Name=org.deepin.dde.XSettings1
-Exec=/usr/bin/dde-xsettings
-SystemdService=dde-xsettings.service
