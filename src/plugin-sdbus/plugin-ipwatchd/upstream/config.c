@@ -1,9 +1,5 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: LGPL-3.0-or-later
-
 /* IPwatchD - IP conflict detection tool for Linux
- * Copyright (C) 2007-2010 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+ * Copyright (C) 2007-2018 Jaroslav Imrich <jariq(at)jariq(dot)sk>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,11 +22,13 @@
 
 
 #include "ipwatchd.h"
+#include "hooks/ipwatchd_hooks.h"
 
+
+extern int debug_flag;
 extern IPWD_S_DEVS devices;
 extern IPWD_S_CONFIG config;
-extern IPWD_S_CHECK_CONTEXT check_context;
-extern IPCONFLICT_DEV_INFO *ipconflict_dev_info;
+
 
 //! Checks existence of the file
 /*!
@@ -76,6 +74,8 @@ int ipwd_read_config (const char *filename)
 	pcap_t *h_pcap = NULL;
 	char errbuf[PCAP_ERRBUF_SIZE];
 
+	int iface_len = 0;
+
 	// Initialize structures with default values
 	config.facility = LOG_DAEMON;
 	config.script = NULL;
@@ -84,22 +84,15 @@ int ipwd_read_config (const char *filename)
 	devices.dev = NULL;
 	devices.devnum = 0;
 
-        ipconflict_dev_info = (IPCONFLICT_DEV_INFO *)malloc(sizeof(IPCONFLICT_DEV_INFO));
-        if (ipconflict_dev_info == NULL)
-        {
-			ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to allocate memory for ipconflict_dev_info - malloc failed");
-			return (IPWD_RV_ERROR);
-        }
-        memset(ipconflict_dev_info->ip, 0, IPWD_MAX_DEVICE_ADDRESS_LEN);
-        memset(ipconflict_dev_info->mac, 0, IPWD_MAX_DEVICE_ADDRESS_LEN);
-        memset(ipconflict_dev_info->remote_mac, 0, IPWD_MAX_DEVICE_ADDRESS_LEN);
-        ipconflict_dev_info->next = NULL;
+	ipwd_message (IPWD_MSG_TYPE_INFO, "Reading configuration file: %s", filename);
 
 	if ((fr = fopen (filename, "r")) == NULL)
 	{
 		ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to open configuration file %s", filename);
 		return (IPWD_RV_ERROR);
 	}
+
+	ipwd_message (IPWD_MSG_TYPE_INFO, "Configuration file opened successfully");
 
 	memset (line, 0, sizeof (line));
 
@@ -261,37 +254,11 @@ int ipwd_read_config (const char *filename)
 			continue;
 		}
 
-                /* debug enables */
-                if (strcasecmp (variable, "log_level") == 0)
-                {
-                    if (strcasecmp (value, "debug") == 0)
-                    {
-                        config.log_level  = IPWD_MSG_TYPE_DEBUG;
-                        continue;
-                    }
-                    else if (strcasecmp (value, "alert") == 0)
-                    {
-                        config.log_level  = IPWD_MSG_TYPE_ALERT;
-                        continue;
-                    }
-                    else if (strcasecmp (value, "error") == 0)
-                    {
-                        config.log_level  = IPWD_MSG_TYPE_ERROR;
-                        continue;
-                    }
-                    else if(strcasecmp (value, "info") == 0)
-                    {
-                        config.log_level  = IPWD_MSG_TYPE_INFO;
-                        continue;
-                    } else {
-                        config.log_level  = IPWD_MSG_TYPE_INFO;
-                    }
-                    continue;
-                }
-
 		/* Configuration mode for network interfaces */
 		if (strcasecmp (variable, "iface_configuration") == 0)
 		{
+			ipwd_message (IPWD_MSG_TYPE_INFO, "Found iface_configuration: %s", value);
+
 			/* Check mode value */
 			if ((strcasecmp (value, "automatic") != 0) && (strcasecmp (value, "manual") != 0))
 			{
@@ -302,16 +269,20 @@ int ipwd_read_config (const char *filename)
 			/* Switch to manual mode if requested */
 			if (strcasecmp (value, "manual") == 0)
 			{
+				ipwd_message (IPWD_MSG_TYPE_INFO, "Using manual configuration mode");
 				config.mode = IPWD_CONFIGURATION_MODE_MANUAL;
 				continue;
 			}
 
 			/* Automatic mode is default */
+			ipwd_message (IPWD_MSG_TYPE_INFO, "Using automatic configuration mode, discovering interfaces...");
 			if (ipwd_fill_devices () != IPWD_RV_SUCCESS)
 			{
 				ipwd_message (IPWD_MSG_TYPE_ERROR, "Automatic configuration mode failed. Please switch to manual configuration mode.");
 				return (IPWD_RV_ERROR);
 			}
+
+			ipwd_message (IPWD_MSG_TYPE_INFO, "Automatic discovery completed, found %d interfaces", devices.devnum);
 
 			continue;
 		}
@@ -365,7 +336,12 @@ int ipwd_read_config (const char *filename)
 			}
 
 			memset (devices.dev[devices.devnum].device, '\0', IPWD_MAX_DEVICE_NAME_LEN);
-			strncpy (devices.dev[devices.devnum].device, variable, IPWD_MAX_DEVICE_NAME_LEN - 1);
+			iface_len = snprintf (devices.dev[devices.devnum].device, IPWD_MAX_DEVICE_NAME_LEN, "%s", variable);
+			if (iface_len < 1 || iface_len > IPWD_MAX_DEVICE_NAME_LEN - 1)
+			{
+				ipwd_message (IPWD_MSG_TYPE_ERROR, "Interface name \"%s\" is not valid", variable);
+				return (IPWD_RV_ERROR);
+			}
 
 			if (strcasecmp (value, "active") == 0)
 			{
@@ -397,6 +373,10 @@ int ipwd_read_config (const char *filename)
 	}
 
 	/* Check number of discovered interfaces */
+	ipwd_message (IPWD_MSG_TYPE_INFO, "Configuration parsing complete. Total interfaces: %d, Mode: %s", 
+	              devices.devnum, 
+	              config.mode == IPWD_CONFIGURATION_MODE_MANUAL ? "manual" : "automatic");
+
 	if (devices.devnum < 1)
 	{
 		if (config.mode == IPWD_CONFIGURATION_MODE_MANUAL)
@@ -410,6 +390,9 @@ int ipwd_read_config (const char *filename)
 			return (IPWD_RV_ERROR);
 		}
 	}
+
+	/* Call hook after configuration is loaded */
+	ipwd_hook_on_config_loaded();
 
 	return (IPWD_RV_SUCCESS);
 

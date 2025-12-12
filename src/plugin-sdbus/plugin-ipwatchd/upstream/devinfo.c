@@ -1,9 +1,5 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: LGPL-3.0-or-later
-
 /* IPwatchD - IP conflict detection tool for Linux
- * Copyright (C) 2007-2010 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+ * Copyright (C) 2007-2018 Jaroslav Imrich <jariq(at)jariq(dot)sk>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -143,6 +139,8 @@ int ipwd_fill_devices (void)
 	memset (&ifc, 0, sizeof (ifc));
 	memset (errbuf, 0, PCAP_ERRBUF_SIZE);
 
+	ipwd_message (IPWD_MSG_TYPE_INFO, "Starting automatic interface discovery...");
+
 	/* Verify that devices structure is empty and configuration mode is automatic */
 	if ((devices.dev != NULL) || (devices.devnum != 0) || (config.mode != IPWD_CONFIGURATION_MODE_AUTOMATIC))
 	{
@@ -172,6 +170,8 @@ int ipwd_fill_devices (void)
 
 	/* Determine number of interfaces */
 	ifaces_num = ifc.ifc_len / sizeof (struct ifreq);
+	
+	ipwd_message (IPWD_MSG_TYPE_INFO, "Found %d network interfaces to check", ifaces_num);
 
 	/* Get pointer to array with interfaces */
 	ifr = ifc.ifc_req;
@@ -180,6 +180,8 @@ int ipwd_fill_devices (void)
 	for (i = 0; i < ifaces_num; i++)
 	{
 		iface = &ifr[i];
+
+		ipwd_message (IPWD_MSG_TYPE_INFO, "Checking interface [%d/%d]: %s", i+1, ifaces_num, iface->ifr_name);
 
 		/* Skip loopback devices */
 		if (ioctl(sock, SIOCGIFFLAGS, iface) < 0)
@@ -190,25 +192,28 @@ int ipwd_fill_devices (void)
 
 		if (iface->ifr_ifru.ifru_flags & IFF_LOOPBACK)
 		{
-			ipwd_message (IPWD_MSG_TYPE_DEBUG, "Skipping loopback device \"%s\"", iface->ifr_name);
+			ipwd_message (IPWD_MSG_TYPE_INFO, "Skipping loopback device \"%s\"", iface->ifr_name);
 			continue;
 		}
 
 		/* Check if device is valid ethernet device */
+		ipwd_message (IPWD_MSG_TYPE_INFO, "Opening pcap for device \"%s\"...", iface->ifr_name);
 		h_pcap = pcap_open_live (iface->ifr_name, BUFSIZ, 0, 0, errbuf);
 		if (h_pcap == NULL)
 		{
-			ipwd_message (IPWD_MSG_TYPE_ERROR, "IPwatchD is unable to work with device \"%s\"", iface->ifr_name);
+			ipwd_message (IPWD_MSG_TYPE_ERROR, "IPwatchD is unable to work with device \"%s\": %s", iface->ifr_name, errbuf);
 			continue;
 		}
 
 		if (pcap_datalink (h_pcap) != DLT_EN10MB)
 		{
-			ipwd_message (IPWD_MSG_TYPE_ERROR, "Device \"%s\" is not valid ethernet device", iface->ifr_name);
+			ipwd_message (IPWD_MSG_TYPE_INFO, "Device \"%s\" is not valid ethernet device (datalink type: %d)", 
+			              iface->ifr_name, pcap_datalink(h_pcap));
 			pcap_close (h_pcap);
 			continue;
 		}
 
+		ipwd_message (IPWD_MSG_TYPE_INFO, "Device \"%s\" is valid ethernet device", iface->ifr_name);
 		pcap_close (h_pcap);
 
 		/* Put read values into devices structure */
@@ -221,7 +226,7 @@ int ipwd_fill_devices (void)
 
 		memset (devices.dev[devices.devnum].device, '\0', IPWD_MAX_DEVICE_NAME_LEN);
 		strncpy (devices.dev[devices.devnum].device, iface->ifr_name, IPWD_MAX_DEVICE_NAME_LEN - 1);
-		devices.dev[devices.devnum].mode = IPWD_PROTECTION_MODE_ACTIVE;
+		devices.dev[devices.devnum].mode = IPWD_PROTECTION_MODE_PASSIVE;
 
 		/* Set time of last conflict */
 		devices.dev[devices.devnum].time.tv_sec = 0;
