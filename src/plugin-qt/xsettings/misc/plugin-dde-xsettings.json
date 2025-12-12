@@ -1,6 +1,8 @@
 {
   "name": "org.deepin.dde.XSettings1",
+  "libPath": "libplugin-dde-xsettings.so",
   "startType": "Resident",
+  "pluginType": "qt",
   "policy": [
     {
       "path": "/org/deepin/dde/XSettings1"

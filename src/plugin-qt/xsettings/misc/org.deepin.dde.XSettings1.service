@@ -1,5 +1,5 @@
 [Unit]
-Description=dde-xsettings
+Description=org.deepin.dde.XSettings1
 Requisite=dde-session-initialized.target dde-session-pre.target
 RefuseManualStart=no
 RefuseManualStop=no
@@ -13,7 +13,7 @@ Before=dde-session@x11.service
 [Service]
 Type=dbus
 BusName=org.deepin.dde.XSettings1
-ExecStart=/usr/bin/dde-xsettings
+ExecStart=/usr/bin/deepin-service-manager -n org.deepin.dde.XSettings1
 Restart=on-failure
 RestartSec=3
 Slice=session.slice
