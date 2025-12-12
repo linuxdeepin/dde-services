@@ -1,9 +1,5 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: LGPL-3.0-or-later
-
 /* IPwatchD - IP conflict detection tool for Linux
- * Copyright (C) 2007-2010 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+ * Copyright (C) 2007-2018 Jaroslav Imrich <jariq(at)jariq(dot)sk>
  * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,13 +25,13 @@
 
 
 extern pcap_t *h_pcap;
-extern volatile int exit_flag;
+
 
 //! Sets signal handler for SIGTERM
 /*!
  * \return IPWD_RV_SUCCESS if successful IPWD_RV_ERROR otherwise
  */
-int ipwd_set_signal_andler (void)
+int ipwd_set_signal_handler (void)
 {
 
 	struct sigaction sigact;
@@ -63,12 +59,11 @@ void ipwd_signal_handler (int signal)
 {
 
 	ipwd_message (IPWD_MSG_TYPE_DEBUG, "Received signal %d", signal);
-//
-//	if (signal == SIGTERM)
-//	{
-////		pcap_breakloop (h_pcap);
-//                exit_flag = 1;
-//	}
+
+	if (signal == SIGTERM)
+	{
+		pcap_breakloop (h_pcap);
+	}
 
 }
 

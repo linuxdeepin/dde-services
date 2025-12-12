@@ -1,9 +1,5 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: LGPL-3.0-or-later
-
 /* IPwatchD - IP conflict detection tool for Linux
- * Copyright (C) 2007-2010 Jaroslav Imrich <jariq(at)jariq(dot)sk>
+ * Copyright (C) 2007-2018 Jaroslav Imrich <jariq(at)jariq(dot)sk>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,13 +42,10 @@
 #include <pcap.h>
 #include <time.h>
 #include <stdarg.h>
-#include <stdbool.h>
-#include <systemd/sd-bus.h>
 
-#include "service.h"
 
 //! String with IPwatchD version information
-#define IPWATCHD_VERSION "IPwatchD 1.2.1"
+#define IPWATCHD_VERSION "IPwatchD 1.3.0"
 
 //! Absolute path to pid file
 #define IPWD_PIDFILE "/var/run/ipwatchd.pid"
@@ -75,9 +68,9 @@
 //! Message type
 typedef enum
 {
-	IPWD_MSG_TYPE_ERROR = 1,	/**< Message type: error */
-	IPWD_MSG_TYPE_ALERT = 2,	/**< Message type: alert */
-        IPWD_MSG_TYPE_INFO = 3,		/**< Message type: information */
+	IPWD_MSG_TYPE_INFO = 1,		/**< Message type: information */
+	IPWD_MSG_TYPE_ERROR = 2,	/**< Message type: error */
+	IPWD_MSG_TYPE_ALERT = 3,	/**< Message type: alert */
 	IPWD_MSG_TYPE_DEBUG = 4		/**< Message type: debug */
 }
 IPWD_MSG_TYPE;
@@ -117,7 +110,6 @@ typedef struct
 	char * script;					/**< Absolute path to user-defined script */
 	int defend_interval;			/**< Minimum interval between defensive ARPs */
 	IPWD_CONFIGURATION_MODE mode;	/**< Configuration mode for network devices */
-        IPWD_MSG_TYPE log_level;
 }
 IPWD_S_CONFIG;
 
@@ -129,9 +121,6 @@ IPWD_S_CONFIG;
 
 //! Size of buffer used for IP and MAC address of the device
 #define IPWD_MAX_DEVICE_ADDRESS_LEN 20
-
-// pcap max capture times
-#define PCAP_MAX_TIMES 5
 
 //! State of the device device indicating if it should be used in conflict detection process
 typedef enum
@@ -152,17 +141,6 @@ typedef struct
 	struct timeval time;						/**< Time information indicating when the last conflict was detected */
 }
 IPWD_S_DEV;
-
-typedef struct IPCONFLICT_DEV_INFO
-{
-    /* data */
-    char ip[IPWD_MAX_DEVICE_ADDRESS_LEN];
-    char mac[IPWD_MAX_DEVICE_ADDRESS_LEN];
-    char remote_mac[IPWD_MAX_DEVICE_ADDRESS_LEN];
-    struct IPCONFLICT_DEV_INFO *next;
-    int signal_count;
-}
-IPCONFLICT_DEV_INFO;
 
 //! Structure that holds information about ALL network interfaces
 typedef struct
@@ -192,21 +170,10 @@ typedef struct
 }
 IPWD_S_ARP_HEADER;
 
-//! Structure useful for ip conflict check
-typedef struct
-{
-    const char* ip;
-    const char* misc;
-    sd_bus_message *msg;
-    IPWD_S_DEV dev;
-    // dbus 调用
-    bool wait_reply;
-    char *conflic_mac;
-}
-IPWD_S_CHECK_CONTEXT;
+
 /* IPwatchD internal functions - described in corresponding source files */
 
-// \cond - Doxygen ignore block start
+// \cond Doxygen ignore block start
 
 /* analyse.c */
 void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char * packet);
@@ -215,6 +182,8 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 int ipwd_file_exists (const char *filename);
 int ipwd_read_config (const char *filename);
 
+/* daemonize.c */
+int ipwd_daemonize (void);
 int ipwd_create_pidfile (void);
 int ipwd_check_pidfile (void);
 
@@ -230,16 +199,10 @@ void ipwd_print_help (void);
 
 /* message.c */
 void ipwd_message (IPWD_MSG_TYPE type, const char *format, ...);
+
+/* signal.c */
+int ipwd_set_signal_handler (void);
 void ipwd_signal_handler (int signal);
 
-typedef struct {
-    sd_bus *bus;
-    char *config_file;
-    int debug_flag;
-}ipwatchd_args_t;
-// \endcond - Doxygen ignore block end
-int start_ipwatchd(ipwatchd_args_t *args);
-void stop_ipwatchd();
-int ipwd_check_context_verify ();
-int ipwd_conflict_check (sd_bus_message *m, void *userdata,
-                        sd_bus_error *ret_error);
+// \endcond Doxygen ignore block end
+
