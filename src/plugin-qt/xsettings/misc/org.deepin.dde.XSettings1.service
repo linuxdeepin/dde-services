@@ -1,6 +1,5 @@
 [Unit]
 Description=org.deepin.dde.XSettings1
-Requisite=dde-session-initialized.target dde-session-pre.target
 RefuseManualStart=no
 RefuseManualStop=no
 CollectMode=inactive-or-failed
@@ -8,7 +7,7 @@ CollectMode=inactive-or-failed
 PartOf=dde-session-pre.target
 Before=dde-session-pre.target
 
-Before=dde-session@x11.service
+Before=org.dde.session.Daemon1.service
 
 [Service]
 Type=dbus
