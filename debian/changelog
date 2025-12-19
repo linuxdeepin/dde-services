@@ -1,3 +1,12 @@
+dde-services (1.0.17) unstable; urgency=medium
+
+  * chore: remove OOMScoreAdjust plugin
+  * fix: remove unnecessary dependencies from xsettings service
+  * feat: refactor ipwatchd plugin to use service group framework
+  * refactor: convert xsettings from executable to plugin
+
+ -- fuleyi <fuleyi@uniontech.com>  Fri, 19 Dec 2025 13:28:07 +0800
+
 dde-services (1.0.16) unstable; urgency=medium
 
   * feat: convert xsettings from plugin to standalone application
