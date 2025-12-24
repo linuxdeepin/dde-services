@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
+#include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QThreadPool>
 #include <QtMath>
@@ -29,7 +30,10 @@ XSettingsManager::XSettingsManager(QObject *parent)
     , m_xcbUtils(XcbUtils::getInstance())
 {
     connect(m_settingDconfig, &DTK_CORE_NAMESPACE::DConfig::valueChanged, this, &XSettingsManager::handleDConfigChangedCb);
+    setScreenScaleFactors(getScreenScaleFactors(), false);
+    adjustScaleFactor(getRecommendedScaleFactor());
     setSettings(getSettingsInSchema());
+
     updateDPI();
     updateXResources();
     QThreadPool::globalInstance()->start([this]() {
@@ -229,6 +233,123 @@ void XSettingsManager::handleDConfigChangedCb(const QString &key)
     xsValue.value = value;
     QVector<XsSetting> xsSetting{ xsValue };
     setSettings(xsSetting);
+}
+
+double toListedScaleFactor(double s)
+{
+    const double min = 1.0;
+    const double max = 3.0;
+    const double step = 0.25;
+
+    if (s <= min) {
+        return min;
+    } else if (s >= max) {
+        return max;
+    }
+
+    for (double i = min; i <= max; i += step) {
+        if (i > s) {
+            double ii = i - step;
+            double d1 = s - ii;
+            double d2 = i - s;
+
+            if (d1 >= d2) {
+                return i;
+            } else {
+                return ii;
+            }
+        }
+    }
+    return max;
+}
+
+// calcRecommendedScaleFactor 计算推荐的缩放比
+double calcRecommendedScaleFactor(double widthPx, double heightPx, double widthMm, double heightMm)
+{
+    if (widthMm == 0.0 || heightMm == 0.0) {
+        return 1.0;
+    }
+    double lenPx = std::sqrt(std::pow(widthPx, 2) + std::pow(heightPx, 2));
+    double lenMm = std::sqrt(std::pow(widthMm, 2) + std::pow(heightMm, 2));
+
+    double lenPxStd = std::sqrt(std::pow(1920, 2) + std::pow(1080, 2)); // 标准分辨率对角线长度
+    double lenMmStd = std::sqrt(std::pow(477, 2) + std::pow(268, 2));   // 标准物理尺寸对角线长度
+
+    const double a = 0.00158;
+    double fix = (lenMm - lenMmStd) * (lenPx / lenPxStd) * a;
+    double scaleFactor = (lenPx / lenMm) / (lenPxStd / lenMmStd) + fix;
+
+    return toListedScaleFactor(scaleFactor);
+}
+
+double XSettingsManager::getRecommendedScaleFactor()
+{
+    QList<XcbUtils::MonitorSizeInfo> monitors = XcbUtils::getInstance().getMonitorSizeInfos();
+    if (monitors.isEmpty()) {
+        return 1.0;
+    }
+    // 允许用户通过 force-scale-factor.ini 强制设置全局缩放
+    double forceScaleFactor = getForceScaleFactor();
+    if (forceScaleFactor > 0.0) {
+        return forceScaleFactor;
+    }
+    double minScaleFactor = 3.0;
+    for (auto &&monitor : monitors) {
+        double scaleFactor = calcRecommendedScaleFactor(monitor.width, monitor.height, monitor.mmWidth, monitor.mmHeight);
+        if (minScaleFactor > scaleFactor) {
+            minScaleFactor = scaleFactor;
+        }
+    }
+    return minScaleFactor;
+}
+
+// GetForceScaleFactor 允许用户通过 force-scale-factor.ini 强制设置全局缩放
+double XSettingsManager::getForceScaleFactor()
+{
+    QString fileName = Utils::GetUserConfigDir() + "/deepin/force-scale-factor.ini";
+    KeyFile keyFile;
+    bool bSuccess = keyFile.loadFile(fileName);
+    if (bSuccess) {
+        bool ok = false;
+        double forceScaleFactor = keyFile.getStr("ForceScaleFactor", "scale").toDouble(&ok);
+        if (ok && forceScaleFactor >= 1.0 && forceScaleFactor <= 3.0) {
+            return forceScaleFactor;
+        }
+        qWarning() << "invalid forceScaleFactor:" << keyFile.getStr("ForceScaleFactor", "scale");
+    }
+    return -1.0;
+}
+
+void XSettingsManager::adjustScaleFactor(double recommendedScaleFactor)
+{
+    qDebug() << "recommended scale factor:" << recommendedScaleFactor;
+    double value = m_settingDconfig->value("scale-factor").toDouble();
+    if (value <= 0) {
+        ScaleFactors map;
+        map.insert("ALL", value);
+        setScreenScaleFactors(map, false);
+        // m_restartOSD = true;
+    }
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if (!env.value("STARTDDE_MIGRATE_SCALE_FACTOR").isEmpty()) {
+        double scaleFactor = getScaleFactor();
+        if (scaleFactor > 0.0) {
+            ScaleFactors map;
+            map.insert("", scaleFactor);
+            setScreenScaleFactorsForQt(map);
+        }
+        cleanUpDdeEnv();
+        return;
+    }
+    if (!QFile::exists("/etc/lightdm/deepin/qt-theme.ini")) {
+        // lightdm-deepin-greeter does not have the qt-theme.ini file yet.
+        double scaleFactor = getScaleFactor();
+        if (scaleFactor > 0.0) {
+            ScaleFactors map;
+            map.insert("", scaleFactor);
+            setScreenScaleFactorsForQt(map);
+        }
+    }
 }
 
 void XSettingsManager::updateDPI()
