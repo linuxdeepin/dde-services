@@ -14,6 +14,14 @@ class XcbUtils : public QObject
 {
     Q_OBJECT
 public:
+    struct MonitorSizeInfo
+    {
+        uint16_t width;
+        uint16_t height;
+        uint32_t mmWidth;
+        uint32_t mmHeight;
+    };
+
     static XcbUtils &getInstance();
     xcb_window_t createWindows();
     xcb_atom_t getAtom(const char *name, bool exist = false);
@@ -28,6 +36,7 @@ public:
     QByteArray getXcbAtomProperty(xcb_atom_t atom);
     QByteArray xcbPropertyReplyDataToArray(xcb_get_property_reply_t *reply);
     QString getXcbAtomName(xcb_atom_t atom);
+    QList<MonitorSizeInfo> getMonitorSizeInfos();
 
 private:
     XcbUtils(QObject *parent = nullptr);

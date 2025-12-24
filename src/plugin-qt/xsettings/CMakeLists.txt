@@ -14,10 +14,9 @@ file(GLOB_RECURSE SRCS "*.h" "*.cpp")
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus)
 find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Gui Core)
-find_package(PkgConfig REQUIRED)
-
-pkg_check_modules(X11 REQUIRED IMPORTED_TARGET x11)
-pkg_check_modules(XCB REQUIRED IMPORTED_TARGET xcb)
+find_package(X11 REQUIRED)
+find_package(XCB REQUIRED)
+find_package(XCB REQUIRED COMPONENTS RANDR)
 
 add_library(${BIN_NAME} MODULE
     ${SRCS}
@@ -26,8 +25,9 @@ add_library(${BIN_NAME} MODULE
 target_link_libraries(${BIN_NAME}
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::DBus
-    PkgConfig::X11
-    PkgConfig::XCB
+    X11::X11
+    XCB::XCB
+    XCB::RANDR
     Dtk${DTK_VERSION_MAJOR}::Core
 )
 macro(install_user_symlink filepath wantsdir)

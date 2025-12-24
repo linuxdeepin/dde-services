@@ -12,6 +12,9 @@ Build-Depends:  debhelper (>= 11),
  libglib2.0-dev,
  libdtk6gui-dev,
  libdtk6core-dev,
+ libx11-dev,
+ libxcb-randr0-dev,
+ libxcb1-dev,
 Standards-Version: 4.1.3
 Homepage: https://github.com/linuxdeepin
 

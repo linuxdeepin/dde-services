@@ -6,6 +6,7 @@
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
+#include <xcb/randr.h>
 #include <xcb/xcb.h>
 
 #include <stdio.h>
@@ -179,6 +180,72 @@ QString XcbUtils::getXcbAtomName(xcb_atom_t atom)
         return xcb_get_atom_name_name(reply);
     }
     return "";
+}
+
+QList<XcbUtils::MonitorSizeInfo> XcbUtils::getMonitorSizeInfos()
+{
+    // 获取XCB版本信息
+    const xcb_setup_t *setup = xcb_get_setup(connection);
+    int majorVersion = setup->protocol_major_version;
+    int minorVersion = setup->protocol_minor_version;
+    qInfo() << QString("randr version %1.%2").arg(majorVersion).arg(minorVersion);
+    if (majorVersion < 1 || (majorVersion == 1 && minorVersion < 2)) {
+        return {};
+    }
+    xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator(setup);
+    xcb_window_t root = screen_iter.data->root;
+    xcb_randr_get_screen_resources_cookie_t cookie = xcb_randr_get_screen_resources(connection, root);
+    xcb_generic_error_t *error = nullptr;
+    xcb_randr_get_screen_resources_reply_t *resources = xcb_randr_get_screen_resources_reply(connection, cookie, &error);
+    if (error) {
+        qWarning() << "Error getting screen resources: " << error->error_code;
+        free(error);
+        return {};
+    }
+
+    xcb_randr_output_t *outputs = xcb_randr_get_screen_resources_outputs(resources);
+    int output_count = xcb_randr_get_screen_resources_outputs_length(resources);
+    QList<MonitorSizeInfo> monitors;
+    for (int i = 0; i < output_count; i++) {
+        xcb_randr_output_t output = outputs[i];
+        xcb_randr_get_output_info_cookie_t info_cookie = xcb_randr_get_output_info(connection, output, resources->config_timestamp);
+
+        xcb_randr_get_output_info_reply_t *output_info = xcb_randr_get_output_info_reply(connection, info_cookie, nullptr);
+
+        if (!output_info)
+            continue;
+
+        // 检查输出是否连接
+        if (output_info->connection != XCB_RANDR_CONNECTION_CONNECTED) {
+            free(output_info);
+            continue;
+        }
+
+        if (output_info->crtc == XCB_NONE) {
+            free(output_info);
+            continue;
+        }
+        xcb_randr_get_crtc_info_cookie_t crtc_cookie = xcb_randr_get_crtc_info(connection, output_info->crtc, resources->config_timestamp);
+
+        xcb_randr_get_crtc_info_reply_t *crtc_info = xcb_randr_get_crtc_info_reply(connection, crtc_cookie, nullptr);
+
+        if (crtc_info) {
+            MonitorSizeInfo monitor;
+            monitor.width = crtc_info->width;
+            monitor.height = crtc_info->height;
+            monitor.mmWidth = output_info->mm_width;
+            monitor.mmHeight = output_info->mm_height;
+
+            monitors.push_back(monitor);
+
+            free(crtc_info);
+        }
+
+        free(output_info);
+    }
+
+    free(resources);
+    return monitors;
 }
 
 // 获取 _XSETTINGS_SETTINGS 属性

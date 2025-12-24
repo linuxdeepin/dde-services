@@ -42,6 +42,9 @@ protected Q_SLOTS:
     void handleDConfigChangedCb(const QString &key);
 
 private:
+    double getRecommendedScaleFactor();
+    double getForceScaleFactor();
+    void adjustScaleFactor(double recommendedScaleFactor);
     void updateDPI();
     void updateXResources();
     void updateFirefoxDPI();
