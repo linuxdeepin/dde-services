@@ -326,7 +326,7 @@ void XSettingsManager::adjustScaleFactor(double recommendedScaleFactor)
     double value = m_settingDconfig->value("scale-factor").toDouble();
     if (value <= 0) {
         ScaleFactors map;
-        map.insert("ALL", value);
+        map.insert("ALL", recommendedScaleFactor);
         setScreenScaleFactors(map, false);
         // m_restartOSD = true;
     }
