@@ -1,3 +1,10 @@
+dde-services (1.0.18) unstable; urgency=medium
+
+  * fix: correct default scale factor initialization
+  * feat: add automatic screen scaling recommendation
+
+ -- zhangkun <zhangkun2@uniontech.com>  Tue, 06 Jan 2026 20:29:23 +0800
+
 dde-services (1.0.17) unstable; urgency=medium
 
   * chore: remove OOMScoreAdjust plugin
