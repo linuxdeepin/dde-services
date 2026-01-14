@@ -1,3 +1,9 @@
+dde-services (1.0.19) unstable; urgency=medium
+
+  * feat: 移除ipwatchd插件
+
+ -- fuleyi <fuleyi@uniontech.com>  Wed, 14 Jan 2026 14:49:28 +0800
+
 dde-services (1.0.18) unstable; urgency=medium
 
   * fix: correct default scale factor initialization
