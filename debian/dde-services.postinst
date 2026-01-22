@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "triggered" ]; then
+    # Reload shortcut configurations for all active user sessions
+    # Find all active user sessions and notify them
+    for user_session in /run/user/*/bus; do
+        if [ -S "$user_session" ]; then
+            user_id=$(basename $(dirname "$user_session"))
+            user_name=$(id -un "$user_id" 2>/dev/null || echo "")
+            
+            if [ -n "$user_name" ]; then
+                # Try to reload configs for this user session
+                su - "$user_name" -c "
+                    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$user_id/bus
+                    dbus-send --session --type=method_call \
+                        --dest=org.deepin.dde.Keybinding1 \
+                        /org/deepin/dde/Keybinding1 \
+                        org.deepin.dde.Keybinding1.ReloadConfigs
+                " 2>/dev/null || true
+            fi
+        fi
+    done
+    
+    exit 0
+fi
+
+#DEBHELPER#
+
+exit 0

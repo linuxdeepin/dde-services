@@ -6,6 +6,9 @@ Build-Depends:  debhelper (>= 11),
  pkg-config,
  cmake,
  qt6-base-dev,
+ qt6-wayland-dev,
+ qt6-tools-dev,
+ qt6-tools-dev-tools,
  libsystemd-dev,
  libpcap-dev,
  libnet-dev,
@@ -15,6 +18,11 @@ Build-Depends:  debhelper (>= 11),
  libx11-dev,
  libxcb-randr0-dev,
  libxcb1-dev,
+ libxcb-keysyms1-dev,
+ libxcb-xtest0-dev,
+ libwayland-dev,
+ treeland-protocols,
+ python3,
 Standards-Version: 4.1.3
 Homepage: https://github.com/linuxdeepin
 
@@ -23,5 +31,26 @@ Architecture: any
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
- deepin-service-manager (>= 1.0.5)
+ deepin-service-manager (>= 1.0.5),
+ dbus,
+ libdtk6core,
+ libqt6core6,
+ libqt6dbus6,
+ libqt6gui6,
+ libxcb-keysyms1,
+ libxcb-xtest0,
+ libwayland-client0
 Description: deepin desktop-environment plugins service
+ This package provides various system service plugins for Deepin Desktop
+ Environment, including:
+  - dde-shortcut: Global keyboard shortcut and gesture management for X11 and Wayland
+  - thememanager: Theme management service
+  - wallpaperslideshow: Wallpaper slideshow service
+  - xsettings: X11 settings management
+ .
+ The dde-shortcut plugin provides:
+  - Global keyboard shortcut management for X11 and Wayland
+  - Gesture shortcut support (Wayland only)
+  - Dynamic configuration via DConfig
+  - DBus interface for shortcut registration and management
+  - Integration with Deepin Desktop Environment

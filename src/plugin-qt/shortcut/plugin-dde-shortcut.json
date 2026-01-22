@@ -1,0 +1,20 @@
+{
+  "name": "org.deepin.dde.Keybinding1",
+  "libPath": "libplugin-dde-shortcut.so",
+  "group": "dde",
+  "pluginType": "qt",
+  "version": "1.0",
+  "policyStartType": "Resident",
+  "startDelay": 0,
+  "dependencies": [],
+  "policy": [
+    {
+      "path": "/org/deepin/dde/Keybinding1",
+      "pathhide": false
+    },
+    {
+      "path": "/org/deepin/dde/Gesture1",
+      "pathhide": false
+    }
+  ]
+}

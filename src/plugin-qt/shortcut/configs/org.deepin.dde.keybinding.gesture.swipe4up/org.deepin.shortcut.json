@@ -1,0 +1,106 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "appId": {
+            "value": "org.deepin.dde.keybinding",
+            "serial": 0,
+            "flags": [],
+            "name": "appId",
+            "name[zh_CN]": "提供快捷键应用Id",
+            "description": "provide gesture app id",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "displayName": {
+            "value": "Swipe up with four fingers",
+            "serial": 0,
+            "flags": [],
+            "name": "displayName",
+            "name[zh_CN]": "四指向上",
+            "description": "swipe4up gesture",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "gestureType": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "gestureType",
+            "name[zh_CN]": "手势类型",
+            "description": "手势类型，1-swipe，2-hold",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "fingerCount": {
+            "value": 4,
+            "serial": 0,
+            "flags": [],
+            "name": "fingerCount",
+            "name[zh_CN]": "手指个数",
+            "description": "手指个数，如四指",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "direction": {
+            "value": 3,
+            "serial": 0,
+            "flags": [],
+            "name": "direction",
+            "name[zh_CN]": "手指滑动方向",
+            "description": "手指滑动方向，枚举：0-none，1-down，2-left，3-up，4-right",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "triggerType": {
+            "value": 3,
+            "serial": 0,
+            "flags": [],
+            "name": "triggerType",
+            "name[zh_CN]": "快捷键触发动作类型",
+            "description": "action类型",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "triggerValue": {
+            "value": [16],
+            "serial": 0,
+            "flags": [],
+            "name": "triggerValue",
+            "name[zh_CN]": "快捷键触发动作",
+            "description": "触发动作,open_multitask_view",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "category": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "category",
+            "name[zh_CN]": "快捷键类别,1:系统",
+            "description": "系统快捷键",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "enabled": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "enabled",
+            "name[zh_CN]": "使能",
+            "description": "是否启用快捷键",
+            "permissions": "readonly",
+            "visibility": "private"
+        },
+        "modifiable": {
+            "value": false,
+            "serial": 0,
+            "flags": [],
+            "name": "modifiable",
+            "name[zh_CN]": "能否修改快捷键",
+            "description": "不能修改快捷键",
+            "permissions": "readonly",
+            "visibility": "private"
+        }
+    }
+}
