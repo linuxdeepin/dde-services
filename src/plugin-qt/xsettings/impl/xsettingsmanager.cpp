@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "xsettingsmanager.h"
@@ -218,7 +218,13 @@ void XSettingsManager::handleDConfigChangedCb(const QString &key)
         updateXResources();
     } else if (key == "gtk-cursor-theme-size-base") {
         int cursorSizeBase = m_settingDconfig->value(key).toInt();
-        m_settingDconfig->setValue("gtk-cursor-theme-size", cursorSizeBase);
+        double scale = m_settingDconfig->value(dcKeyScaleFactor).toDouble();
+        if (scale <= 0) {
+            qWarning() << "invalid scale factor:" << scale << ", fallback to 1.0";
+            scale = 1.0;
+        }
+        qDebug() << "update gtk-cursor-theme-size to" << cursorSizeBase * scale;
+        m_settingDconfig->setValue("gtk-cursor-theme-size", cursorSizeBase * scale);
         return;
     }
 
