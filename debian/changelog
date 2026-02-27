@@ -1,3 +1,9 @@
+dde-services (1.0.21) unstable; urgency=medium
+
+  * fix: apply scale factor to GTK cursor theme size
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 27 Feb 2026 15:49:37 +0800
+
 dde-services (1.0.20) unstable; urgency=medium
 
   * chore: disable direct D-Bus service execution
