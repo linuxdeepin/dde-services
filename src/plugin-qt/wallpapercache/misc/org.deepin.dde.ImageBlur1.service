@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=org.deepin.dde.ImageBlur1
+Exec=/usr/bin/deepin-service-manager -n org.deepin.dde.WallpaperCache
+User=deepin-daemon
+SystemdService=deepin-service-plugin@org.deepin.dde.WallpaperCache.service
