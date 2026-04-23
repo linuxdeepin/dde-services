@@ -1,9 +1,9 @@
-# SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+# SPDX-FileCopyrightText: 2023 - 2026 UnionTech Software Technology Co., Ltd.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
-set(BIN_NAME "plugin-dde-xsettings")
+set(PLUGIN_NAME "plugin-dde-xsettings")
 
-project(${BIN_NAME})
+project(${PLUGIN_NAME})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -13,16 +13,17 @@ include(GNUInstallDirs)
 file(GLOB_RECURSE SRCS "*.h" "*.cpp")
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus)
-find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Gui Core)
+find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Dtk${DTK_VERSION_MAJOR}DConfig REQUIRED)
 find_package(X11 REQUIRED)
 find_package(XCB REQUIRED)
 find_package(XCB REQUIRED COMPONENTS RANDR)
 
-add_library(${BIN_NAME} MODULE
+add_library(${PLUGIN_NAME} MODULE
     ${SRCS}
 )
 
-target_link_libraries(${BIN_NAME}
+target_link_libraries(${PLUGIN_NAME}
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::DBus
     X11::X11
@@ -36,9 +37,12 @@ macro(install_user_symlink filepath wantsdir)
     install(FILES ${PROJECT_BINARY_DIR}/link/${wantsdir}/${filepath} DESTINATION lib/systemd/user/${wantsdir}/)
 endmacro(install_user_symlink)
 
-install(TARGETS ${BIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
+install(TARGETS ${PLUGIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/plugin-dde-xsettings.json DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/deepin-service-manager/user)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.XSettings.json DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dsg/configs/org.deepin.dde.daemon)
+dtk_add_config_meta_files(
+    APPID org.deepin.dde.daemon
+    FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.XSettings.json
+)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/dbus/org.deepin.dde.XSettings1.service DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/services)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.dde.XSettings1.service
     DESTINATION lib/systemd/user/

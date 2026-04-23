@@ -7,13 +7,19 @@
 #include "xsdatainfo.h"
 
 #include <QDBusPendingReply>
+#include <QDBusReply>
 #include <QDBusUnixFileDescriptor>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QDir>
 #include <QDirIterator>
+#include <QFile>
 #include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QThreadPool>
+#include <QVariant>
 #include <QtMath>
 
 #include <fcntl.h>
@@ -22,23 +28,96 @@ const static int DPI_FALLBACK = 96;
 const static int BASE_CURSORSIZE = 24;
 const static QString PLYMOUTH_CONFIGFILE = "/etc/plymouth/plymouthd.conf";
 
+// 从 ScreenScale 服务获取缩放信息，返回 {current, recommended}
+std::pair<double, double> XSettingsManager::getScaleInfoFromService()
+{
+    QString screensJson = getScreensJson();
+    QDBusReply<QString> reply = m_screenScaleInterface->call("GetScreenScaleInfo", screensJson);
+    if (!reply.isValid()) {
+        return {0.0, 0.0};
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(reply.value().toUtf8());
+    if (!doc.isObject()) {
+        return {0.0, 0.0};
+    }
+
+    QJsonObject obj = doc.object();
+    return {obj.value("current").toDouble(), obj.value("recommended").toDouble()};
+}
+
 XSettingsManager::XSettingsManager(QObject *parent)
     : QObject(parent)
-    , m_settingDconfig(DTK_CORE_NAMESPACE::DConfig::create("org.deepin.dde.daemon", "org.deepin.XSettings"))
-    , m_greeterInterface(new QDBusInterface("org.deepin.dde.Greeter1", "/org/deepin/dde/Greeter1", "org.deepin.dde.Greeter1", QDBusConnection::systemBus()))
-    , m_sysDaemonInterface(new QDBusInterface("com.deepin.daemon.Daemon", "/com/deepin/daemon/Daemon", "com.deepin.daemon.Daemon", QDBusConnection::systemBus()))
+    , m_settingDconfig(
+          DTK_CORE_NAMESPACE::DConfig::create("org.deepin.dde.daemon", "org.deepin.XSettings"))
+    , m_greeterInterface(new QDBusInterface("org.deepin.dde.Greeter1",
+                                            "/org/deepin/dde/Greeter1",
+                                            "org.deepin.dde.Greeter1",
+                                            QDBusConnection::systemBus()))
+    , m_sysDaemonInterface(new QDBusInterface("org.deepin.dde.Daemon1",
+                                              "/org/deepin/dde/Daemon1",
+                                              "org.deepin.dde.Daemon1",
+                                              QDBusConnection::systemBus()))
     , m_xcbUtils(XcbUtils::getInstance())
+    , m_screenScaleInterface(new QDBusInterface("org.deepin.dde.ScreenScale1",
+                                                "/org/deepin/dde/ScreenScale1",
+                                                "org.deepin.dde.ScreenScale1",
+                                                QDBusConnection::systemBus()))
 {
-    connect(m_settingDconfig, &DTK_CORE_NAMESPACE::DConfig::valueChanged, this, &XSettingsManager::handleDConfigChangedCb);
-    setScreenScaleFactors(getScreenScaleFactors(), false);
-    adjustScaleFactor(getRecommendedScaleFactor());
-    setSettings(getSettingsInSchema());
+    // 监听 ScreenScale1 的信号，实现一处改变，全处同步
+    // 对于非常驻服务，直接连接信号，D-Bus 会在服务启动后传递信号
+    QDBusConnection::systemBus().connect(m_screenScaleInterface->service(),
+                                         m_screenScaleInterface->path(),
+                                         m_screenScaleInterface->interface(),
+                                         "ScaleFactorChanged",
+                                         this,
+                                         SLOT(onScaleFactorChanged(double)));
 
+    // 初始化时确定缩放系数（一次 D-Bus 调用获取 current 和 recommended）
+    double initScale = 0;
+    double recommended = 0;
+
+    auto [current, rec] = getScaleInfoFromService();
+    initScale = current;
+    recommended = rec;
+
+    // 如果 ScreenScale 为空，尝试从旧配置迁移或取推荐值
+    if (initScale <= 0.1) {
+        initScale = getForceScaleFactor();
+        if (initScale <= 0.1) {
+            initScale = recommended > 0.1 ? recommended : 1.0;
+        }
+
+        // 如果有了有效值，同步回 ScreenScale (使其成为新的事实来源)
+        if (initScale > 0.1) {
+            QDBusMessage setReply = m_screenScaleInterface->call("SetScaleFactor", initScale);
+            if (setReply.type() == QDBusMessage::ErrorMessage) {
+                qWarning() << "Failed to sync initial scale to ScreenScale1:" << setReply.errorMessage();
+            }
+        }
+    }
+
+    connect(m_settingDconfig,
+            &DTK_CORE_NAMESPACE::DConfig::valueChanged,
+            this,
+            &XSettingsManager::handleDConfigChangedCb);
+
+    // 同步到所有兼容性配置中（仅保存配置，不触发运行时生效）
+    onScaleFactorChanged(initScale);
+
+    // 初始化时更新 XSETTINGS 和 Qt 主题配置（登录后生效）
+    ScaleFactors factors;
+    factors.insert("all", initScale);
+    setScreenScaleFactorsForQt(factors);
     updateDPI();
-    updateXResources();
-    QThreadPool::globalInstance()->start([this]() {
-        updateFirefoxDPI();
-    });
+
+    // 处理旧版本迁移：清理 .dde_env 中的缩放相关环境变量
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if (!env.value("STARTDDE_MIGRATE_SCALE_FACTOR").isEmpty()) {
+        cleanUpDdeEnv();
+    }
+
+    setSettings(getSettingsInSchema());
 }
 
 ArrayOfColor XSettingsManager::getColor(const QString &prop)
@@ -50,7 +129,7 @@ ArrayOfColor XSettingsManager::getColor(const QString &prop)
         return arrayOfColor;
     }
     ColorValueInfo color = std::get<ColorValueInfo>(value);
-    for (int i = 0; i < colorSize; i++) {
+    for (size_t i = 0; i < colorSize; i++) {
         arrayOfColor.push_back(color[i]);
     }
     return arrayOfColor;
@@ -67,23 +146,45 @@ int XSettingsManager::getInteger(const QString &prop)
     return std::get<int>(value);
 }
 
-double XSettingsManager::getScaleFactor()
+QString XSettingsManager::getScreensJson()
 {
-    if (m_settingDconfig->isValid()) {
-        return m_settingDconfig->value(dcKeyScaleFactor).toDouble();
+    QList<XcbUtils::MonitorSizeInfo> monitors = m_xcbUtils.getMonitorSizeInfos();
+    if (monitors.isEmpty()) {
+        return "[]";
     }
 
-    return 0;
+    QJsonArray screens;
+    for (const auto &monitor : monitors) {
+        QJsonObject screen;
+        screen["widthPx"] = monitor.width;
+        screen["heightPx"] = monitor.height;
+        screen["widthMm"] = static_cast<int>(monitor.mmWidth);
+        screen["heightMm"] = static_cast<int>(monitor.mmHeight);
+        screens.append(screen);
+    }
+
+    return QJsonDocument(screens).toJson(QJsonDocument::Compact);
+}
+
+double XSettingsManager::getScaleFactor()
+{
+    // 从 ScreenScale 获取，它是唯一的事实来源
+    auto [current, _] = getScaleInfoFromService();
+    return current > 0.1 ? current : 0;
 }
 
 ScaleFactors XSettingsManager::getScreenScaleFactors()
 {
-    if (m_settingDconfig->isValid()) {
-        QString factors = m_settingDconfig->value(cKeyIndividualScaling).toString();
-        return parseScreenFactors(factors);
+    // 不再通过 individual-scaling 配置获取缩放，改为使用 screenscale 的配置
+    // 如果需要用到 ScaleFactors map，直接将当前缩放系数转成 map 即可
+    double currentScale = getScaleFactor();
+
+    ScaleFactors factors;
+    if (currentScale > 0.1) {
+        factors.insert("all", currentScale);
     }
 
-    return ScaleFactors();
+    return factors;
 }
 
 QString XSettingsManager::getString(const QString &prop)
@@ -134,7 +235,7 @@ void XSettingsManager::setColor(const QString &prop, const ArrayOfColor &v)
         return;
     }
     ColorValueInfo color;
-    for (int i = 0; i < colorSize; i++) {
+    for (size_t i = 0; i < colorSize; i++) {
         color[i] = v[i];
     }
 
@@ -167,32 +268,14 @@ void XSettingsManager::setScreenScaleFactors(const ScaleFactors &factors, bool e
         return;
     }
 
-    for (auto iter : factors.keys()) {
-        if (factors[iter] < 0) {
-            return;
-        }
-    }
-
-    // err := m.dsfHelper.SetScaleFactors(factors)
-
-    double singleFactor = 0;
-    if (factors.size() == 1) {
-        singleFactor = factors.first();
+    double singleFactor = 1.0;
+    if (factors.contains("all")) {
+        singleFactor = factors["all"];
     } else {
-        if (factors.count("All") == 1) {
-            singleFactor = factors["All"];
-        } else {
-            singleFactor = 1;
-        }
+        singleFactor = factors.first();
     }
+
     setSingleScaleFactor(singleFactor, emitSignal);
-
-    QString factorsJoined = joinScreenScaleFactors(factors);
-    if (m_settingDconfig->isValid()) {
-        m_settingDconfig->setValue(cKeyIndividualScaling, factorsJoined);
-    }
-
-    setScreenScaleFactorsForQt(factors);
 }
 
 void XSettingsManager::setString(const QString &prop, const QString &v)
@@ -210,7 +293,10 @@ void XSettingsManager::setString(const QString &prop, const QString &v)
 
 void XSettingsManager::handleDConfigChangedCb(const QString &key)
 {
-    static const QStringList excludedkeys = { "xft-dpi", "scale-factor", "window-scale" };
+    static const QStringList excludedkeys = { "xft-dpi",
+                                              "scale-factor",
+                                              "window-scale",
+                                              "individual-scaling" };
     if (excludedkeys.contains(key)) {
         return;
     }
@@ -241,74 +327,6 @@ void XSettingsManager::handleDConfigChangedCb(const QString &key)
     setSettings(xsSetting);
 }
 
-double toListedScaleFactor(double s)
-{
-    const double min = 1.0;
-    const double max = 3.0;
-    const double step = 0.25;
-
-    if (s <= min) {
-        return min;
-    } else if (s >= max) {
-        return max;
-    }
-
-    for (double i = min; i <= max; i += step) {
-        if (i > s) {
-            double ii = i - step;
-            double d1 = s - ii;
-            double d2 = i - s;
-
-            if (d1 >= d2) {
-                return i;
-            } else {
-                return ii;
-            }
-        }
-    }
-    return max;
-}
-
-// calcRecommendedScaleFactor 计算推荐的缩放比
-double calcRecommendedScaleFactor(double widthPx, double heightPx, double widthMm, double heightMm)
-{
-    if (widthMm == 0.0 || heightMm == 0.0) {
-        return 1.0;
-    }
-    double lenPx = std::sqrt(std::pow(widthPx, 2) + std::pow(heightPx, 2));
-    double lenMm = std::sqrt(std::pow(widthMm, 2) + std::pow(heightMm, 2));
-
-    double lenPxStd = std::sqrt(std::pow(1920, 2) + std::pow(1080, 2)); // 标准分辨率对角线长度
-    double lenMmStd = std::sqrt(std::pow(477, 2) + std::pow(268, 2));   // 标准物理尺寸对角线长度
-
-    const double a = 0.00158;
-    double fix = (lenMm - lenMmStd) * (lenPx / lenPxStd) * a;
-    double scaleFactor = (lenPx / lenMm) / (lenPxStd / lenMmStd) + fix;
-
-    return toListedScaleFactor(scaleFactor);
-}
-
-double XSettingsManager::getRecommendedScaleFactor()
-{
-    QList<XcbUtils::MonitorSizeInfo> monitors = XcbUtils::getInstance().getMonitorSizeInfos();
-    if (monitors.isEmpty()) {
-        return 1.0;
-    }
-    // 允许用户通过 force-scale-factor.ini 强制设置全局缩放
-    double forceScaleFactor = getForceScaleFactor();
-    if (forceScaleFactor > 0.0) {
-        return forceScaleFactor;
-    }
-    double minScaleFactor = 3.0;
-    for (auto &&monitor : monitors) {
-        double scaleFactor = calcRecommendedScaleFactor(monitor.width, monitor.height, monitor.mmWidth, monitor.mmHeight);
-        if (minScaleFactor > scaleFactor) {
-            minScaleFactor = scaleFactor;
-        }
-    }
-    return minScaleFactor;
-}
-
 // GetForceScaleFactor 允许用户通过 force-scale-factor.ini 强制设置全局缩放
 double XSettingsManager::getForceScaleFactor()
 {
@@ -326,45 +344,13 @@ double XSettingsManager::getForceScaleFactor()
     return -1.0;
 }
 
-void XSettingsManager::adjustScaleFactor(double recommendedScaleFactor)
-{
-    qDebug() << "recommended scale factor:" << recommendedScaleFactor;
-    double value = m_settingDconfig->value("scale-factor").toDouble();
-    if (value <= 0) {
-        ScaleFactors map;
-        map.insert("ALL", recommendedScaleFactor);
-        setScreenScaleFactors(map, false);
-        // m_restartOSD = true;
-    }
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    if (!env.value("STARTDDE_MIGRATE_SCALE_FACTOR").isEmpty()) {
-        double scaleFactor = getScaleFactor();
-        if (scaleFactor > 0.0) {
-            ScaleFactors map;
-            map.insert("", scaleFactor);
-            setScreenScaleFactorsForQt(map);
-        }
-        cleanUpDdeEnv();
-        return;
-    }
-    if (!QFile::exists("/etc/lightdm/deepin/qt-theme.ini")) {
-        // lightdm-deepin-greeter does not have the qt-theme.ini file yet.
-        double scaleFactor = getScaleFactor();
-        if (scaleFactor > 0.0) {
-            ScaleFactors map;
-            map.insert("", scaleFactor);
-            setScreenScaleFactorsForQt(map);
-        }
-    }
-}
-
 void XSettingsManager::updateDPI()
 {
     double scale = 1;
     QVector<XsSetting> xsSettngVec;
     int scaledDpi = static_cast<int>((DPI_FALLBACK * 1024) * scale);
-    int cursorSize;
-    int windowScale;
+    int cursorSize = BASE_CURSORSIZE;
+    int windowScale = 1;
 
     if (m_settingDconfig->isValid()) {
         bool bOk = false;
@@ -441,8 +427,12 @@ void XSettingsManager::updateXResources()
 {
     QVector<QPair<QString, QString>> xresourceInfos;
     if (m_settingDconfig->isValid()) {
-        xresourceInfos.push_back(qMakePair(QString("Xcursor.theme"), m_settingDconfig->value("gtk-cursor-theme-name").toString()));
-        xresourceInfos.push_back(qMakePair(QString("Xcursor.size"), QString::number(m_settingDconfig->value(dcKeyGtkCursorThemeSize).toInt())));
+        xresourceInfos.push_back(
+            qMakePair(QString("Xcursor.theme"),
+                      m_settingDconfig->value("gtk-cursor-theme-name").toString()));
+        xresourceInfos.push_back(
+            qMakePair(QString("Xcursor.size"),
+                      QString::number(m_settingDconfig->value(dcKeyGtkCursorThemeSize).toInt())));
 
         double scaleFactor = m_settingDconfig->value(dcKeyScaleFactor).toDouble();
         int xftDpi = static_cast<int>(DPI_FALLBACK * scaleFactor);
@@ -450,100 +440,6 @@ void XSettingsManager::updateXResources()
     }
 
     m_xcbUtils.updateXResources(xresourceInfos);
-}
-
-QStringList getFirefoxConfigs(const QString &path)
-{
-    QStringList configs;
-    QString config;
-    QDir dir(path);
-    QDirIterator it(path, QStringList() << "prefs.js", QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext()) {
-        QString config = it.next();
-        configs.append(config);
-    }
-
-    if (!configs.empty()) {
-        qWarning() << "found firefox config file: " << configs;
-    }
-    return configs;
-}
-
-const QString ffKeyPixels = R"(user_pref("layout.css.devPixelsPerPx",)";
-
-bool setFirefoxDPI(double value, QString src, QString dest)
-{
-    QFile file(src);
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        qWarning() << "failed to open file:" << file.errorString();
-        return false;
-    }
-    QTextStream in(&file);
-    QStringList lines;
-    while (!in.atEnd()) {
-        lines << in.readLine(); // 读取一行
-    }
-
-    QString target = QString("%1 \"%2\");").arg(ffKeyPixels).arg(QString::number(value, 'f', 2));
-    bool found = false;
-    for (int i = 0; i < lines.size(); ++i) {
-        QString line = lines[i].trimmed();
-        if (line.isEmpty() || line.startsWith("#")) {
-            continue; // 跳过空行和注释行
-        }
-
-        if (!line.contains(ffKeyPixels)) {
-            continue; // 不包含 ffKeyPixels 的行
-        }
-
-        if (line == target) {
-            return true; // 找到目标行，无需修改
-        }
-
-        QString tmp = QString("%1, \"%2\");").arg(ffKeyPixels.split(",")[0]).arg(QString::number(value, 'f', 2));
-        lines[i] = tmp; // 更新行内容
-        found = true;
-        break; // 找到并更新后退出
-    }
-    if (!found) {
-        if (value == -1) {
-            return false;
-        }
-        QString tmp = lines[lines.length() - 1];
-        lines[lines.length() - 1] = target;
-        lines.append(tmp);
-    }
-    file.seek(0);
-    file.resize(0);
-    QTextStream out(&file);
-    for (const QString &line : lines) {
-        out << line << "\n";
-    }
-    file.close();
-    return true;
-}
-
-void XSettingsManager::updateFirefoxDPI()
-{
-    QString homeDir = Utils::getUserHomeDir();
-    if (homeDir == "") {
-        return;
-    }
-    QDir dir(homeDir);
-    QString ffDir = dir.filePath(".mozilla/firefox");
-    double scale = getScaleFactor();
-    if (scale <= 0) {
-        scale = -1;
-    }
-    auto configs = getFirefoxConfigs(ffDir);
-    if (configs.empty()) {
-        return;
-    }
-    for (auto config : configs) {
-        if (!setFirefoxDPI(scale, config, config)) {
-            qWarning() << "failed to set firefox dpi";
-        }
-    }
 }
 
 XsValue XSettingsManager::getSettingValue(QString prop)
@@ -573,7 +469,8 @@ void XSettingsManager::setSettings(QVector<XsSetting> settings)
             continue;
         }
 
-        QSharedPointer<XSItemInfo> xSItemInfo(new XSItemInfo(xsettingItem.prop, xsettingItem.value));
+        QSharedPointer<XSItemInfo> xSItemInfo(
+            new XSItemInfo(xsettingItem.prop, xsettingItem.value));
         xsInfo.inserItem(xSItemInfo);
         xsInfo.increaseNumSettings();
     }
@@ -599,7 +496,8 @@ QVector<XsSetting> XSettingsManager::getSettingsInSchema()
 
         XsValue value = dconfInfo->getValue(*m_settingDconfig);
         if (!Utils::hasXsValue(value)) {
-            qWarning() << "unknown Xs type:" << dconfInfo->getDconfKey() << dconfInfo->getKeySType();
+            qWarning() << "unknown Xs type:" << dconfInfo->getDconfKey()
+                       << dconfInfo->getKeySType();
             continue;
         }
 
@@ -610,26 +508,6 @@ QVector<XsSetting> XSettingsManager::getSettingsInSchema()
         xsSettingVec.push_back(xsStting);
     }
     return xsSettingVec;
-}
-
-ScaleFactors XSettingsManager::parseScreenFactors(QString screenFactors)
-{
-    ScaleFactors factorMap;
-
-    QStringList factors = screenFactors.split(";");
-    for (auto factor : factors) {
-        QStringList kv = factor.split("=");
-        if (kv.size() != 2) {
-            continue;
-        }
-        bool bOk = false;
-        double value = kv[1].toDouble(&bOk);
-        if (bOk) {
-            factorMap[kv[0]] = value;
-        }
-    }
-
-    return factorMap;
 }
 
 void XSettingsManager::setGSettingsByXProp(const QString &prop, XsValue value)
@@ -643,18 +521,54 @@ void XSettingsManager::setGSettingsByXProp(const QString &prop, XsValue value)
 
 void XSettingsManager::setSingleScaleFactor(double scale, bool emitSignal)
 {
+    if (scale <= 0.1) {
+        return;
+    }
+
+    emitSignalSetScaleFactor(false, emitSignal);
+
+    // 优先同步到 ScreenScale1 (事实来源)
+    auto [remoteScale, _] = getScaleInfoFromService();
+    bool screenScaleAvailable = remoteScale > 0.1;
+
+    if (!qFuzzyCompare(remoteScale, scale)) {
+        QDBusMessage setReply = m_screenScaleInterface->call("SetScaleFactor", scale);
+        if (setReply.type() == QDBusMessage::ErrorMessage) {
+            qWarning() << "Failed to set scale factor in ScreenScale1:" << setReply.errorMessage();
+            screenScaleAvailable = false;
+        }
+    }
+
+    // 如果 ScreenScale 调用失败，则降级手动触发同步逻辑
+    if (!screenScaleAvailable) {
+        onScaleFactorChanged(scale);
+    }
+
+    emitSignalSetScaleFactor(true, emitSignal);
+}
+
+void XSettingsManager::onScaleFactorChanged(double scale)
+{
+    if (scale <= 0.1) {
+        return;
+    }
+
+    qDebug() << "onScaleFactorChanged saving configs for scale:" << scale;
+
     int windowScale = qFloor((scale + 0.3) * 10) / 10;
     if (windowScale < 1) {
         windowScale = 1;
     }
 
+    ScaleFactors factors;
+    factors.insert("all", scale);
+
+    // 1. 同步到 XSettings 的 DConfig (仅为了兼容性，注销后生效)
     if (m_settingDconfig->isValid()) {
         m_settingDconfig->setValue(dcKeyScaleFactor, scale);
+        m_settingDconfig->setValue(dcKeyWindowScale, windowScale);
+        m_settingDconfig->setValue(cKeyIndividualScaling, joinScreenScaleFactors(factors));
 
-        int oldWindowScale = m_settingDconfig->value(dcKeyWindowScale).toInt();
-        if (windowScale != oldWindowScale) {
-            m_settingDconfig->setValue(dcKeyWindowScale, windowScale);
-        }
         bool ok = false;
         int baseCursorSizeInt = m_settingDconfig->value("gtk-cursor-theme-size-base").toInt(&ok);
         if (!ok || baseCursorSizeInt <= 0) {
@@ -664,7 +578,11 @@ void XSettingsManager::setSingleScaleFactor(double scale, bool emitSignal)
         m_settingDconfig->setValue(dcKeyGtkCursorThemeSize, cursorSize);
     }
 
-    setScaleFactorForPlymouth(windowScale, emitSignal);
+    // 2. 同步 Plymouth 缩放（下次启动生效）
+    setScaleFactorForPlymouth(windowScale, true);
+
+    // 注意：不在此处调用 updateDPI() 和 setScreenScaleFactorsForQt()
+    // 这些操作只应在初始化时执行，运行时修改缩放需要注销后生效
 }
 
 void XSettingsManager::setScaleFactorForPlymouth(int factor, bool emitSignal)
@@ -699,7 +617,8 @@ int XSettingsManager::getPlymouthThemeScaleFactor(QString theme)
 {
     if (theme == "deepin-logo" || theme == "deepin-ssd-logo" || theme == "uos-ssd-logo") {
         return 1;
-    } else if (theme == "deepin-hidpi-logo" || theme == "deepin-hidpi-ssd-logo" || theme == "uos-hidpi-ssd-logo") {
+    } else if (theme == "deepin-hidpi-logo" || theme == "deepin-hidpi-ssd-logo"
+               || theme == "uos-hidpi-ssd-logo") {
         return 2;
     } else {
         return 0;
@@ -711,7 +630,7 @@ QString XSettingsManager::joinScreenScaleFactors(const ScaleFactors &factors)
     QString value;
 
     for (auto key : factors.keys()) {
-        value = QString::asprintf("%s=%.2f;", key.toStdString().c_str(), factors[key]);
+        value += QString::asprintf("%s=%.2f;", key.toStdString().c_str(), factors[key]);
     }
 
     return value;
@@ -770,7 +689,8 @@ void XSettingsManager::updateGreeterQtTheme(KeyFile &keyFile)
         return;
     }
     QDBusUnixFileDescriptor dbusFd(file.handle());
-    QDBusMessage reply = m_greeterInterface->call("UpdateGreeterQtTheme", QVariant::fromValue(dbusFd));
+    QDBusMessage reply =
+        m_greeterInterface->call("UpdateGreeterQtTheme", QVariant::fromValue(dbusFd));
     if (reply.type() == QDBusMessage::ErrorMessage) {
         qWarning() << "update greeter qt-theme failed:" << reply.errorMessage();
     }
@@ -782,7 +702,11 @@ void XSettingsManager::cleanUpDdeEnv()
 {
     bool bNeedSave = false;
     QMap<QString, QString> envMap = loadDDEUserEnv();
-    const QStringList keyEnvs{ "QT_SCALE_FACTOR", "QT_SCREEN_SCALE_FACTORS", "QT_AUTO_SCREEN_SCALE_FACTOR", "QT_FONT_DPI", "DEEPIN_WINE_SCALE" };
+    const QStringList keyEnvs{ "QT_SCALE_FACTOR",
+                               "QT_SCREEN_SCALE_FACTORS",
+                               "QT_AUTO_SCREEN_SCALE_FACTOR",
+                               "QT_FONT_DPI",
+                               "DEEPIN_WINE_SCALE" };
 
     for (auto env : keyEnvs) {
         if (envMap.find(env) != envMap.end()) {
@@ -830,7 +754,9 @@ void XSettingsManager::saveDDEUserEnv(const QMap<QString, QString> &userEnvs)
 
     QString text = QString::asprintf("# DDE user env file, bash script\n");
     for (auto key : userEnvs.keys()) {
-        text += QString::asprintf("export %s=%s;\n", key.toStdString().c_str(), userEnvs[key].toStdString().c_str());
+        text += QString::asprintf("export %s=%s;\n",
+                                  key.toStdString().c_str(),
+                                  userEnvs[key].toStdString().c_str());
     }
 
     file.write(text.toLatin1(), text.length());
