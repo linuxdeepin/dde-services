@@ -1,0 +1,92 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "appId": {
+            "value": "org.deepin.dde.keybinding",
+            "serial": 0,
+            "flags": [],
+            "name": "appId",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "提供快捷键应用Id",
+            "description": "provide shortcut app id"
+        },
+        "displayName": {
+            "value": "Audio rewind",
+            "serial": 0,
+            "flags": [],
+            "name": "displayName",
+            "name[zh_CN]": "倒带",
+            "permissions": "readonly",
+            "visibility": "private",
+            "description": "倒带快捷键"
+        },
+        "hotkeys": {
+            "value": [
+                "Media Rewind"
+            ],
+            "serial": 0,
+            "flags": [],
+            "name": "hotkeys",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "快捷键组合",
+            "description": "快捷键组合"
+        },
+        "triggerType": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "triggerType",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "快捷键触发动作类型",
+            "description": "二进制command类型"
+        },
+        "triggerValue": {
+            "value": [
+                "/usr/bin/dde-shortcut-tool",
+                "media",
+                "rewind"
+            ],
+            "serial": 0,
+            "flags": [],
+            "name": "triggerValue",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "快捷键触发动作",
+            "description": "触发动作"
+        },
+        "category": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "category",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "快捷键类别,1:系统",
+            "description": "系统快捷键"
+        },
+        "enabled": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "enabled",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "使能",
+            "description": "是否启用快捷键"
+        },
+        "modifiable": {
+            "value": false,
+            "serial": 0,
+            "flags": [],
+            "name": "modifiable",
+            "permissions": "readonly",
+            "visibility": "private",
+            "name[zh_CN]": "能否修改快捷键",
+            "description": "不能修改快捷键"
+        }
+    }
+}
