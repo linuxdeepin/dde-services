@@ -24,4 +24,6 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends},
  deepin-service-manager (>= 1.0.5)
+Breaks: dde-daemon (<< 6.1.87)
+Replaces: dde-daemon (<< 6.1.87)
 Description: deepin desktop-environment plugins service
