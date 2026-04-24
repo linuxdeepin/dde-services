@@ -1,3 +1,9 @@
+dde-services (1.0.22) unstable; urgency=medium
+
+  * feat: implement wallpaper cache plugin for dde-services
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 24 Apr 2026 09:58:27 +0800
+
 dde-services (1.0.21) unstable; urgency=medium
 
   * fix: apply scale factor to GTK cursor theme size
