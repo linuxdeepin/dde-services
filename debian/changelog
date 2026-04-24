@@ -1,3 +1,9 @@
+dde-services (1.0.23) unstable; urgency=medium
+
+  * chore: add Breaks and Replaces for dde-daemon
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 24 Apr 2026 16:48:56 +0800
+
 dde-services (1.0.22) unstable; urgency=medium
 
   * feat: implement wallpaper cache plugin for dde-services
