@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.deepin.dde.ScreenScale1
+User=deepin-daemon
+Exec=/usr/bin/deepin-service-manager -n org.deepin.dde.ScreenScale1
