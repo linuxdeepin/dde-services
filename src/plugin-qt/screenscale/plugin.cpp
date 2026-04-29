@@ -1,8 +1,8 @@
-// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
-#include "impl/xsettings1.h"
+#include "impl/screenscale.h"
 
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
@@ -17,7 +17,7 @@ struct QObjectDeleteLater {
     }
 };
 
-static std::unique_ptr<XSettings1, QObjectDeleteLater> xSettings;
+static std::unique_ptr<ScreenScale, QObjectDeleteLater> screenScale;
 
 extern "C" int DSMRegister(const char *name, void *data)
 {
@@ -27,17 +27,18 @@ extern "C" int DSMRegister(const char *name, void *data)
         return 1;
     }
 
-    xSettings.reset(new XSettings1());
+    screenScale.reset(new ScreenScale());
 
     QDBusConnection::RegisterOptions opts = QDBusConnection::ExportAllSlots
                                            | QDBusConnection::ExportAllSignals
                                            | QDBusConnection::ExportAllProperties;
+    
     QString path = name;
     path = QString("/%1").arg(path.replace(".", "/"));
-
-    if (!connection->registerObject(path, xSettings.get(), opts)) {
+    
+    if (!connection->registerObject(path, screenScale.get(), opts)) {
         qWarning() << "Failed to register object at" << path;
-        xSettings.reset();
+        screenScale.reset();
         return 2;
     }
 
@@ -48,6 +49,6 @@ extern "C" int DSMUnRegister(const char *name, void *data)
 {
     Q_UNUSED(name);
     Q_UNUSED(data);
-    xSettings.reset();
+    screenScale.reset();
     return 0;
 }
