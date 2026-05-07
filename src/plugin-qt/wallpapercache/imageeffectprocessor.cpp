@@ -17,6 +17,7 @@
 #define PIXMIX_OPACITY      90          // Color opacity
 #define PIXMIX_SATURATION   50          // Saturation
 #define PIXMIX_BRIGHTNESS   -60         // Brightness
+#define PIXMIX_MAX_DIM      7680        // 8K UHD long side cap
 
 DGUI_USE_NAMESPACE
 
@@ -67,9 +68,25 @@ ImageEffectProcessor::EffectType ImageEffectProcessor::effectTypeFromString(cons
 
 QImage ImageEffectProcessor::processPixmixEffect(const QString &imagePath)
 {
-    QImage originalImage;
-    if (!originalImage.load(imagePath)) {
-        qWarning() << "Failed to load image:" << imagePath;
+    QImageReader reader(imagePath);
+    if (!reader.canRead()) {
+        qWarning() << "Cannot read image:" << imagePath;
+        return QImage();
+    }
+
+    QSize originalSize = reader.size();
+    if (!originalSize.isEmpty()
+        && (originalSize.width() > PIXMIX_MAX_DIM || originalSize.height() > PIXMIX_MAX_DIM)) {
+        QSize decodeSize = originalSize;
+        decodeSize.scale(PIXMIX_MAX_DIM, PIXMIX_MAX_DIM, Qt::KeepAspectRatio);
+        reader.setScaledSize(decodeSize);
+        qDebug() << "Decoding image at" << decodeSize
+                 << "(original:" << originalSize << ")";
+    }
+
+    QImage originalImage = reader.read();
+    if (originalImage.isNull()) {
+        qWarning() << "Failed to load image:" << imagePath << reader.errorString();
         return QImage();
     }
 
