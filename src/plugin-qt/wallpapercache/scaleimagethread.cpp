@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QImageReader>
 
 ScaleImageThread::ScaleImageThread(QObject *parent)
     : QThread(parent)
@@ -142,21 +143,37 @@ void ScaleImageThread::executeTask(const TaskData &task)
 QImage ScaleImageThread::scaleImage(const TaskData &task)
 {
     qDebug() << "scale image info:" << task.originalPath << " targetSize:" << task.targetSize;
-    QImage image;
-    image.load(task.originalPath);
+
+    QImageReader reader(task.originalPath);
+    if (!reader.canRead()) {
+        qWarning() << "Cannot read image:" << task.originalPath;
+        return QImage();
+    }
+
+    QSize originalSize = reader.size();
+    if (originalSize.isEmpty()) {
+        qWarning() << "Cannot get image size:" << task.originalPath;
+        return QImage();
+    }
+
+    QSize decodeSize = originalSize;
+    decodeSize.scale(task.targetSize, Qt::KeepAspectRatioByExpanding);
+    reader.setScaledSize(decodeSize);
+
+    QImage image = reader.read();
     if (image.isNull()) {
-        qWarning() << "load image failed:" << task.originalPath;
+        qWarning() << "load image failed:" << task.originalPath << reader.errorString();
         return image;
     }
 
-    QSize size = task.targetSize;
-    image = image.scaled(size, Qt::KeepAspectRatioByExpanding, Qt::FastTransformation);
-    image = image.copy(QRect((image.width() - size.width()) / 2,
-                             (image.height() - size.height()) / 2,
-                             size.width(),
-                             size.height()));
-
-    return image;
+    const QSize &size = task.targetSize;
+    if (image.width() < size.width() || image.height() < size.height()) {
+        return image;
+    }
+    return image.copy(QRect((image.width() - size.width()) / 2,
+                            (image.height() - size.height()) / 2,
+                            size.width(),
+                            size.height()));
 }
 
 QString ScaleImageThread::cacheImageToDisk(QImage &image, const TaskData &task, const QString &md5String)

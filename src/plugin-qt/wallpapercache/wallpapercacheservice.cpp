@@ -201,10 +201,14 @@ QString WallpaperCacheService::saveImageFromFd(const QDBusUnixFileDescriptor &fd
     }
     originFile.close();
 
-    // Detect format and rename with extension
-    QImageReader reader(originPath);
-    QString format = reader.format();
-    QString destinationPath = originPath + QString(".%1").arg(format);
+    // Detect format using static method to avoid loading entire image
+    QByteArray format = QImageReader::imageFormat(originPath);
+    if (format.isEmpty()) {
+        qWarning() << "Failed to detect image format:" << originPath;
+        QFile::remove(originPath);
+        return QString();
+    }
+    QString destinationPath = originPath + QString(".%1").arg(QString::fromLatin1(format));
     QFile file(originPath);
     if (!file.rename(destinationPath)) {
         qWarning() << "originPath rename failed";
