@@ -1,0 +1,12 @@
+{
+  "name": "org.deepin.dde.ScreenScale1",
+  "libPath": "libplugin-dde-screenscale.so",
+  "startType": "OnDemand",
+  "idleTime": 1,
+  "pluginType": "qt",
+  "policy": [
+    {
+      "path": "/org/deepin/dde/ScreenScale1"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "magic": "dsg.config.meta",
+  "version": "1.0",
+  "contents": {
+    "scaleFactor": {
+      "value": 0.0,
+      "serial": 0,
+      "flags": [
+        "global"
+      ],
+      "name": "Global Scale Factor",
+      "name[zh_CN]": "全局缩放比例",
+      "description": "Global scale factor for all monitors.",
+      "permissions": "readwrite",
+      "visibility": "public"
+    },
+    "scaleStep": {
+      "value": 0.25,
+      "serial": 0,
+      "flags": [
+        "global"
+      ],
+      "name": "Scale Step",
+      "name[zh_CN]": "缩放步长",
+      "description": "Step size for screen scaling.",
+      "permissions": "readonly",
+      "visibility": "public"
+    }
+  }
+}

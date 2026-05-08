@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #ifndef XSETTINGSMANAGER_H
@@ -17,6 +17,8 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
+
+#include <utility>
 
 class XSettingsManager : public QObject
 {
@@ -40,18 +42,19 @@ Q_SIGNALS: // SIGNALS
 
 protected Q_SLOTS:
     void handleDConfigChangedCb(const QString &key);
+    void onScaleFactorChanged(double scale);
 
 private:
-    double getRecommendedScaleFactor();
+    // 从 ScreenScale 服务获取缩放信息，返回 {current, recommended}
+    std::pair<double, double> getScaleInfoFromService();
+
+    QString getScreensJson();
     double getForceScaleFactor();
-    void adjustScaleFactor(double recommendedScaleFactor);
     void updateDPI();
     void updateXResources();
-    void updateFirefoxDPI();
     XsValue getSettingValue(QString prop);
     void setSettings(QVector<XsSetting> settings);
     QVector<XsSetting> getSettingsInSchema();
-    ScaleFactors parseScreenFactors(QString screenFactors);
     void setGSettingsByXProp(const QString &prop, XsValue value);
     void setSingleScaleFactor(double scale, bool emitSignal);
     void setScaleFactorForPlymouth(int factor, bool emitSignal);
@@ -75,6 +78,7 @@ private:
     // bool m_restartOSD;                   //
     XcbUtils &m_xcbUtils;
     DconfInfos m_dconfInfos;
+    QSharedPointer<QDBusInterface> m_screenScaleInterface;
 };
 
 #endif // XSETTINGSMANAGER_H

@@ -1,13 +1,12 @@
-# SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+# SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-cmake_minimum_required(VERSION 3.16)
+set(PLUGIN_NAME "plugin-qt-wallpaperslideshow")
 
-set(BIN_NAME "plugin-qt-wallpaperslideshow")
+project(${PLUGIN_NAME})
 
-project(${BIN_NAME})
-
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
@@ -22,22 +21,17 @@ qt_add_dbus_adaptor(ADAPTER_SOURCES
                      wallpaperslideshow.h
                      WallpaperSlideshow)
 
-add_library(${BIN_NAME} MODULE
+add_library(${PLUGIN_NAME} MODULE
     ${SRCS}
     ${ADAPTER_SOURCES}
 )
 
-target_include_directories(${BIN_NAME} PUBLIC
-  Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::DBus
+target_link_libraries(${PLUGIN_NAME}
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::DBus
+    Dtk${DTK_VERSION_MAJOR}::Core
+    Dtk${DTK_VERSION_MAJOR}::Gui
 )
 
-target_link_libraries(${BIN_NAME} PRIVATE
-  Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::DBus
-  Dtk${DTK_VERSION_MAJOR}::Core
-  Dtk${DTK_VERSION_MAJOR}::Gui
-)
-
-install(TARGETS ${BIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plugin-qt-wallpaperslideshow.json DESTINATION share/deepin-service-manager/user/)
+install(TARGETS ${PLUGIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plugin-qt-wallpaperslideshow.json DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/deepin-service-manager/user)

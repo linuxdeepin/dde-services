@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "xsdatainfo.h"
@@ -46,7 +46,7 @@ void XSItemInfo::unMarshalXSItemInfoData(QByteArray &datas)
         value = tempString;
         break;
     case HeadTypeColor:
-        for (int i = 0; i < colorSize; i++) {
+        for (size_t i = 0; i < colorSize; i++) {
             Utils::readInteger(datas, tempColor[i]);
         }
         value = tempColor;
@@ -127,7 +127,7 @@ bool XSItemInfo::marshalXSItemInfoData(QByteArray &datas)
         if (colorValue == nullptr) {
             break;
         }
-        for (int i = 0; i < colorSize; i++) {
+        for (size_t i = 0; i < colorSize; i++) {
             Utils::writeInteger(datas, (*colorValue)[i]);
         }
         ret = true;
