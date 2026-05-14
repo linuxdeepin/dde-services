@@ -30,8 +30,18 @@ XSettingsManager::XSettingsManager(QObject *parent)
     , m_xcbUtils(XcbUtils::getInstance())
 {
     connect(m_settingDconfig, &DTK_CORE_NAMESPACE::DConfig::valueChanged, this, &XSettingsManager::handleDConfigChangedCb);
-    setScreenScaleFactors(getScreenScaleFactors(), false);
-    adjustScaleFactor(getRecommendedScaleFactor());
+
+    double scale = 0;
+    if (m_settingDconfig->isValid()) {
+        scale = m_settingDconfig->value("scale-factor").toDouble();
+    }
+
+    // scale <= 0 is invalid, use recommended scale factor
+    if (scale <= 0) {
+        setScreenScaleFactors(getScreenScaleFactors(), false);
+        adjustScaleFactor(getRecommendedScaleFactor());
+    }
+
     setSettings(getSettingsInSchema());
 
     updateDPI();
