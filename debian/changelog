@@ -1,3 +1,10 @@
+dde-services (1.0.25) unstable; urgency=medium
+
+  * perf: optimize XSettings1 startup — remove Before constraint, skip
+    redundant init, clean up debug code
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 15 May 2026 09:35:57 +0800
+
 dde-services (1.0.24) unstable; urgency=medium
 
   * fix(wallpapercache): use QImageReader scaled decoding to avoid OOM
