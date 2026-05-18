@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="zh_CN">
+<context>
+    <name>LowPowerManager</name>
+    <message>
+        <source>Battery critically low</source>
+        <translation>电池电量耗尽</translation>
+    </message>
+    <message>
+        <source>Battery low, please plug in</source>
+        <translation>电池电量低，请连接电源</translation>
+    </message>
+</context>
+<context>
+    <name>PowerManager</name>
+    <message>
+        <source>The system will shut down automatically after %1 s</source>
+        <translation>系统将在%1秒后自动关机</translation>
+    </message>
+    <message>
+        <source>Scheduled Shutdown</source>
+        <translation>定时关机</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Shut down</source>
+        <translation>关机</translation>
+    </message>
+</context>
+</TS>
