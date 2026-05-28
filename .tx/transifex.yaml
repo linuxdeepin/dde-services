@@ -4,5 +4,15 @@ filters:
     file_format: QT
     source_language: en_US
     translation_files_expression: src/plugin-qt/power/session/translations/plugin-power-session_<lang>.ts
+  - filter_type: file
+    source_file: src/plugin-qt/shortcut/translations/org.deepin.dde.keybinding_en.ts
+    file_format: QT
+    source_language: en_US
+    translation_files_expression: src/plugin-qt/shortcut/translations/org.deepin.dde.keybinding_<lang>.ts
+  - filter_type: file
+    source_file: src/plugin-qt/shortcut/dde-app-shortcuts/translations/org.deepin.dde.shortcut.dde-app_en.ts
+    file_format: QT
+    source_language: en_US
+    translation_files_expression: src/plugin-qt/shortcut/dde-app-shortcuts/translations/org.deepin.dde.shortcut.dde-app_<lang>.ts
 settings:
     pr_branch_name: transifex_update_<br_unique_id>

@@ -1,0 +1,54 @@
+#!/bin/sh
+set -e
+
+# Reload shortcut configurations for all active user sessions when files under
+# /usr/share/deepin/org.deepin.dde.keybinding/ change. Failures are logged via
+# `logger` instead of being silently dropped so packagers can diagnose them.
+reload_shortcuts_for_sessions() {
+    for user_session in /run/user/*/bus; do
+        [ -S "$user_session" ] || continue
+
+        user_id=$(basename "$(dirname "$user_session")")
+        user_name=$(getent passwd "$user_id" | cut -d: -f1)
+        if [ -z "$user_name" ]; then
+            logger -t dde-services-trigger "no passwd entry for uid $user_id, skipping"
+            continue
+        fi
+
+        # runuser does not invoke PAM session like `su -`, so it works for
+        # users without a login shell and avoids reloading the full env.
+        # Capture stdout+stderr and the exit code separately — POSIX sh has
+        # no `pipefail`, so `cmd | logger` always returns logger's status
+        # and would mask dbus-send failures behind a successful pipe.
+        output=$(runuser -u "$user_name" -- env \
+                DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$user_id/bus" \
+                XDG_RUNTIME_DIR="/run/user/$user_id" \
+                dbus-send --session --type=method_call \
+                    --dest=org.deepin.dde.Keybinding1 \
+                    /org/deepin/dde/Keybinding1 \
+                    org.deepin.dde.Keybinding1.ReloadConfigs \
+                2>&1) || rc=$?
+        rc=${rc:-0}
+
+        if [ -n "$output" ]; then
+            printf '%s\n' "$output" | logger -t dde-services-trigger -p user.warning
+        fi
+        if [ "$rc" -ne 0 ]; then
+            logger -t dde-services-trigger -p user.warning \
+                "ReloadConfigs failed for uid=$user_id user=$user_name (exit=$rc)"
+        fi
+        unset rc output
+    done
+}
+
+if [ "$1" = "triggered" ]; then
+    # Never propagate a per-user reload failure to dpkg — the trigger is
+    # already declared `interest-noawait`, but `set -e` would still abort the
+    # postinst on a non-zero subshell. Swallow at the function boundary only.
+    reload_shortcuts_for_sessions || true
+    exit 0
+fi
+
+#DEBHELPER#
+
+exit 0
