@@ -14,19 +14,19 @@
     <name>PowerManager</name>
     <message>
         <source>The system will shut down automatically after %1 s</source>
-        <translation type="unfinished"/>
+        <translation>El sistema s&apos;aturarà automàticament d&apos;aquí a %1 s</translation>
     </message>
     <message>
         <source>Scheduled Shutdown</source>
-        <translation type="unfinished"/>
+        <translation>Aturada programada</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancel·la</translation>
     </message>
     <message>
         <source>Shut down</source>
-        <translation type="unfinished"/>
+        <translation>Atura&apos;t</translation>
     </message>
 </context>
 </TS>
