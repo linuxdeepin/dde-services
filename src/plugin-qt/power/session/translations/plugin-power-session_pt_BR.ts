@@ -7,14 +7,14 @@
     </message>
     <message>
         <source>Battery low, please plug in</source>
-        <translation type="unfinished"/>
+        <translation>Bateria fraca. Conecte o carregador</translation>
     </message>
 </context>
 <context>
     <name>PowerManager</name>
     <message>
         <source>The system will shut down automatically after %1 s</source>
-        <translation type="unfinished"/>
+        <translation>O sistema será desligado automaticamente em %1s</translation>
     </message>
     <message>
         <source>Scheduled Shutdown</source>
