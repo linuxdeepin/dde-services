@@ -358,8 +358,8 @@ void PowerManager::handleBeforeSleep(bool)
     qDebug(logPowerSession) << "System is going to sleep, prepare suspend state:" << m_prepareSuspendState;
     m_prepareSuspendState = PS_Sleeping;
     setBlackScreenActive(true);
-    if (m_useWayland && m_sleepLock) {
-        m_proxy->lockSession(currentSessionId());
+    if (m_sleepLock) {
+        doLock(true);
     }
 }
 
@@ -370,11 +370,18 @@ void PowerManager::handleWakeup()
     m_delayInActive = true;
     QTimer::singleShot(m_delayWakeupInterval * 1000, this, [this]() {
         m_delayInActive = false;
+        if (m_sleepLock) {
+            qCDebug(logPowerSession) << "Locking session after wakeup delay";
+            doLock(true);
+        }
         setBlackScreenActive(false);
     });
     setDPMSModeOn();
-    if (m_powerSavePlan) m_powerSavePlan->HandleIdleOff();
-    if (m_scheduledShutdownState) scheduledShutdown(SchedInit);
+    if (m_powerSavePlan)
+        m_powerSavePlan->HandleIdleOff();
+
+    if (m_scheduledShutdownState)
+        scheduledShutdown(SchedInit);
 }
 
 void PowerManager::Reset()
