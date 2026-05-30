@@ -101,10 +101,11 @@ public:
     void setBrightness(int index, double value) override;
 
     wl_display *m_display = nullptr;
+    wl_registry *m_registry = nullptr;
     std::unique_ptr<OutputPowerManager> m_manager;
     std::unique_ptr<TreeLandOutputMgr> m_treeLandMgr;
     std::vector<Output> m_outputs;
-    QHash<int, QVariantAnimation*> m_brightnessAnims;
+    QHash<uint32_t, QVariantAnimation*> m_brightnessAnims;
     bool m_brightnessAvailable = false;
 
 private:

@@ -170,6 +170,8 @@ WaylandScreenController::~WaylandScreenController()
     m_outputs.clear();
     m_treeLandMgr.reset();
     m_manager.reset();
+    if (m_registry)
+        wl_registry_destroy(m_registry);
 }
 
 static void scOutputGlobal(void *data, wl_registry *r, uint32_t name,
@@ -184,21 +186,32 @@ static void scOutputGlobal(void *data, wl_registry *r, uint32_t name,
         out.wlOutput = wlo;
         out.power = sc->m_manager->getOutputPower(wlo);
         if (out.power) {
-            QObject::connect(out.power.get(), &OutputPower::modeChanged,
-                sc, [sc, idx = int(sc->m_outputs.size())](uint32_t m) {
-                if (idx < int(sc->m_outputs.size())) {
-                    sc->m_outputs[idx].currentMode = m;
-                    Q_EMIT sc->modeChanged(idx, m == 0 ? ScreenController::Off : ScreenController::On);
+            auto *pwr = out.power.get();
+            QObject::connect(pwr, &OutputPower::modeChanged,
+                sc, [sc, pwr](uint32_t m) {
+                auto &outs = sc->m_outputs;
+                for (int i = 0; i < int(outs.size()); ++i) {
+                    if (outs[i].power.get() == pwr) {
+                        outs[i].currentMode = m;
+                        Q_EMIT sc->modeChanged(i, m == 0 ? ScreenController::Off : ScreenController::On);
+                        return;
+                    }
                 }
             });
         }
         if (sc->m_brightnessAvailable) {
             out.colorControl.reset(sc->m_treeLandMgr->getColorControl(wlo));
             if (out.colorControl) {
-                QObject::connect(out.colorControl.get(), &OutputColorControl::brightnessChanged,
-                    sc, [sc, idx = int(sc->m_outputs.size())](double v) {
-                    if (idx < int(sc->m_outputs.size()))
-                        Q_EMIT sc->brightnessChanged(idx, v);
+                auto *cc = out.colorControl.get();
+                QObject::connect(cc, &OutputColorControl::brightnessChanged,
+                    sc, [sc, cc](double v) {
+                    auto &outs = sc->m_outputs;
+                    for (int i = 0; i < int(outs.size()); ++i) {
+                        if (outs[i].colorControl.get() == cc) {
+                            Q_EMIT sc->brightnessChanged(i, v);
+                            return;
+                        }
+                    }
                 });
             }
         }
@@ -212,8 +225,13 @@ static void scOutputRemove(void *data, wl_registry *, uint32_t name)
     auto &outs = sc->m_outputs;
     for (auto it = outs.begin(); it != outs.end(); ++it) {
         if (it->registryName == name) {
-            int idx = int(it - outs.begin());
-            if (auto *anim = sc->m_brightnessAnims.take(idx)) {
+            if (it->power) {
+                QObject::disconnect(it->power.get(), nullptr, sc, nullptr);
+            }
+            if (it->colorControl) {
+                QObject::disconnect(it->colorControl.get(), nullptr, sc, nullptr);
+            }
+            if (auto *anim = sc->m_brightnessAnims.take(it->registryName)) {
                 anim->stop();
                 anim->deleteLater();
             }
@@ -229,11 +247,12 @@ static const wl_registry_listener kOutputListener = {scOutputGlobal, scOutputRem
 
 void WaylandScreenController::discoverOutputs()
 {
-    auto *reg = wl_display_get_registry(m_display);
-    wl_registry_add_listener(reg, &kOutputListener, this);
+    if (m_registry)
+        wl_registry_destroy(m_registry);
+    m_registry = wl_display_get_registry(m_display);
+    wl_registry_add_listener(m_registry, &kOutputListener, this);
     wl_display_roundtrip(m_display);
     wl_display_roundtrip(m_display);
-    wl_registry_destroy(reg);
 }
 
 ScreenController::Mode WaylandScreenController::mode(int index) const
@@ -291,7 +310,7 @@ void WaylandScreenController::setBrightness(int index, double value)
         return;
     }
 
-    if (auto *old = m_brightnessAnims.take(index)) {
+    if (auto *old = m_brightnessAnims.take(out.registryName)) {
         old->disconnect(this);
         old->stop();
         old->deleteLater();
@@ -303,17 +322,22 @@ void WaylandScreenController::setBrightness(int index, double value)
     anim->setEndValue(value);
     anim->setEasingCurve(QEasingCurve::InOutCubic);
 
+    auto regName = out.registryName;
     connect(anim, &QVariantAnimation::valueChanged, this,
-            [this, index](const QVariant &v) {
-        if (index < 0 || size_t(index) >= m_outputs.size()) return;
-        auto &o = m_outputs[size_t(index)];
-        if (o.colorControl) {
-            o.colorControl->set_brightness(wl_fixed_from_double(v.toDouble()));
-            o.colorControl->commit();
-            wl_display_flush(m_display);
+            [this, regName](const QVariant &v) {
+        auto &outs = m_outputs;
+        for (int i = 0; i < int(outs.size()); ++i) {
+            if (outs[i].registryName == regName) {
+                if (outs[i].colorControl) {
+                    outs[i].colorControl->set_brightness(wl_fixed_from_double(v.toDouble()));
+                    outs[i].colorControl->commit();
+                    wl_display_flush(m_display);
+                }
+                return;
+            }
         }
     });
 
-    m_brightnessAnims[index] = anim;
+    m_brightnessAnims[regName] = anim;
     anim->start();
 }

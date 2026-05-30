@@ -165,6 +165,7 @@ void PowerSavePlan::HandleIdleOff()
     m_isIdle = false;
     interruptTasks();
     if (!m_powerManager) return;
+    m_powerManager->SetPrepareSuspend(static_cast<int>(PS_Normal));
     if (m_powerManager->screenController()) {
         m_powerManager->screenController()->setAllModes(ScreenController::On);
     }
