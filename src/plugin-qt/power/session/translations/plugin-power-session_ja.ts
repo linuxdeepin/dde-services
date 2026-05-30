@@ -3,18 +3,18 @@
     <name>LowPowerManager</name>
     <message>
         <source>Battery critically low</source>
-        <translation type="unfinished"/>
+        <translation>バッテリー残量がごくわずかです</translation>
     </message>
     <message>
         <source>Battery low, please plug in</source>
-        <translation type="unfinished"/>
+        <translation>バッテリーが少なくなっています。電源に接続してください</translation>
     </message>
 </context>
 <context>
     <name>PowerManager</name>
     <message>
         <source>The system will shut down automatically after %1 s</source>
-        <translation type="unfinished"/>
+        <translation>%1秒後に自動的にシャットダウンします</translation>
     </message>
     <message>
         <source>Scheduled Shutdown</source>
