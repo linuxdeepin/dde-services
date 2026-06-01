@@ -1,0 +1,20 @@
+[main]
+host = https://www.transifex.com
+
+[o:linuxdeepin:p:deepin-desktop-environment:r:6d0f6b10f2193a64c169f1d0911be362]
+file_filter = src/plugin-qt/power/session/translations/plugin-power-session_<lang>.ts
+source_file = src/plugin-qt/power/session/translations/plugin-power-session_en.ts
+source_lang = en_US
+type = QT
+
+[o:linuxdeepin:p:deepin-desktop-environment:r:0766b57663621587d28ce3eb90c1e473]
+file_filter = src/plugin-qt/shortcut/translations/org.deepin.dde.keybinding_<lang>.ts
+source_file = src/plugin-qt/shortcut/translations/org.deepin.dde.keybinding_en.ts
+source_lang = en_US
+type = QT
+
+[o:linuxdeepin:p:deepin-desktop-environment:r:a07ae48d24f2a19611cd31a4d575cef8]
+file_filter = src/plugin-qt/shortcut/dde-app-shortcuts/translations/org.deepin.dde.shortcut.dde-app_<lang>.ts
+source_file = src/plugin-qt/shortcut/dde-app-shortcuts/translations/org.deepin.dde.shortcut.dde-app_en.ts
+source_lang = en_US
+type = QT
