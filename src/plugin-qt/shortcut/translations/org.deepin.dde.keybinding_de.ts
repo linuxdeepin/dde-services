@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Default terminal</source>
-        <translation type="unfinished"/>
+        <translation>Standard-Terminal</translation>
     </message>
 </context>
 </TS>
