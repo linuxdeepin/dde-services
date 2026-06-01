@@ -15,11 +15,11 @@
     </message>
     <message>
         <source>Shutdown interface</source>
-        <translation type="unfinished"/>
+        <translation>Interface de desligamento</translation>
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation type="unfinished"/>
+        <translation>Janela Quake do terminal</translation>
     </message>
     <message>
         <source>launcher</source>
