@@ -19,11 +19,11 @@
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra del terminal Quake</translation>
     </message>
     <message>
         <source>launcher</source>
-        <translation type="unfinished"/>
+        <translation>Llançador</translation>
     </message>
 </context>
 </TS>
