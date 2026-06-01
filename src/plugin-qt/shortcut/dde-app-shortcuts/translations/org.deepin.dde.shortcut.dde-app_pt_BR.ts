@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification Center</source>
-        <translation type="unfinished"/>
+        <translation>Notificações</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
