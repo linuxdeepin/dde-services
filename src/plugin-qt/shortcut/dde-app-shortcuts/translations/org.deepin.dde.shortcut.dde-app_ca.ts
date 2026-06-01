@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation>Bloca la pantalla</translation>
+        <translation>Pantalla de blocatge</translation>
     </message>
     <message>
         <source>Notification Center</source>
