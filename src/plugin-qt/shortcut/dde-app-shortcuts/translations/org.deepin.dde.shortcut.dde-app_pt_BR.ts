@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>launcher</source>
-        <translation type="unfinished"/>
+        <translation>Launcher</translation>
     </message>
 </context>
 </TS>
