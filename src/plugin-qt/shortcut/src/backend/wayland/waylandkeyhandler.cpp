@@ -7,6 +7,7 @@
 
 #include <QDebug>
 #include <QGuiApplication>
+#include <QSet>
 #include <QtWaylandClient/QWaylandClientExtension>
 #include <wayland-client.h>
 
@@ -27,6 +28,15 @@ WaylandKeyHandler::~WaylandKeyHandler()
 {
 }
 
+// Lock keys (NumLock, CapsLock) are rejected by Treeland at commit time.
+// Skip bindKey() for these so the bulk commit does not fail; the config
+// remains visible on D-Bus and the physical keys keep working.
+static bool isLockKey(const QString &hotkey)
+{
+    static const QSet<QString> lockKeys = { "NumLock", "CapsLock", "Num_Lock", "Caps_Lock" };
+    return lockKeys.contains(hotkey);
+}
+
 bool WaylandKeyHandler::registerKey(const KeyConfig &config)
 {
     if (!m_wrapper) return false;
@@ -39,6 +49,12 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
     bool allSuccess = true;
 
     for (const QString &hotkey : config.hotkeys) {
+        if (isLockKey(hotkey)) {
+            qDebug() << "Skipping lock key registration on Wayland:" << hotkey
+                     << "for" << config.getId();
+            continue;
+        }
+
         QString name = config.getId() + "_" + hotkey;
         
         // Determine action: if triggerType is Action (3), use value? 
