@@ -1,0 +1,100 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "appId": {
+            "value": "org.deepin.dde.shortcut.dde-app",
+            "serial": 0,
+            "flags": [],
+            "name": "appId",
+            "name[zh_CN]": "提供快捷键应用Id",
+            "description": "provide shortcut app id",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayName": {
+            "value": "Previous Workspace",
+            "serial": 0,
+            "flags": [],
+            "name": "displayName",
+            "name[zh_CN]": "上一个工作区",
+            "description": "上一个工作区",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "hotkeys": {
+            "value": [
+                "Meta+Left"
+            ],
+            "serial": 0,
+            "flags": [],
+            "name": "hotkeys",
+            "name[zh_CN]": "快捷键组合",
+            "description": "快捷键组合",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "triggerType": {
+            "value": 3,
+            "serial": 0,
+            "flags": [],
+            "name": "triggerType",
+            "name[zh_CN]": "快捷键触发动作类型",
+            "description": "1=命令,2=应用,3=合成器动作",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "triggerValue": {
+            "value": [
+                "8"
+            ],
+            "serial": 0,
+            "flags": [],
+            "name": "triggerValue",
+            "name[zh_CN]": "快捷键触发动作",
+            "description": "8=上一个工作区(prev_workspace)",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "keyEventFlags": {
+            "value": 2,
+            "serial": 0,
+            "flags": [],
+            "name": "keyEventFlags",
+            "name[zh_CN]": "按键事件标志",
+            "description": "按键事件标志:1-press,2-release,4-repeat",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "category": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "category",
+            "name[zh_CN]": "快捷键类别,1:系统",
+            "description": "系统快捷键",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "enabled": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "enabled",
+            "name[zh_CN]": "使能",
+            "description": "是否启用快捷键",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "modifiable": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "modifiable",
+            "name[zh_CN]": "能否修改快捷键",
+            "description": "能否修改快捷键",
+            "permissions": "",
+            "visibility": "private"
+        }
+    }
+}
