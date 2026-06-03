@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilat näkymä</translation>
     </message>
 </context>
 </TS>
