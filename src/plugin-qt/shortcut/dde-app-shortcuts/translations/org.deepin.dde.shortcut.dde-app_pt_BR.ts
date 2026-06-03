@@ -27,15 +27,15 @@
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar maximização da janela</translation>
     </message>
     <message>
         <source>Close Window</source>
-        <translation type="unfinished"/>
+        <translation>Fechar janela</translation>
     </message>
     <message>
         <source>Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Maximizar janela</translation>
     </message>
     <message>
         <source>Next Window</source>
