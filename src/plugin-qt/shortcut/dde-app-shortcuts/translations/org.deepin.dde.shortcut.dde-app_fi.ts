@@ -15,15 +15,15 @@
     </message>
     <message>
         <source>Shutdown interface</source>
-        <translation type="unfinished"/>
+        <translation>Sammutus käyttöliittymä</translation>
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation type="unfinished"/>
+        <translation>Quake terminaali</translation>
     </message>
     <message>
         <source>launcher</source>
-        <translation type="unfinished"/>
+        <translation>käynnistäjä</translation>
     </message>
     <message>
         <source>Cancel Maximize Window</source>
