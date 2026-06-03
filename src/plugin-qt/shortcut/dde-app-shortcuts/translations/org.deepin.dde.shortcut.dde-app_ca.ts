@@ -25,5 +25,57 @@
         <source>launcher</source>
         <translation>Llançador</translation>
     </message>
+    <message>
+        <source>Cancel Maximize Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Close Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Maximize Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Next Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Next Window of Same App</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Next Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Previous Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Previous Window of Same App</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Previous Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Show Desktop</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Show Window Menu</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Task Switcher</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Toggle Multitask View</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
