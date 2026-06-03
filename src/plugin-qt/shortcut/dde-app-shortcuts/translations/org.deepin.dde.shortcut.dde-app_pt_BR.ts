@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>Alternar multitarefas</translation>
     </message>
 </context>
 </TS>
