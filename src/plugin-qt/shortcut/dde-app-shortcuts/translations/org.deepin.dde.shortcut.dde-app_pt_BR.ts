@@ -59,19 +59,19 @@
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Área de trabalho anterior</translation>
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>Exibir área de trabalho</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>Exibir menu da janela</translation>
     </message>
     <message>
         <source>Task Switcher</source>
-        <translation type="unfinished"/>
+        <translation>Alternador de tarefas</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
