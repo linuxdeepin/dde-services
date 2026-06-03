@@ -59,11 +59,11 @@
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Edellinen työtila</translation>
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>Näytä työpöytä</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
