@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Next Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Próxima área de trabalho</translation>
     </message>
     <message>
         <source>Previous Window</source>
