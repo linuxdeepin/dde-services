@@ -51,11 +51,11 @@
     </message>
     <message>
         <source>Previous Window</source>
-        <translation type="unfinished"/>
+        <translation>Janela anterior</translation>
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Janela anterior do mesmo aplicativo</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
