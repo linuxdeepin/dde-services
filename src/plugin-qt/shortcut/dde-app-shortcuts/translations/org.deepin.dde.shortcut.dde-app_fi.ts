@@ -67,11 +67,11 @@
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>Näytä ikkunan valikot</translation>
     </message>
     <message>
         <source>Task Switcher</source>
-        <translation type="unfinished"/>
+        <translation>Tehtävien vaihtaja</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
