@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Next Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Saman sovelluksen seuraava ikkuna</translation>
     </message>
     <message>
         <source>Next Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Seuraava työtila</translation>
     </message>
     <message>
         <source>Previous Window</source>
-        <translation type="unfinished"/>
+        <translation>Edellinen ikkuna</translation>
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Saman sovelluksen edellinen ikkuna</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
