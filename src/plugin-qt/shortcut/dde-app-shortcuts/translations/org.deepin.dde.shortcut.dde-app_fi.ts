@@ -27,19 +27,19 @@
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Peruuta suurennettu ikkuna</translation>
     </message>
     <message>
         <source>Close Window</source>
-        <translation type="unfinished"/>
+        <translation>Sulje ikkuna</translation>
     </message>
     <message>
         <source>Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Suurenna ikkuna</translation>
     </message>
     <message>
         <source>Next Window</source>
-        <translation type="unfinished"/>
+        <translation>Seuraava ikkuna</translation>
     </message>
     <message>
         <source>Next Window of Same App</source>
