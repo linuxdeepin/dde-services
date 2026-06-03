@@ -39,11 +39,11 @@
     </message>
     <message>
         <source>Next Window</source>
-        <translation type="unfinished"/>
+        <translation>Próxima janela</translation>
     </message>
     <message>
         <source>Next Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Próxima janela do mesmo aplicativo</translation>
     </message>
     <message>
         <source>Next Workspace</source>
