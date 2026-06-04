@@ -39,15 +39,15 @@
     </message>
     <message>
         <source>Next Window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra següent</translation>
     </message>
     <message>
         <source>Next Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Finestra següent de la mateixa aplicació</translation>
     </message>
     <message>
         <source>Next Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Espai de treball següent</translation>
     </message>
     <message>
         <source>Previous Window</source>
