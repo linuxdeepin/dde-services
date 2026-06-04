@@ -103,11 +103,11 @@
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut okna</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut OCR (Tekst z obrazu)</translation>
     </message>
 </context>
 </TS>
