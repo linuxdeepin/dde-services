@@ -99,11 +99,11 @@
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor del sistema</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de la finestra</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
