@@ -3,7 +3,7 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Display switch</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz ekran</translation>
     </message>
     <message>
         <source>Default terminal</source>
