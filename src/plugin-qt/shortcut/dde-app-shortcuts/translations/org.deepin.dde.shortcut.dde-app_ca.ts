@@ -79,15 +79,15 @@
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Retarda la captura</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>Gestor de fitxers</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de pantalla completa</translation>
     </message>
     <message>
         <source>Global Search</source>
