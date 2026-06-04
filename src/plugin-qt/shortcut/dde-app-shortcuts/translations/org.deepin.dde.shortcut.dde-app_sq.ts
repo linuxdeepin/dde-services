@@ -31,43 +31,43 @@
     </message>
     <message>
         <source>Close Window</source>
-        <translation type="unfinished"/>
+        <translation>Mbylle Dritaren</translation>
     </message>
     <message>
         <source>Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Maksimizoje Dritaren</translation>
     </message>
     <message>
         <source>Next Window</source>
-        <translation type="unfinished"/>
+        <translation>Dritarja Pasuese</translation>
     </message>
     <message>
         <source>Next Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Dritarja Pasuese e të Njëjtit Aplikacion</translation>
     </message>
     <message>
         <source>Next Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Hapësira Pasuese e Punës</translation>
     </message>
     <message>
         <source>Previous Window</source>
-        <translation type="unfinished"/>
+        <translation>Dritarja e Mëparshme</translation>
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Dritarja e Mëparshme e të Njëjtit Aplikacion</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Hapësira e Mëparshme e Punës</translation>
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>Shfaqe Desktopin</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>Shfaq Menu Dritaresh</translation>
     </message>
     <message>
         <source>Task Switcher</source>
