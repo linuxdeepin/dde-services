@@ -1,3 +1,21 @@
+dde-services (1.0.26) unstable; urgency=medium
+
+  * chore(shortcut): remove taskswitch-enter shortcut config
+  * feat(shortcut): add 8 app shortcuts to dde-app-shortcuts
+  * feat(shortcut): add Treeland compositor action shortcuts to dde-app-
+    shortcuts
+  * fix: skip NumLock/CapsLock registration on Wayland
+  * feat: add tx config file
+  * feat: add shortcut manager plugin
+  * fix(power): fix idle ignored after wakeup, add wakeup lock, and
+    support output hotplug
+  * chore(transifex): add configuration for power plugin translations
+  * feat(power): add session power management plugin
+  * fix(wallpaperslideshow): skip DBus registration on Wayland, handled
+    by Treeland
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 04 Jun 2026 19:44:27 +0800
+
 dde-services (1.0.25) unstable; urgency=medium
 
   * perf: optimize XSettings1 startup — remove Before constraint, skip
