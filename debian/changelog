@@ -1,3 +1,10 @@
+dde-services (1.0.27) unstable; urgency=medium
+
+  * refactor(shortcut): use backslash line continuation in INI SubPaths
+  * feat(shortcut): add SwapHotkeys and ReplaceHotkey D-Bus methods
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 04 Jun 2026 21:17:50 +0800
+
 dde-services (1.0.26) unstable; urgency=medium
 
   * chore(shortcut): remove taskswitch-enter shortcut config
