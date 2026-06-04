@@ -77,5 +77,37 @@
         <source>Toggle Multitask View</source>
         <translation>Vaihda työtilat näkymä</translation>
     </message>
+    <message>
+        <source>Delay Screenshot</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File Manager</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Fullscreen Screenshot</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Global Search</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>System Monitor</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window Screenshot</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>OCR Screenshot</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
