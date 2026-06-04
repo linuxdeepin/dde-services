@@ -63,19 +63,19 @@
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>Mostra l&apos;escriptori</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>Mostra el menú de la finestra</translation>
     </message>
     <message>
         <source>Task Switcher</source>
-        <translation type="unfinished"/>
+        <translation>Canviador de tasques</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>Commuta la vista de multitasca</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
