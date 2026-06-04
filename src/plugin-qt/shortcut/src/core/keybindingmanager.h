@@ -67,6 +67,11 @@ public slots:
     Q_SCRIPTABLE QList<ShortcutInfo> SearchShortcuts(const QString &keyword);
     Q_SCRIPTABLE bool ModifyHotkeys(const QString &id, const QStringList &newHotkeys);
     Q_SCRIPTABLE bool Disable(const QString &id);
+
+    // Atomically swap the hotkeys of two shortcuts in a single compositor commit.
+    Q_SCRIPTABLE bool SwapHotkeys(const QString &id1, const QString &id2);
+    // Remove newHotkey from conflictId and assign it to targetId in one commit.
+    Q_SCRIPTABLE bool ReplaceHotkey(const QString &targetId, const QString &newHotkey, const QString &conflictId);
     Q_SCRIPTABLE void ReloadConfigs();
     Q_SCRIPTABLE void Reset();
     
@@ -95,6 +100,9 @@ private slots:
 private:
     bool registerShortcut(const KeyConfig &config);
     QString checkConflictForConfig(const KeyConfig &config, const QString &excludeId = QString());
+    void rollbackRegistration(const QString &id1, const QString &id2,
+                              KeyConfig &config1, KeyConfig &config2,
+                              const QStringList &hotkeys1, const QStringList &hotkeys2);
 
 
     ConfigLoader *m_loader;
