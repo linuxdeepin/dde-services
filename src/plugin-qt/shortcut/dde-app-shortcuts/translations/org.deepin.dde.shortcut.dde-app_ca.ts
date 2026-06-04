@@ -51,15 +51,15 @@
     </message>
     <message>
         <source>Previous Window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra anterior</translation>
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Finestra anterior de la mateixa aplicació</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Espai de treball anterior</translation>
     </message>
     <message>
         <source>Show Desktop</source>
