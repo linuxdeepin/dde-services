@@ -79,5 +79,37 @@
         <source>Toggle Multitask View</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Delay Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fullscreen Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OCR Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
