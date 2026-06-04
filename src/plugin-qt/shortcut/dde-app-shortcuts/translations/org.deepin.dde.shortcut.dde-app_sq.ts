@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Anulo Maksimizim Dritareje</translation>
     </message>
     <message>
         <source>Close Window</source>
@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Task Switcher</source>
-        <translation type="unfinished"/>
+        <translation>Ndërrues Punësh</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -83,11 +83,11 @@
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>Përgjegjës Kartelash</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Foto Ekrani Sa Krejt Ekrani</translation>
     </message>
     <message>
         <source>Global Search</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Foto Ekrani</translation>
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>Mbikëqyrës Sistemi</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Foto Ekrani Dritareje</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Foto Ekrani OCR</translation>
     </message>
 </context>
 </TS>
