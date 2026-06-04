@@ -87,15 +87,15 @@
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation>Captura de pantalla completa</translation>
+        <translation>Captura de la pantalla completa</translation>
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Cerca global</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de pantalla</translation>
     </message>
     <message>
         <source>System Monitor</source>
