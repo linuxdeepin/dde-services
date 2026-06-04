@@ -55,19 +55,19 @@
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>Poprzednie okno tej samej aplikacji</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Poprzedni obszar roboczy</translation>
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż pulpit</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż menu okna</translation>
     </message>
     <message>
         <source>Task Switcher</source>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz widok wielozadaniowości</translation>
     </message>
 </context>
 </TS>
