@@ -9,8 +9,11 @@
 
 #include <QDir>
 #include <QDebug>
+#include <QFile>
+#include <QTemporaryFile>
 #include <QSettings>
 #include <QSet>
+#include <QRegularExpression>
 
 #include <DConfig>
 
@@ -111,32 +114,52 @@ QSet<QString> ConfigLoader::discoverSubPaths()
     }
     
     // Scan INIs
+    // QSettings does not support backslash line continuation, so we read
+    // the raw file, join continuation lines, then feed to QSettings.
+    static const QRegularExpression reContinuation(QStringLiteral("\\\\\\s*\\n"));
     QStringList iniFiles = regDir.entryList(QStringList() << "*.ini", QDir::Files | QDir::NoDotAndDotDot);
     for (const QString &iniFile : iniFiles) {
-        QString fullPath = CONFIG_SUBPATH_DIR + iniFile;
-        QSettings settings(fullPath, QSettings::IniFormat);
+        QString fullPath = QDir(CONFIG_SUBPATH_DIR).absoluteFilePath(iniFile);
+        QFile file(fullPath);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "ConfigLoader: Failed to open" << fullPath;
+            continue;
+        }
+        QString content = QString::fromUtf8(file.readAll());
+        content.replace(reContinuation, QString());
+
+        // Write processed content to a temp file for QSettings
+        // (QSettings does not support backslash line continuation natively).
+        QTemporaryFile tmpFile;
+        tmpFile.setAutoRemove(true);
+        if (!tmpFile.open()) {
+            qWarning() << "ConfigLoader: Failed to create temp file for" << fullPath;
+            continue;
+        }
+        tmpFile.write(content.toUtf8());
+        tmpFile.flush();
+        tmpFile.close();
+
+        QSettings settings(tmpFile.fileName(), QSettings::IniFormat);
         settings.beginGroup("Config");
-        
+
         QVariant subPathsVar = settings.value("SubPaths");
         if (!subPathsVar.isValid()) {
             subPathsVar = settings.value("SubPath");
         }
-        
-        QString subPathsStr;
+
+        QStringList subPaths;
         if (subPathsVar.typeId() == QMetaType::QStringList) {
-            subPathsStr = subPathsVar.toStringList().join(",");
+            subPaths = subPathsVar.toStringList();
         } else {
-            subPathsStr = subPathsVar.toString();
+            subPaths = subPathsVar.toString().split(",", Qt::SkipEmptyParts);
         }
-        
+
         settings.endGroup();
 
-        qInfo() << "ConfigLoader: File:" << fullPath << "Status:" << settings.status() << "Raw Value:" << subPathsStr;
+        qDebug() << "ConfigLoader: File:" << fullPath << "Parsed" << subPaths.size() << "subpaths";
 
-        if (!subPathsStr.isEmpty()) {
-            // Use comma as separator
-            QStringList subPaths = subPathsStr.split(",", Qt::SkipEmptyParts);
-            qInfo() << "ConfigLoader: Parsed subpaths:" << subPaths;
+        if (!subPaths.isEmpty()) {
             for (const QString &subPath : subPaths) {
                 foundSubPaths.insert(subPath.trimmed());
             }
