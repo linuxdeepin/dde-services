@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Kërkim Global</translation>
     </message>
     <message>
         <source>Screenshot</source>
