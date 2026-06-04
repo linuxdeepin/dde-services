@@ -79,27 +79,27 @@
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Opóźniony zrzutu ekranu</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>Menedżer plików</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut pełnego ekranu</translation>
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Wyszukiwanie globalne</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut ekranu</translation>
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor systemu</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
