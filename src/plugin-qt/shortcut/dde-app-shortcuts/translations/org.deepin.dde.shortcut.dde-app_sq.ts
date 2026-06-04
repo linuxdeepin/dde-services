@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>Shfaq/Fshih Pamjen Shumëpunëshe</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
