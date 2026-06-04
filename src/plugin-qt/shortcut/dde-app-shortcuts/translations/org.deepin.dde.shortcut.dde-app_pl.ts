@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Task Switcher</source>
-        <translation type="unfinished"/>
+        <translation>Przełączanie zadań</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
