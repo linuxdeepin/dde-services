@@ -37,8 +37,8 @@ Depends:
  ${misc:Depends},
  deepin-service-manager (>> 1.0.21),
  dbus
-Breaks: dde-daemon (<< 6.1.87)
-Replaces: dde-daemon (<< 6.1.87)
+Breaks: dde-daemon (<< 6.1.94)
+Replaces: dde-daemon (<< 6.1.94)
 Description: deepin desktop-environment plugins service
  This package provides various system service plugins for Deepin Desktop
  Environment, including:
