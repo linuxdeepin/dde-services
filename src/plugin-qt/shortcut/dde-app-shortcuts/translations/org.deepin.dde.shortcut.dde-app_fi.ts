@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>OCR-tekstintunnistus</translation>
     </message>
 </context>
 </TS>
