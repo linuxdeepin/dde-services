@@ -91,19 +91,19 @@
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Haku</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Kaappaus</translation>
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>Järjestelmän valvonta</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Ikkunan kaappaus</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
