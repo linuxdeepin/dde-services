@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor de Sistema</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Capturar texto da tela por OCR</translation>
     </message>
 </context>
 </TS>
