@@ -79,11 +79,11 @@
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Capturar tela com atraso</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>Gerenciador de Arquivos</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
