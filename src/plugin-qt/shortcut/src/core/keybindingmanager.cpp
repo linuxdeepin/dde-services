@@ -162,10 +162,37 @@ ShortcutInfo KeybindingManager::LookupConflictShortcut(const QString &hotkey)
 QList<ShortcutInfo> KeybindingManager::SearchShortcuts(const QString &keyword)
 {
     QList<ShortcutInfo> list;
-    QList<KeyConfig> configs = m_keyConfigsMap.values();
-    for (const KeyConfig &config : configs) {
-        if (config.hotkeys.contains(keyword, Qt::CaseInsensitive)) {
+    if (keyword.isEmpty()) return list;
+
+    for (auto it = m_keyConfigsMap.constBegin(); it != m_keyConfigsMap.constEnd(); ++it) {
+        const KeyConfig &config = it.value();
+        if (!config.isValid()) continue;
+
+        // Match against shortcutId
+        if (config.getId().contains(keyword, Qt::CaseInsensitive)) {
             list.append(toShortcutInfo(config));
+            continue;
+        }
+
+        // Match against display name
+        if (config.displayName.contains(keyword, Qt::CaseInsensitive)) {
+            list.append(toShortcutInfo(config));
+            continue;
+        }
+
+        // Match against localized display name
+        QString localName = m_translationManager->translate(config.appId, config.displayName);
+        if (localName.contains(keyword, Qt::CaseInsensitive)) {
+            list.append(toShortcutInfo(config));
+            continue;
+        }
+
+        // Match against hotkey combinations
+        for (const QString &hk : config.hotkeys) {
+            if (hk.contains(keyword, Qt::CaseInsensitive)) {
+                list.append(toShortcutInfo(config));
+                break;
+            }
         }
     }
 
