@@ -79,15 +79,15 @@
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Kaappaus viiveellä</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>Tiedostonhallinta</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Kokonäytön kaappaus</translation>
     </message>
     <message>
         <source>Global Search</source>
