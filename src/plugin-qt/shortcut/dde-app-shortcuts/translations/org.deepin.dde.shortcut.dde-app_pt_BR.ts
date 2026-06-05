@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Pesquisa global</translation>
     </message>
     <message>
         <source>Screenshot</source>
