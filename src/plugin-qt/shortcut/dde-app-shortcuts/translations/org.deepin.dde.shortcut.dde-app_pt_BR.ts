@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Capturar tela inteira</translation>
     </message>
     <message>
         <source>Global Search</source>
@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de Tela</translation>
     </message>
     <message>
         <source>System Monitor</source>
