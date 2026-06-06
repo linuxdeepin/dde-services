@@ -7,19 +7,19 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"/>
+        <translation>画面をロック</translation>
     </message>
     <message>
         <source>Notification Center</source>
-        <translation type="unfinished"/>
+        <translation>通知センター</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
-        <translation type="unfinished"/>
+        <translation>シャットダウンインターフェース</translation>
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation type="unfinished"/>
+        <translation>ドロップダウンターミナル</translation>
     </message>
     <message>
         <source>launcher</source>
@@ -87,27 +87,27 @@
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>画面全体のスクリーンショット</translation>
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Global Search</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>スクリーンショット</translation>
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>システム モニター</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>ウィンドウのスクリーンショット</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>OCRスクリーンショット</translation>
     </message>
 </context>
 </TS>
