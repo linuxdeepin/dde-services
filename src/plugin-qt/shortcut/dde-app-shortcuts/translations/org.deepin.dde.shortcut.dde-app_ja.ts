@@ -47,43 +47,43 @@
     </message>
     <message>
         <source>Next Workspace</source>
-        <translation type="unfinished"/>
+        <translation>次のワークスペース</translation>
     </message>
     <message>
         <source>Previous Window</source>
-        <translation type="unfinished"/>
+        <translation>前のウィンドウ</translation>
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"/>
+        <translation>同じアプリの前のウィンドウ</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"/>
+        <translation>前のワークスペース</translation>
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>デスクトップを表示</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>ウィンドウメニューの表示</translation>
     </message>
     <message>
         <source>Task Switcher</source>
-        <translation type="unfinished"/>
+        <translation>タスクスイッチャー</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>マルチタスクビューの切り替え</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>指定時間後にスクリーンショットを撮影</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>ファイルマネージャー</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
