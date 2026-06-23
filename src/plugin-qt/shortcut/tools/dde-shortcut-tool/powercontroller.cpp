@@ -410,7 +410,13 @@ void PowerController::systemTurnOffScreen()
     qInfo() << "PowerController: turn off screen";
 
     if (isWaylandSession()) {
-        // TODO: adapt screen-off for Treeland Wayland (DPMS path TBD).
+        QDBusInterface power("org.deepin.dde.Power1", "/org/deepin/dde/Power1",
+                             "org.deepin.dde.Power1", QDBusConnection::sessionBus());
+        if (power.isValid()) {
+            power.call("TurnOffScreen");
+        } else {
+            qWarning() << "PowerController: Power1 unavailable for TurnOffScreen";
+        }
         return;
     }
 
