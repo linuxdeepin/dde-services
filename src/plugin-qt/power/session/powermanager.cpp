@@ -411,7 +411,7 @@ void PowerManager::SetPrepareSuspend(int state)
 
 void PowerManager::TurnOffScreen()
 {
-    setDPMSModeOff();
+    doTurnOffScreen();
 }
 
 void PowerManager::TurnOnScreen()
