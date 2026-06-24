@@ -1,3 +1,9 @@
+dde-services (1.0.30) unstable; urgency=medium
+
+  * fix: add Wayland screen-off in systemTurnOffScreen
+
+ -- zhangkun <zhangkun2@uniontech.com>  Wed, 24 Jun 2026 15:34:14 +0800
+
 dde-services (1.0.29) unstable; urgency=medium
 
   * fix(wallpapercache): restrict bus name ownership
