@@ -237,7 +237,25 @@ bool PowerController::hasMultipleDisplaySession()
     QVariant v = displayMgr.property("Sessions");
     if (!v.isValid())
         return false;
-    return qdbus_cast<QList<QDBusObjectPath>>(v).size() >= 2;
+
+    const QList<QDBusObjectPath> sessions = qdbus_cast<QList<QDBusObjectPath>>(v);
+    if (!isWaylandSession())
+        return sessions.size() >= 2;
+
+    // On Treeland the default display manager (ddm) keeps a default session(dde)
+    int userSessions = 0;
+    for (const QDBusObjectPath &path : sessions) {
+        QDBusInterface session("org.freedesktop.DisplayManager", path.path(),
+                               "org.freedesktop.DisplayManager.Session",
+                               QDBusConnection::systemBus());
+        if (!session.isValid())
+            continue;
+        if (session.property("UserName").toString() == QLatin1String("dde"))
+            continue;
+        ++userSessions;
+    }
+
+    return userSessions >= 2;
 }
 
 void PowerController::doPrepareSuspend()
