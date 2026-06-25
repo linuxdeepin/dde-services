@@ -103,6 +103,7 @@ private:
     void rollbackRegistration(const QString &id1, const QString &id2,
                               KeyConfig &config1, KeyConfig &config2,
                               const QStringList &hotkeys1, const QStringList &hotkeys2);
+    QString localizedNoHotkeyText() const;
 
 
     ConfigLoader *m_loader;
@@ -130,5 +131,4 @@ inline const QDBusArgument &operator>>(const QDBusArgument &argument, ShortcutIn
     argument.endStructure();
     return argument;
 }
-
 

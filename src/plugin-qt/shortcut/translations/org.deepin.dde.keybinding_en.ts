@@ -11,5 +11,9 @@
         <source>Default terminal</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
