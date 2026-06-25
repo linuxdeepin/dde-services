@@ -14,6 +14,13 @@
 #include <QDebug>
 #include <QDBusConnection>
 
+#include <algorithm>
+
+namespace {
+constexpr const char *kDefaultShortcutAppId = "org.deepin.dde.keybinding";
+constexpr const char *kNoHotkeyText = "None";
+}
+
 // Normalize a hotkey from XKB form ("<Control><Alt>T") to Qt PortableText
 // ("Ctrl+Alt+T"). Inputs already in Qt form pass through unchanged.
 // dde-services emits XKB on the wire for legacy control-center compatibility
@@ -32,6 +39,12 @@ static QStringList normalizeHotkeys(const QStringList &hotkeys)
     for (const QString &h : hotkeys)
         out.append(normalizeHotkey(h));
     return out;
+}
+
+static bool containsEmptyHotkey(const QStringList &hotkeys)
+{
+    return std::any_of(hotkeys.begin(), hotkeys.end(),
+                      [](const QString &h) { return h.trimmed().isEmpty(); });
 }
 
 KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *executor,
@@ -101,9 +114,7 @@ QList<ShortcutInfo> KeybindingManager::ListAllShortcuts()
     for (const auto &config : m_keyConfigsMap) {
         // Only expose modifiable shortcuts — control center filters out
         // non-modifiable entries to avoid showing read-only items.
-        // Skip shortcuts with no hotkeys (e.g. after ReplaceHotkey stole
-        // the last binding but before the next reload prunes them).
-        if (!config.modifiable || config.hotkeys.isEmpty()) {
+        if (!config.modifiable) {
             continue;
         }
         list.append(toShortcutInfo(config));
@@ -213,6 +224,11 @@ bool KeybindingManager::ModifyHotkeys(const QString &id, const QStringList &newH
     // Accept either Qt PortableText ("Ctrl+Alt+T") or XKB form
     // ("<Control><Alt>T") on the wire; canonicalize to Qt internally.
     const QStringList normalized = normalizeHotkeys(newHotkeys);
+    if (normalized.isEmpty() || containsEmptyHotkey(normalized)) {
+        qWarning() << "ModifyHotkeys: new hotkeys can not be empty:" << id;
+        return false;
+    }
+
     // Check for conflicts (exclude self)
     for (const QString &hotkey : normalized) {
         ShortcutInfo conflictInfo = LookupConflictShortcut(hotkey);
@@ -363,6 +379,10 @@ bool KeybindingManager::ReplaceHotkey(const QString &targetId, const QString &ne
     }
 
     const QString normalized = normalizeHotkey(newHotkey);
+    if (normalized.trimmed().isEmpty()) {
+        qWarning() << "ReplaceHotkey: new hotkey can not be empty:" << targetId;
+        return false;
+    }
 
     // Remove the hotkey from the conflict shortcut
     if (!conflictConfig.hotkeys.removeOne(normalized)) {
@@ -411,14 +431,7 @@ bool KeybindingManager::ReplaceHotkey(const QString &targetId, const QString &ne
     m_loader->updateValue(targetId, "hotkeys", targetConfig.hotkeys);
     m_loader->updateValue(conflictId, "hotkeys", conflictConfig.hotkeys);
     emit ShortcutChanged(targetId, toShortcutInfo(targetConfig));
-    if (conflictConfig.hotkeys.isEmpty()) {
-        // Last hotkey was stolen.
-        // The shortcut stays in dconfig with empty hotkeys; on next load
-        // registerShortcut will skip it (isValid requires non-empty hotkeys).
-        emit ShortcutRemoved(conflictId);
-    } else {
-        emit ShortcutChanged(conflictId, toShortcutInfo(conflictConfig));
-    }
+    emit ShortcutChanged(conflictId, toShortcutInfo(conflictConfig));
 
     return true;
 }
@@ -467,7 +480,39 @@ void KeybindingManager::ReloadConfigs()
 void KeybindingManager::Reset()
 {
     // Reset shortcut hotkeys to defaults; other fields (enabled, etc.) are untouched.
-    m_loader->resetConfig();
+    const QStringList resetIds = m_loader->resettableHotkeyIds();
+    if (resetIds.isEmpty()) {
+        return;
+    }
+
+    // DConfig resets are delivered later as per-key valueChanged signals.
+    // Release all reset targets first so one restored default does not conflict
+    // with another target's stale binding.
+    QStringList toRestore;
+    for (const QString &id : resetIds) {
+        if (!m_keyConfigsMap.contains(id)) {
+            continue;
+        }
+
+        m_keyHandler->unregisterKey(id);
+        m_specialKeyHandler->unregisterKey(id);
+        toRestore.append(id);
+    }
+
+    if (!m_keyHandler->commitSync()) {
+        // Compositor rejected the unregister; leave the local map and dconfig
+        // untouched so state stays consistent with what's actually bound.
+        qWarning() << "Reset: failed to commit unregistering existing hotkeys";
+        return;
+    }
+
+    // The compositor confirmed the unregister. Drop the local entries so the
+    // async valueChanged restore goes through onKeyConfigChanged's new-entry path
+    for (const QString &id : toRestore) {
+        m_keyConfigsMap.remove(id);
+    }
+
+    m_loader->resetHotkeys(resetIds);
 }
 
 void KeybindingManager::onKeyConfigChanged(const KeyConfig &config)
@@ -485,6 +530,12 @@ void KeybindingManager::onKeyConfigChanged(const KeyConfig &config)
         }
     } else { // exist
         KeyConfig &old = m_keyConfigsMap[config.getId()];
+
+        // No actual change, skip to avoid spurious ShortcutChanged signal
+        if (old == config) {
+            return;
+        }
+
         if (!config.enabled) {
             // enable->disable
             m_keyHandler->unregisterKey(config.getId());
@@ -546,6 +597,12 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config)
                     << "DisplayName:" << config.displayName
                     << "hotkeys:" << config.hotkeys;
         return false;
+    }
+
+    if (config.hotkeys.isEmpty()) {
+        qInfo() << "Shortcut has no hotkeys, keeping it visible without registration:"
+                << config.getId();
+        return true;
     }
 
     if (m_keyConfigsMap.contains(config.getId())) {
@@ -647,12 +704,22 @@ ShortcutInfo KeybindingManager::toShortcutInfo(const KeyConfig &config)
     // Emit hotkeys in X11/XKB form (e.g. "<Control><Alt>T", "XF86AudioMute")
     // so the legacy control-center shortcut page can render each modifier as
     // a separate chip without doing its own format translation.
-    info.hotkeys.reserve(config.hotkeys.size());
-    for (const QString &hk : config.hotkeys) {
-        info.hotkeys.append(QKeySequenceConverter::qKeySequenceToXkb(hk));
+    if (config.hotkeys.isEmpty()) {
+        info.hotkeys.append(localizedNoHotkeyText());
+    } else {
+        info.hotkeys.reserve(config.hotkeys.size());
+        for (const QString &hk : config.hotkeys) {
+            info.hotkeys.append(QKeySequenceConverter::qKeySequenceToXkb(hk));
+        }
     }
     info.localLanguageName = m_translationManager->translate(config.appId, config.displayName);
     return info;
+}
+
+QString KeybindingManager::localizedNoHotkeyText() const
+{
+    return m_translationManager->translate(QString::fromLatin1(kDefaultShortcutAppId),
+                                           QString::fromLatin1(kNoHotkeyText));
 }
 
 uint KeybindingManager::GetNumLockState() const

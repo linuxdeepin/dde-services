@@ -13,7 +13,8 @@ def extract_translations(config_dir, output_file, app_id):
     Scans the config_dir for org.deepin.shortcut.json / org.deepin.gesture.json
     files and extracts the displayName field into a dummy C++ file for lupdate scanning.
     """
-    display_names = set()
+    # Fixed display text used when a shortcut has no assigned key sequence.
+    display_names = {"None"}
     target_files = {"org.deepin.shortcut.json", "org.deepin.gesture.json"}
 
     for root, dirs, files in os.walk(config_dir):

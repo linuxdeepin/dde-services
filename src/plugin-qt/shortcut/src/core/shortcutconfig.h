@@ -50,7 +50,24 @@ struct KeyConfig : public BaseConfig
 
     KeyConfig() : keyEventFlags(KeyEventFlag::Release) {} // Default to release
 
-    bool isValid() const { return enabled && !appId.isEmpty() && !displayName.isEmpty() && !hotkeys.isEmpty(); }
+    bool isValid() const { return enabled && !appId.isEmpty() && !displayName.isEmpty(); }
+
+    bool operator==(const KeyConfig &other) const {
+        return appId == other.appId &&
+               subPath == other.subPath &&
+               displayName == other.displayName &&
+               category == other.category &&
+               enabled == other.enabled &&
+               modifiable == other.modifiable &&
+               triggerType == other.triggerType &&
+               triggerValue == other.triggerValue &&
+               hotkeys == other.hotkeys &&
+               keyEventFlags == other.keyEventFlags;
+    }
+
+    bool operator!=(const KeyConfig &other) const {
+        return !(*this == other);
+    }
 };
 
 enum class GestureType {
