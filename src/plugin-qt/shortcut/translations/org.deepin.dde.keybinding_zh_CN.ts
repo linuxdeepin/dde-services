@@ -11,5 +11,9 @@
         <source>Default terminal</source>
         <translation>终端</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
 </context>
 </TS>

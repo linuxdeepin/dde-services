@@ -80,16 +80,29 @@ void ConfigLoader::reload()
     // Content changes to existing entries are delivered via DConfig::valueChanged.
 }
 
-void ConfigLoader::resetConfig()
+QStringList ConfigLoader::resettableHotkeyIds() const
 {
-    // Reset key hotkeys to defaults. Only keys are touched — gestures have
-    // no "hotkeys" field. Other key fields (enabled, keyEventFlags...) are
-    // left alone, and non-modifiable keys (hardware keys, locked entries)
-    // are skipped.
+    QStringList ids;
+
     for (const KeyConfig &key : m_keys) {
         if (!key.modifiable) continue;
         DConfig *config = m_configs.value(key.subPath);
-        if (config) config->reset("hotkeys");
+        if (config && !config->isDefaultValue("hotkeys")) {
+            ids.append(key.getId());
+        }
+    }
+
+    return ids;
+}
+
+void ConfigLoader::resetHotkeys(const QStringList &ids)
+{
+    // Reset key hotkeys to defaults.
+    for (const QString &id : ids) {
+        DConfig *config = m_configs.value(id);
+        if (config) {
+            config->reset("hotkeys");
+        }
     }
 }
 
@@ -199,8 +212,10 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
     if (isKey) {
         KeyConfig keyConfig = parseKeyConfig(config);
         if (!keyConfig.isValid()) {
-            // isValid() requires enabled && non-empty appId/displayName/hotkeys.
-            // Most commonly this triggers for shipped-disabled hardware keys
+            // isValid() requires enabled && non-empty appId/displayName.
+            // Empty hotkeys are valid: ReplaceHotkey can intentionally leave
+            // a shortcut unassigned so Reset can restore the default later.
+            // Most commonly invalid configs are shipped-disabled hardware keys
             // (e.g. wlan with enabled=false). Remember the subPath so reload()
             // doesn't re-attempt and log this every dpkg trigger.
             qWarning() << "Skipping invalid or disabled KeyConfig:" << subPath

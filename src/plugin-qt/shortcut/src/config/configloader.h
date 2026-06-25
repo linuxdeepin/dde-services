@@ -27,7 +27,8 @@ public:
     
     void scanForConfigs();
     void reload();
-    void resetConfig();
+    QStringList resettableHotkeyIds() const;
+    void resetHotkeys(const QStringList &ids);
     void updateValue(const QString &id, const QString &key, const QVariant &value);
     void dumpConfigs();
 
