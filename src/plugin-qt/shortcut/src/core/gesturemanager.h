@@ -21,13 +21,15 @@ class TranslationManager;
 struct GestureInfo {
     QString id;
     QString displayName;
-    int category;
+    QString category;
     int gestureType;
     int fingerCount;
     int direction;
     int triggerType;
     QStringList triggerValue;
     QString localLanguageName;
+    QString localLanguageCategory;
+    bool isCustom = false;
 };
 Q_DECLARE_METATYPE(GestureInfo)
 
@@ -84,14 +86,14 @@ Q_DECLARE_METATYPE(QList<GestureInfo>)
 
 inline QDBusArgument &operator<<(QDBusArgument &argument, const GestureInfo &info) {
     argument.beginStructure();
-    argument << info.id << info.displayName << info.category << info.gestureType << info.fingerCount << info.direction << info.triggerType << info.triggerValue << info.localLanguageName;
+    argument << info.id << info.displayName << info.category << info.gestureType << info.fingerCount << info.direction << info.triggerType << info.triggerValue << info.localLanguageName << info.localLanguageCategory << info.isCustom;
     argument.endStructure();
     return argument;
 }
 
 inline const QDBusArgument &operator>>(const QDBusArgument &argument, GestureInfo &info) {
     argument.beginStructure();
-    argument >> info.id >> info.displayName >> info.category >> info.gestureType >> info.fingerCount >> info.direction >> info.triggerType >> info.triggerValue >> info.localLanguageName;
+    argument >> info.id >> info.displayName >> info.category >> info.gestureType >> info.fingerCount >> info.direction >> info.triggerType >> info.triggerValue >> info.localLanguageName >> info.localLanguageCategory >> info.isCustom;
     argument.endStructure();
     return argument;
 }

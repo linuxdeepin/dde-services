@@ -79,7 +79,9 @@ QList<GestureInfo> GestureManager::ListAllGestures()
         info.direction = config.direction;
         info.triggerType = config.triggerType;
         info.triggerValue = config.triggerValue;
+        info.isCustom = (config.category == CategoryKey::Custom);
         info.localLanguageName = m_translationManager->translate(config.appId, config.displayName);
+        info.localLanguageCategory = m_translationManager->translate(config.appId, config.category);
         list.append(info);
     }
     return list;

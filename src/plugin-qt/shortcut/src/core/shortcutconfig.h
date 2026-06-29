@@ -21,11 +21,13 @@ namespace KeyEventFlag {
     constexpr int Repeat = 0x4;  // Trigger on key repeat (auto-repeat)
 }
 
-enum Category {
-    System = 1,
-    App,
-    Custom
-};
+// Framework-reserved shortcut categories.
+namespace CategoryKey {
+    inline constexpr const char *System = "System";
+    inline constexpr const char *Window = "Window";
+    inline constexpr const char *Workspace = "Workspace";
+    inline constexpr const char *Custom = "Custom";
+}
 
 // Base configuration information
 struct BaseConfig
@@ -33,7 +35,7 @@ struct BaseConfig
     QString appId;              // Application ID
     QString subPath;            // DConfig subPath (e.g. [appId].shortcut.xxx)
     QString displayName;        // Localized name
-    int category;               // 1: System, 2: App, 3: Custom
+    QString category;           // Logical category key (e.g. "System", "Window", app-defined)
     bool enabled;
     bool modifiable;
     int triggerType;            // 1: Command, 2: App, 3: Action
