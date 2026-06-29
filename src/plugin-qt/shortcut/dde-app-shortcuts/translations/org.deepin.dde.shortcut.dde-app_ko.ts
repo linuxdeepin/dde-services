@@ -72,10 +72,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -109,6 +105,18 @@
     </message>
     <message>
         <source>OCR Screenshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Workspace</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -11,10 +11,12 @@ import sys
 def extract_translations(config_dir, output_file, app_id):
     """
     Scans the config_dir for org.deepin.shortcut.json / org.deepin.gesture.json
-    files and extracts the displayName field into a dummy C++ file for lupdate scanning.
+    files and extracts the displayName and category fields into a dummy C++ file
+    for lupdate scanning. Both fields use the same translation model: the app
+    that provides the config provides the translation via its per-appId QM.
     """
     # Fixed display text used when a shortcut has no assigned key sequence.
-    display_names = {"None"}
+    translatable = {"None"}
     target_files = {"org.deepin.shortcut.json", "org.deepin.gesture.json"}
 
     for root, dirs, files in os.walk(config_dir):
@@ -25,20 +27,23 @@ def extract_translations(config_dir, output_file, app_id):
                         data = json.load(f)
                         contents = data.get("contents", {})
 
-                        # Check if modifiable is true
+                        # Only extract from modifiable (user-visible) configs
                         modifiable = contents.get("modifiable", {}).get("value", False)
                         if not modifiable:
                             continue
 
-                        # Extract displayName only if modifiable is true
                         display_name = contents.get("displayName", {}).get("value")
                         if display_name:
-                            display_names.add(display_name)
+                            translatable.add(display_name)
+
+                        category = contents.get("category", {}).get("value")
+                        if category and isinstance(category, str):
+                            translatable.add(category)
                     except Exception as e:
                         print(f"Error parsing {file}: {e}", file=sys.stderr)
 
-    if not display_names:
-        print(f"Warning: No shortcut definitions found in {config_dir}", file=sys.stderr)
+    if not translatable:
+        print(f"Warning: No translatable strings found in {config_dir}", file=sys.stderr)
 
     with open(output_file, 'w') as f:
         f.write('// This is an automatically generated file for shortcut translation extraction.\n')
@@ -47,7 +52,7 @@ def extract_translations(config_dir, output_file, app_id):
         f.write('// Mark strings for translation using QT_TRANSLATE_NOOP\n')
         f.write('// The array is marked as unused to suppress compiler warnings\n')
         f.write('[[maybe_unused]] static const char* shortcut_names[] = {\n')
-        for name in sorted(display_names):
+        for name in sorted(translatable):
             f.write(f'    QT_TRANSLATE_NOOP("{app_id}", "{name}"),\n')
         f.write('};\n')
 

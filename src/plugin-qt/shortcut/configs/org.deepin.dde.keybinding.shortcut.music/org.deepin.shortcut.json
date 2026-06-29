@@ -60,12 +60,12 @@
             "visibility": "private"
         },
         "category": {
-            "value": 1,
-            "serial": 0,
+            "value": "System",
+            "serial": 1,
             "flags": [],
             "name": "category",
-            "name[zh_CN]": "快捷键类别,1:系统",
-            "description": "系统快捷键",
+            "name[zh_CN]": "快捷键类别（System）",
+            "description": "System shortcut category",
             "permissions": "",
             "visibility": "private"
         },

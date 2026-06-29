@@ -13,6 +13,7 @@
 
 #include <QDebug>
 #include <QDBusConnection>
+#include <QHash>
 
 #include <algorithm>
 
@@ -64,6 +65,11 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
 
     qDBusRegisterMetaType<ShortcutInfo>();
     qDBusRegisterMetaType<QList<ShortcutInfo>>();
+
+    qRegisterMetaType<CategoryInfo>("CategoryInfo");
+    qRegisterMetaType<QList<CategoryInfo>>("QList<CategoryInfo>");
+    qDBusRegisterMetaType<CategoryInfo>();
+    qDBusRegisterMetaType<QList<CategoryInfo>>();
 
     // Connect signals from key handler
     connect(m_keyHandler, &AbstractKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
@@ -135,7 +141,7 @@ QList<ShortcutInfo> KeybindingManager::ListShortcutsByApp(const QString &appId)
     return list;
 }
 
-QList<ShortcutInfo> KeybindingManager::ListShortcutsByCategory(int category)
+QList<ShortcutInfo> KeybindingManager::ListShortcutsByCategory(const QString &category)
 {
     QList<ShortcutInfo> list;
     QList<KeyConfig> configs = m_keyConfigsMap.values();
@@ -146,6 +152,53 @@ QList<ShortcutInfo> KeybindingManager::ListShortcutsByCategory(int category)
     }
 
     return list;
+}
+
+// Fixed display order for framework-reserved categories. The service owns
+// these, so it is entitled to define their canonical sequence. App-defined
+// categories slot in after Workspace and before Custom (which is always last).
+static const QHash<QString, int> &reservedCategoryOrder()
+{
+    static const QHash<QString, int> order{
+        {QStringLiteral("System"),     0},
+        {QStringLiteral("Window"),     1},
+        {QStringLiteral("Workspace"),  2},
+        {QStringLiteral("Custom"),     99},   // always last
+    };
+    return order;
+}
+
+QList<CategoryInfo> KeybindingManager::ListCategories()
+{
+    // Collect distinct categories from the user-visible (modifiable, with
+    // hotkeys) configs — mirrors ListAllShortcuts' filter so the category
+    // set matches what the control center actually renders.
+    QHash<QString, CategoryInfo> seen;
+    int appOrder = 10;  // app-defined categories land after Workspace(2), before Custom(99)
+    for (const auto &config : m_keyConfigsMap) {
+        if (!config.modifiable || config.category.isEmpty())
+            continue;
+        if (!seen.contains(config.category)) {
+            CategoryInfo ci;
+            ci.key = config.category;
+            ci.displayName = m_translationManager->translate(config.appId, config.category);
+            ci.isCustom = (config.category == CategoryKey::Custom);
+            const auto &reserved = reservedCategoryOrder();
+            if (reserved.contains(config.category)) {
+                ci.order = reserved.value(config.category);
+            } else {
+                ci.order = appOrder++;   // first-seen order for app-defined
+            }
+            seen.insert(config.category, ci);
+        }
+    }
+
+    QList<CategoryInfo> result = seen.values();
+    std::sort(result.begin(), result.end(),
+              [](const CategoryInfo &a, const CategoryInfo &b) {
+        return a.order < b.order;
+    });
+    return result;
 }
 
 ShortcutInfo KeybindingManager::GetShortcut(const QString &id)
@@ -713,6 +766,8 @@ ShortcutInfo KeybindingManager::toShortcutInfo(const KeyConfig &config)
         }
     }
     info.localLanguageName = m_translationManager->translate(config.appId, config.displayName);
+    info.isCustom = (config.category == CategoryKey::Custom);
+    info.localLanguageCategory = m_translationManager->translate(config.appId, config.category);
     return info;
 }
 
