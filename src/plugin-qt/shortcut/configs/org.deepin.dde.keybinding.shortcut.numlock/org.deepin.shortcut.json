@@ -59,8 +59,8 @@
             "visibility": "private"
         },
         "category": {
-            "value": 1,
-            "serial": 0,
+            "value": "System",
+            "serial": 1,
             "flags": [],
             "name": "category",
             "name[zh_CN]": "快捷键类别，1:系统",

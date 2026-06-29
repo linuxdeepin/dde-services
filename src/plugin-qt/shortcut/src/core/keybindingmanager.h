@@ -22,11 +22,23 @@ class TranslationManager;
 struct ShortcutInfo {
     QString id;
     QString displayName;
-    int category;
+    QString category;
     QStringList hotkeys;
     QString localLanguageName;
+    QString localLanguageCategory;
+    bool isCustom = false;
 };
 Q_DECLARE_METATYPE(ShortcutInfo)
+
+// Category metadata for the ListCategories() interface.
+struct CategoryInfo {
+    QString key;                    // Logical category key
+    QString displayName;            // Resolved display text
+    int order = 0;                  // Display order (lower = earlier)
+    bool isCustom = false;          // True for the user-editable category
+};
+Q_DECLARE_METATYPE(CategoryInfo)
+Q_DECLARE_METATYPE(QList<CategoryInfo>)
 
 class KeybindingManager : public QObject, protected QDBusContext
 {
@@ -59,7 +71,9 @@ public slots:
     // DBus Methods
     Q_SCRIPTABLE QList<ShortcutInfo> ListAllShortcuts();
     Q_SCRIPTABLE QList<ShortcutInfo> ListShortcutsByApp(const QString &appId);
-    Q_SCRIPTABLE QList<ShortcutInfo> ListShortcutsByCategory(int category);
+    Q_SCRIPTABLE QList<ShortcutInfo> ListShortcutsByCategory(const QString &category);
+
+    Q_SCRIPTABLE QList<CategoryInfo> ListCategories();
 
     Q_SCRIPTABLE ShortcutInfo GetShortcut(const QString &id);
     Q_SCRIPTABLE ShortcutInfo LookupConflictShortcut(const QString &hotkey);
@@ -119,14 +133,30 @@ Q_DECLARE_METATYPE(QList<ShortcutInfo>)
 
 inline QDBusArgument &operator<<(QDBusArgument &argument, const ShortcutInfo &info) {
     argument.beginStructure();
-    argument << info.id << info.displayName << info.category << info.hotkeys << info.localLanguageName;
+    argument << info.id << info.displayName << info.category << info.hotkeys
+             << info.localLanguageName << info.localLanguageCategory << info.isCustom;
     argument.endStructure();
     return argument;
 }
 
 inline const QDBusArgument &operator>>(const QDBusArgument &argument, ShortcutInfo &info) {
     argument.beginStructure();
-    argument >> info.id >> info.displayName >> info.category >> info.hotkeys >> info.localLanguageName;
+    argument >> info.id >> info.displayName >> info.category >> info.hotkeys
+             >> info.localLanguageName >> info.localLanguageCategory >> info.isCustom;
+    argument.endStructure();
+    return argument;
+}
+
+inline QDBusArgument &operator<<(QDBusArgument &argument, const CategoryInfo &info) {
+    argument.beginStructure();
+    argument << info.key << info.displayName << info.order << info.isCustom;
+    argument.endStructure();
+    return argument;
+}
+
+inline const QDBusArgument &operator>>(const QDBusArgument &argument, CategoryInfo &info) {
+    argument.beginStructure();
+    argument >> info.key >> info.displayName >> info.order >> info.isCustom;
     argument.endStructure();
     return argument;
 }
