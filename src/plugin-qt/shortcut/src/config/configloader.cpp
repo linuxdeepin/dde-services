@@ -228,7 +228,7 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
             return;
         }
 
-        configCanNotChanged = keyConfig.category == Category::System && !keyConfig.modifiable;
+        configCanNotChanged = !keyConfig.modifiable;
         qDebug() << "Parsed KeyConfig:" << keyConfig.appId << keyConfig.hotkeys << subPath;
         m_loadedSubPaths.insert(subPath);
         m_keys.append(keyConfig);
@@ -250,7 +250,7 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
             return;
         }
 
-        configCanNotChanged = gestureConfig.category == Category::System && !gestureConfig.modifiable;
+        configCanNotChanged = !gestureConfig.modifiable;
         qDebug() << "Parsed GestureConfig:" << gestureConfig.appId << subPath;
         m_loadedSubPaths.insert(subPath);
         m_gestures.append(gestureConfig);
@@ -310,9 +310,9 @@ KeyConfig ConfigLoader::parseKeyConfig(DConfig *config)
     keyConfig.modifiable = config->value("modifiable").toBool();
     keyConfig.triggerType = config->value("triggerType").toInt();
     keyConfig.triggerValue = config->value("triggerValue").toStringList();
-    keyConfig.category = config->value("category").toInt(); 
+    keyConfig.category = config->value("category").toString();
     keyConfig.hotkeys = config->value("hotkeys").toStringList();
-    
+
     if (config->keyList().contains("keyEventFlags")) {
         // Parse keyEventFlags, default to Release (0x2) if not specified
         keyConfig.keyEventFlags = config->value("keyEventFlags", KeyEventFlag::Release).toInt();
@@ -331,7 +331,7 @@ GestureConfig ConfigLoader::parseGestureConfig(DConfig *config)
     gestureConfig.modifiable = config->value("modifiable").toBool();
     gestureConfig.triggerType = config->value("triggerType").toInt();
     gestureConfig.triggerValue = config->value("triggerValue").toStringList();
-    gestureConfig.category = config->value("category").toInt();
+    gestureConfig.category = config->value("category").toString();
     gestureConfig.gestureType = config->value("gestureType").toInt();
     gestureConfig.fingerCount = config->value("fingerCount").toInt();
     gestureConfig.direction = config->value("direction").toInt();

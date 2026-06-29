@@ -59,14 +59,14 @@
             "description": "触发动作"
         },
         "category": {
-            "value": 1,
-            "serial": 0,
+            "value": "System",
+            "serial": 1,
             "flags": [],
             "name": "category",
             "permissions": "",
             "visibility": "private",
-            "name[zh_CN]": "快捷键类别,1:系统",
-            "description": "系统快捷键"
+            "name[zh_CN]": "快捷键类别（System）",
+            "description": "System shortcut category"
         },
         "enabled": {
             "value": true,

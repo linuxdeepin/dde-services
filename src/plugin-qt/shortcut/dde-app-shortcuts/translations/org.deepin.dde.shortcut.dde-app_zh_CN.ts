@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -72,12 +72,52 @@
         <translation>显示窗口菜单</translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation>任务切换器</translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation>切换多任务视图</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation>系统</translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation>窗口</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>工作空间</translation>
+    </message>
+    <message>
+        <source>Delay Screenshot</source>
+        <translation>延时截图</translation>
+    </message>
+    <message>
+        <source>File Manager</source>
+        <translation>文件管理器</translation>
+    </message>
+    <message>
+        <source>Fullscreen Screenshot</source>
+        <translation>全屏截图</translation>
+    </message>
+    <message>
+        <source>Global Search</source>
+        <translation>全局搜索</translation>
+    </message>
+    <message>
+        <source>OCR Screenshot</source>
+        <translation>OCR截图</translation>
+    </message>
+    <message>
+        <source>Screenshot</source>
+        <translation>截图</translation>
+    </message>
+    <message>
+        <source>System Monitor</source>
+        <translation>系统监视器</translation>
+    </message>
+    <message>
+        <source>Window Screenshot</source>
+        <translation>窗口截图</translation>
     </message>
 </context>
 </TS>

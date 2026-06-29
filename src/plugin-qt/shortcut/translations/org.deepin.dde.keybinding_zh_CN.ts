@@ -12,6 +12,22 @@
         <translation>终端</translation>
     </message>
     <message>
+        <source>System</source>
+        <translation>系统</translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation>窗口</translation>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation>工作空间</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation>自定义</translation>
+    </message>
+    <message>
         <source>None</source>
         <translation>无</translation>
     </message>
