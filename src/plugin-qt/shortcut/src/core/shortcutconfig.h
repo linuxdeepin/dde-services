@@ -42,6 +42,17 @@ struct BaseConfig
     QStringList triggerValue;   // Command args, AppID, or Action Enum Value (as string list)
 
     QString getId() const { return subPath; }
+    bool operator==(const BaseConfig &other) const {
+        return appId == other.appId
+                && subPath == other.subPath
+                && displayName == other.displayName
+                && category == other.category
+                && enabled == other.enabled
+                && modifiable == other.modifiable
+                && triggerType == other.triggerType
+                && triggerValue == other.triggerValue;
+    }
+    bool operator!=(const BaseConfig &other) const { return !(*this == other); }
 };
 
 // Keyboard shortcut configuration
@@ -52,7 +63,17 @@ struct KeyConfig : public BaseConfig
 
     KeyConfig() : keyEventFlags(KeyEventFlag::Release) {} // Default to release
 
-    bool isValid() const { return enabled && !appId.isEmpty() && !displayName.isEmpty() && !hotkeys.isEmpty(); }
+    bool isValid() const { return enabled && !appId.isEmpty() && !displayName.isEmpty(); }
+    bool canRegister() const { return isValid() && !hotkeys.isEmpty(); }
+    // Valid enough to display (has identity) but carries no key binding — shown
+    // as "None" after another shortcut takes its binding.
+    bool isDisplayOnly() const { return enabled && modifiable && !appId.isEmpty() && !displayName.isEmpty() && hotkeys.isEmpty(); }
+    bool operator==(const KeyConfig &other) const {
+        return static_cast<const BaseConfig &>(*this) == static_cast<const BaseConfig &>(other)
+                && hotkeys == other.hotkeys
+                && keyEventFlags == other.keyEventFlags;
+    }
+    bool operator!=(const KeyConfig &other) const { return !(*this == other); }
 };
 
 enum class GestureType {
@@ -68,6 +89,13 @@ struct GestureConfig : public BaseConfig
     int direction;          // 0: None, 1: Down, 2: Left, 3: Up, 4: Right
 
     bool isValid() const { return enabled && !appId.isEmpty() && !displayName.isEmpty() && gestureType > 0 && fingerCount > 0; }
+    bool operator==(const GestureConfig &other) const {
+        return static_cast<const BaseConfig &>(*this) == static_cast<const BaseConfig &>(other)
+                && gestureType == other.gestureType
+                && fingerCount == other.fingerCount
+                && direction == other.direction;
+    }
+    bool operator!=(const GestureConfig &other) const { return !(*this == other); }
 };
 
 Q_DECLARE_METATYPE(KeyConfig)
