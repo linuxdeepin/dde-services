@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "configloader.h"
-#include "core/shortcutconfig.h"
 
 #include <algorithm>
 
@@ -23,6 +22,12 @@ const QString CONFIG_NAME_GESTURE = "org.deepin.gesture";
 const QString CONFIG_SUBPATH_DIR = "/usr/share/deepin/org.deepin.dde.keybinding/";
 
 DCORE_USE_NAMESPACE
+
+static DConfig *createDConfig(const QString &name, const QString &subPath, QObject *parent)
+{
+    const QString normalized = CustomShortcutStore::normalizeSubPath(subPath);
+    return DConfig::create(APP_ID, name, QStringLiteral("/") + normalized, parent);
+}
 
 ConfigLoader::ConfigLoader(QObject *parent)
     : QObject(parent)
@@ -106,22 +111,36 @@ void ConfigLoader::resetHotkeys(const QStringList &ids)
     }
 }
 
-void ConfigLoader::updateValue(const QString &id, const QString &key, const QVariant &value)
+bool ConfigLoader::updateValue(const QString &id, const QString &key, const QVariant &value)
 {
     if (!m_configs.contains(id)) {
         qWarning() << "ConfigLoader: config not found or can not be changed:" << id << key << value;
-        return;
+        return false;
     }
     
     m_configs[id]->setValue(key, value);
+    return true;
+}
+
+bool ConfigLoader::canUpdateValue(const QString &id) const
+{
+    return m_configs.contains(id);
 }
 
 QSet<QString> ConfigLoader::discoverSubPaths()
 {
-    // Accumulate all found subpaths
+    QSet<QString> foundSubPaths;
+    foundSubPaths.unite(scanIniSubPaths(CONFIG_SUBPATH_DIR));
+    foundSubPaths.unite(m_customStore.discoverSubPaths());
+
+    return foundSubPaths;
+}
+
+QSet<QString> ConfigLoader::scanIniSubPaths(const QString &dirPath)
+{
     QSet<QString> foundSubPaths;
 
-    QDir regDir(CONFIG_SUBPATH_DIR);
+    QDir regDir(dirPath);
     if (!regDir.exists()) {
         return foundSubPaths;
     }
@@ -132,7 +151,7 @@ QSet<QString> ConfigLoader::discoverSubPaths()
     static const QRegularExpression reContinuation(QStringLiteral("\\\\\\s*\\n"));
     QStringList iniFiles = regDir.entryList(QStringList() << "*.ini", QDir::Files | QDir::NoDotAndDotDot);
     for (const QString &iniFile : iniFiles) {
-        QString fullPath = QDir(CONFIG_SUBPATH_DIR).absoluteFilePath(iniFile);
+        QString fullPath = regDir.absoluteFilePath(iniFile);
         QFile file(fullPath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             qWarning() << "ConfigLoader: Failed to open" << fullPath;
@@ -182,6 +201,122 @@ QSet<QString> ConfigLoader::discoverSubPaths()
     return foundSubPaths;
 }
 
+bool ConfigLoader::saveCustomShortcut(const KeyConfig &config)
+{
+    const QString subPath = CustomShortcutStore::normalizeSubPath(config.subPath);
+    DConfig *customDconfig = m_configs.value(subPath);
+    const bool existingDConfig = customDconfig;
+    if (!customDconfig) {
+        customDconfig = m_customStore.createConfig(subPath, this);
+        if (!customDconfig)
+            return false;
+        if (!customDconfig->isValid()) {
+            qWarning() << "ConfigLoader: failed to create custom shortcut DConfig:" << subPath;
+            delete customDconfig;
+            return false;
+        }
+    }
+
+    KeyConfig storedConfig = config;
+    storedConfig.subPath = subPath;
+    if (!m_customStore.save(storedConfig, customDconfig)) {
+        if (!existingDConfig) {
+            m_customStore.reset(customDconfig, subPath);
+            customDconfig->deleteLater();
+        }
+        return false;
+    }
+
+    auto existing = std::find_if(m_keys.begin(), m_keys.end(),
+                                 [&](const KeyConfig &item) { return item.subPath == subPath; });
+    if (existing != m_keys.end())
+        *existing = storedConfig;
+    else
+        m_keys.append(storedConfig);
+
+    m_loadedSubPaths.insert(subPath);
+    if (!m_configs.contains(subPath)) {
+        connect(customDconfig, &DConfig::valueChanged, this, [this, subPath, customDconfig](const QString &key) {
+            if (!customDconfig->isValid() || !m_configs.contains(subPath)) {
+                qWarning() << "DConfig invalid or not found:" << subPath;
+                return;
+            }
+
+            KeyConfig updatedConfig = parseKeyConfig(customDconfig);
+            qDebug() << "DConfig value changed:" << subPath << key;
+            auto existing = std::find_if(m_keys.begin(), m_keys.end(),
+                                         [&](const KeyConfig &item) { return item.subPath == subPath; });
+            if (existing != m_keys.end()) {
+                *existing = updatedConfig;
+            } else {
+                m_keys.append(updatedConfig);
+            }
+            emit keyConfigChanged(updatedConfig);
+        });
+        m_configs.insert(subPath, customDconfig);
+    }
+
+    return true;
+}
+
+bool ConfigLoader::updateCustomShortcut(const KeyConfig &config)
+{
+    const QString subPath = CustomShortcutStore::normalizeSubPath(config.subPath);
+    DConfig *customDconfig = m_configs.value(subPath);
+    if (!customDconfig) {
+        qWarning() << "ConfigLoader: custom shortcut config not found for update:" << subPath;
+        return false;
+    }
+
+    KeyConfig storedConfig = config;
+    storedConfig.subPath = subPath;
+    if (!m_customStore.updateCustomShortcutFields(storedConfig, customDconfig))
+        return false;
+
+    auto existing = std::find_if(m_keys.begin(), m_keys.end(),
+                                 [&](const KeyConfig &item) { return item.subPath == subPath; });
+    if (existing != m_keys.end())
+        *existing = storedConfig;
+    else
+        m_keys.append(storedConfig);
+
+    m_loadedSubPaths.insert(subPath);
+    return true;
+}
+
+bool ConfigLoader::removeCustomShortcut(const QString &subPath)
+{
+    const QString normalized = CustomShortcutStore::normalizeSubPath(subPath);
+    if (normalized.isEmpty()) {
+        return false;
+    }
+
+    DConfig *config = m_configs.take(normalized);
+    if (!config || !config->isValid()) {
+        qWarning() << "ConfigLoader: custom shortcut config not found for removal:" << subPath;
+        if (config) config->deleteLater();
+        return false;
+    } else {
+        disconnect(config, nullptr, this, nullptr);
+    }
+
+    m_customStore.reset(config, normalized);
+    if (!m_customStore.removeSubPath(normalized)) {
+        qWarning() << "ConfigLoader: failed to remove custom shortcut subPath after reset,"
+                   << "leaving a stale ini entry:" << normalized;
+    }
+
+    m_loadedSubPaths.remove(normalized);
+    m_keys.erase(std::remove_if(m_keys.begin(), m_keys.end(),
+                                [&](const KeyConfig &config) { return config.subPath == normalized; }),
+                 m_keys.end());
+
+    if (config)
+        config->deleteLater();
+
+    return true;
+}
+
 void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
 {
     qDebug() << "Loading config from:" << subPath;
@@ -199,9 +334,8 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
         return;
     }
 
-    DConfig *config = DConfig::create(APP_ID,
-                                      isKey ? CONFIG_NAME_SHORTCUT : CONFIG_NAME_GESTURE,
-                                      "/" + subPath, this);
+    DConfig *config = createDConfig(isKey ? CONFIG_NAME_SHORTCUT : CONFIG_NAME_GESTURE,
+                                    subPath, this);
     if (!config->isValid()) {
         qWarning() << "Failed to create DConfig for" << subPath;
         delete config;
@@ -272,20 +406,22 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
             qDebug() << "DConfig value changed:" << subPath << key;
             if (isKey) {
                 KeyConfig updatedConfig = parseKeyConfig(config);
-                for (auto &existing : m_keys) {
-                    if (existing.subPath == subPath) {
-                        existing = updatedConfig;
-                        break;
-                    }
+                auto existing = std::find_if(m_keys.begin(), m_keys.end(),
+                                             [&](const KeyConfig &item) { return item.subPath == subPath; });
+                if (existing != m_keys.end()) {
+                    *existing = updatedConfig;
+                } else {
+                    m_keys.append(updatedConfig);
                 }
                 emit keyConfigChanged(updatedConfig);
             } else {
                 GestureConfig updatedConfig = parseGestureConfig(config);
-                for (auto &existing : m_gestures) {
-                    if (existing.subPath == subPath) {
-                        existing = updatedConfig;
-                        break;
-                    }
+                auto existing = std::find_if(m_gestures.begin(), m_gestures.end(),
+                                             [&](const GestureConfig &item) { return item.subPath == subPath; });
+                if (existing != m_gestures.end()) {
+                    *existing = updatedConfig;
+                } else {
+                    m_gestures.append(updatedConfig);
                 }
                 emit gestureConfigChanged(updatedConfig);
             }
@@ -295,15 +431,10 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
     }
 }
 
-static QString normalizedSubpath(const QString &raw)
-{
-    return raw.startsWith(QLatin1Char('/')) ? raw.mid(1) : raw;
-}
-
 KeyConfig ConfigLoader::parseKeyConfig(DConfig *config)
 {
     KeyConfig keyConfig;
-    keyConfig.subPath = normalizedSubpath(config->subpath());
+    keyConfig.subPath = CustomShortcutStore::normalizeSubPath(config->subpath());
     keyConfig.appId = config->value("appId").toString();
     keyConfig.displayName = config->value("displayName").toString();
     keyConfig.enabled = config->value("enabled").toBool();
@@ -324,7 +455,7 @@ KeyConfig ConfigLoader::parseKeyConfig(DConfig *config)
 GestureConfig ConfigLoader::parseGestureConfig(DConfig *config)
 {
     GestureConfig gestureConfig;
-    gestureConfig.subPath = normalizedSubpath(config->subpath());
+    gestureConfig.subPath = CustomShortcutStore::normalizeSubPath(config->subpath());
     gestureConfig.appId = config->value("appId").toString();
     gestureConfig.displayName = config->value("displayName").toString();
     gestureConfig.enabled = config->value("enabled").toBool();
