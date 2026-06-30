@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "keybindingmanager.h"
+#include "customshortcuttransaction.h"
 #include "backend/abstractkeyhandler.h"
 #include "backend/specialkeyhandler.h"
 #include "config/configloader.h"
@@ -14,7 +15,7 @@
 #include <QDebug>
 #include <QDBusConnection>
 #include <QHash>
-
+#include <QUuid>
 #include <algorithm>
 
 namespace {
@@ -48,6 +49,48 @@ static bool containsEmptyHotkey(const QStringList &hotkeys)
                       [](const QString &h) { return h.trimmed().isEmpty(); });
 }
 
+constexpr int MaxCustomShortcutCount = 200;
+constexpr int MaxCustomShortcutNameLength = 128;
+constexpr int MaxCustomShortcutCommandLength = 4096;
+constexpr int MaxCustomShortcutHotkeyLength = 256;
+
+static bool containsControlCharacter(const QString &text)
+{
+    for (const QChar ch : text) {
+        const QChar::Category category = ch.category();
+        if (category == QChar::Other_Control
+            || category == QChar::Other_Format
+            || category == QChar::Other_Surrogate
+            || category == QChar::Other_PrivateUse
+            || category == QChar::Other_NotAssigned) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool isValidCustomShortcutName(const QString &name)
+{
+    return !name.isEmpty()
+            && name.size() <= MaxCustomShortcutNameLength
+            && !containsControlCharacter(name);
+}
+
+static bool isValidCustomShortcutCommand(const QString &command)
+{
+    return !command.isEmpty()
+            && command.size() <= MaxCustomShortcutCommandLength
+            && !containsControlCharacter(command);
+}
+
+static bool isValidCustomShortcutHotkey(const QString &hotkey, bool allowEmpty)
+{
+    if (hotkey.isEmpty())
+        return allowEmpty;
+    return hotkey.size() <= MaxCustomShortcutHotkeyLength
+            && !containsControlCharacter(hotkey);
+}
+
 KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *executor,
                                      TranslationManager *translationManager,
                                      AbstractKeyHandler *keyHandler,
@@ -79,7 +122,10 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
     
     connect(m_loader, &ConfigLoader::keyConfigChanged, this, &KeybindingManager::onKeyConfigChanged);
     connect(m_loader, &ConfigLoader::keyConfigAdded, this, [this](const KeyConfig &newConfig){
-        if (registerShortcut(newConfig)) {
+        if (newConfig.isDisplayOnly()) {
+            m_keyConfigsMap[newConfig.getId()] = newConfig;
+            emit ShortcutChanged(newConfig.getId(), toShortcutInfo(newConfig));
+        } else if (registerShortcut(newConfig)) {
             m_keyConfigsMap[newConfig.getId()] = newConfig;
             m_keyHandler->commit();
         }
@@ -100,7 +146,9 @@ void KeybindingManager::registerAllShortcuts()
     
     // Register existing configs
     for (const KeyConfig &config : m_loader->keys()) {
-        if (registerShortcut(config)) {
+        if (config.isDisplayOnly()) {
+            m_keyConfigsMap[config.getId()] = config;
+        } else if (registerShortcut(config)) {
             m_keyConfigsMap[config.getId()] = config;
         }
     }
@@ -120,6 +168,8 @@ QList<ShortcutInfo> KeybindingManager::ListAllShortcuts()
     for (const auto &config : m_keyConfigsMap) {
         // Only expose modifiable shortcuts — control center filters out
         // non-modifiable entries to avoid showing read-only items.
+        // Empty hotkeys are still exposed so the control center can show
+        // the existing row as "None" after another shortcut takes its binding.
         if (!config.modifiable) {
             continue;
         }
@@ -209,6 +259,17 @@ ShortcutInfo KeybindingManager::GetShortcut(const QString &id)
     }
 
     return ShortcutInfo();
+}
+
+QString KeybindingManager::GetShortcutCommand(const QString &id)
+{
+    const KeyConfig config = m_keyConfigsMap.value(id);
+    if (config.category == QLatin1String(CategoryKey::Custom)
+        && config.triggerType == static_cast<int>(TriggerType::Command)
+        && !config.triggerValue.isEmpty()) {
+        return config.triggerValue.first();
+    }
+    return QString();
 }
 
 ShortcutInfo KeybindingManager::LookupConflictShortcut(const QString &hotkey)
@@ -330,6 +391,143 @@ bool KeybindingManager::ModifyHotkeys(const QString &id, const QStringList &newH
     return true;
 }
 
+QString KeybindingManager::AddCustomShortcut(const QString &name, const QString &action, const QString &hotkey)
+{
+    const QString displayName = name.trimmed();
+    const QString actionText = action.trimmed();
+    const QString normalizedHotkey = normalizeHotkey(hotkey);
+
+    if (runtimeCustomShortcutCount() >= MaxCustomShortcutCount) {
+        qWarning() << "AddCustomShortcut: custom shortcut count limit reached";
+        return QString();
+    }
+
+    if (!isValidCustomShortcutName(displayName)
+        || !isValidCustomShortcutCommand(actionText)
+        || !isValidCustomShortcutHotkey(normalizedHotkey, false)) {
+        qWarning() << "AddCustomShortcut: invalid input";
+        return QString();
+    }
+
+    KeyConfig config;
+    config.appId = QStringLiteral("org.deepin.dde.keybinding");
+    config.subPath = createCustomShortcutId();
+    config.keyEventFlags = KeyEventFlag::Release;
+    updateCustomShortcutConfigFields(config, displayName, actionText, normalizedHotkey);
+
+    CustomShortcutChange change;
+    change.newTarget = config;
+    if (!prepareConflictShortcutChange(normalizedHotkey, change))
+        return QString();
+
+    CustomShortcutTransaction transaction(this, change);
+    if (!transaction.applyRuntime()) {
+        qWarning() << "AddCustomShortcut: failed to apply runtime change" << config.getId();
+        return QString();
+    }
+
+    if (!transaction.persistAdd())
+        return QString();
+
+    transaction.publish();
+    return config.getId();
+}
+
+bool KeybindingManager::ModifyCustomShortcut(const QString &id, const QString &name,
+                                             const QString &action, const QString &hotkey)
+{
+    if (!m_keyConfigsMap.contains(id)) {
+        return false;
+    }
+
+    KeyConfig oldConfig = m_keyConfigsMap[id];
+    if (!isRuntimeCustomShortcut(oldConfig)) {
+        qWarning() << "ModifyCustomShortcut: shortcut is not a runtime custom shortcut:" << id;
+        return false;
+    }
+
+    const QString displayName = name.trimmed();
+    const QString actionText = action.trimmed();
+    const QString normalizedHotkey = normalizeHotkey(hotkey);
+    if (!isValidCustomShortcutName(displayName)
+        || !isValidCustomShortcutCommand(actionText)
+        || !isValidCustomShortcutHotkey(normalizedHotkey, true)) {
+        qWarning() << "ModifyCustomShortcut: invalid input" << id;
+        return false;
+    }
+
+    KeyConfig newConfig = oldConfig;
+    updateCustomShortcutConfigFields(newConfig, displayName, actionText, normalizedHotkey);
+
+    const bool hotkeysChanged = oldConfig.hotkeys != newConfig.hotkeys;
+    if (!hotkeysChanged) {
+        if (oldConfig == newConfig)
+            return true;
+
+        if (!m_loader->updateCustomShortcut(newConfig)) {
+            qWarning() << "ModifyCustomShortcut: failed to persist custom shortcut:" << id;
+            return false;
+        }
+
+        m_keyConfigsMap[id] = newConfig;
+        emit ShortcutChanged(id, toShortcutInfo(newConfig));
+        return true;
+    }
+
+    CustomShortcutChange change;
+    change.hasOldTarget = true;
+    change.oldTarget = oldConfig;
+    change.newTarget = newConfig;
+    if (!prepareConflictShortcutChange(normalizedHotkey, change, id))
+        return false;
+
+    CustomShortcutTransaction transaction(this, change);
+    if (!transaction.applyRuntime()) {
+        qWarning() << "ModifyCustomShortcut: failed to apply runtime change" << id;
+        return false;
+    }
+
+    if (!transaction.persistModify())
+        return false;
+
+    transaction.publish();
+    return true;
+}
+
+bool KeybindingManager::DeleteCustomShortcut(const QString &id)
+{
+    if (!m_keyConfigsMap.contains(id)) {
+        return false;
+    }
+
+    KeyConfig oldConfig = m_keyConfigsMap[id];
+    if (!isRuntimeCustomShortcut(oldConfig)) {
+        qWarning() << "DeleteCustomShortcut: shortcut is not a runtime custom shortcut:" << id;
+        return false;
+    }
+
+    unregisterShortcut(id);
+    if (!m_keyHandler->commitSync()) {
+        qWarning() << "DeleteCustomShortcut: commit failed, restoring" << id;
+        if (registerShortcut(oldConfig, QStringList{id})) {
+            m_keyHandler->commitSync();
+        }
+        return false;
+    }
+
+    if (!m_loader->removeCustomShortcut(id)) {
+        qWarning() << "DeleteCustomShortcut: failed to remove persisted custom shortcut, restoring" << id;
+        if (registerShortcut(oldConfig, QStringList{id})) {
+            m_keyHandler->commitSync();
+        }
+        return false;
+    }
+
+    m_keyConfigsMap.remove(id);
+    emit ShortcutRemoved(id);
+    return true;
+}
+
 bool KeybindingManager::SwapHotkeys(const QString &id1, const QString &id2)
 {
     if (id1 == id2)
@@ -344,6 +542,12 @@ bool KeybindingManager::SwapHotkeys(const QString &id1, const QString &id2)
     if (!config1.enabled || !config1.modifiable || !config2.enabled || !config2.modifiable) {
         qWarning() << "SwapHotkeys: both shortcuts must be enabled and modifiable:"
                     << id1 << id2;
+        return false;
+    }
+    if (!canPersistShortcutHotkeys(config1) || !canPersistShortcutHotkeys(config2)) {
+        qWarning() << "SwapHotkeys: both shortcuts must have writable configs:"
+                    << id1 << m_loader->canUpdateValue(id1)
+                    << id2 << m_loader->canUpdateValue(id2);
         return false;
     }
 
@@ -428,6 +632,12 @@ bool KeybindingManager::ReplaceHotkey(const QString &targetId, const QString &ne
     }
     if (!conflictConfig.enabled || !conflictConfig.modifiable) {
         qWarning() << "ReplaceHotkey: conflict shortcut not modifiable or enabled:" << conflictId;
+        return false;
+    }
+    if (!canPersistShortcutHotkeys(targetConfig) || !canPersistShortcutHotkeys(conflictConfig)) {
+        qWarning() << "ReplaceHotkey: target and conflict shortcuts must have writable configs:"
+                    << targetId << m_loader->canUpdateValue(targetId)
+                    << conflictId << m_loader->canUpdateValue(conflictId);
         return false;
     }
 
@@ -574,6 +784,8 @@ void KeybindingManager::onKeyConfigChanged(const KeyConfig &config)
         if (!config.enabled) {
             // new one, but disabled, skip
             return;
+        } else if (config.isDisplayOnly()) {
+            m_keyConfigsMap[config.getId()] = config;
         } else {
             // new one, enable
             if (registerShortcut(config)) {
@@ -598,7 +810,9 @@ void KeybindingManager::onKeyConfigChanged(const KeyConfig &config)
             // update
             m_keyHandler->unregisterKey(config.getId());
             m_keyConfigsMap.remove(config.getId());
-            if (registerShortcut(config)) {
+            if (config.isDisplayOnly()) {
+                m_keyConfigsMap[config.getId()] = config;
+            } else if (registerShortcut(config)) {
                 m_keyConfigsMap[config.getId()] = config;
             }
             m_keyHandler->commit();
@@ -641,24 +855,18 @@ void KeybindingManager::onKeyActivated(const QString &shortcutId)
     }
 }
 
-bool KeybindingManager::registerShortcut(const KeyConfig &config)
+bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringList &excludeIds)
 {
-    if (!config.isValid()) {
-        qWarning() << "Shortcut is disabled or invalid, skipping registration:"
-                    << "Enabled:" << config.enabled
-                    << "AppId:" << config.appId
-                    << "DisplayName:" << config.displayName
-                    << "hotkeys:" << config.hotkeys;
+    if (!config.canRegister()) {
+        qWarning() << "Shortcut can not be registered, skipping:"
+                   << "Enabled:" << config.enabled
+                   << "AppId:" << config.appId
+                   << "DisplayName:" << config.displayName
+                   << "hotkeys:" << config.hotkeys;
         return false;
     }
 
-    if (config.hotkeys.isEmpty()) {
-        qInfo() << "Shortcut has no hotkeys, keeping it visible without registration:"
-                << config.getId();
-        return true;
-    }
-
-    if (m_keyConfigsMap.contains(config.getId())) {
+    if (m_keyConfigsMap.contains(config.getId()) && !excludeIds.contains(config.getId())) {
         qWarning() << "Shortcut conflict detected during init: has same appId and displayName"
                     << "hotkeys:" << config.hotkeys
                     << "Conflicts with:" << m_keyConfigsMap[config.getId()].hotkeys
@@ -685,7 +893,7 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config)
         // Check for conflicts before registering
         for (const QString &hotkey : normalHotkeys) {
             auto shortcutInfo = LookupConflictShortcut(hotkey);
-            if (!shortcutInfo.id.isEmpty()) {
+            if (!shortcutInfo.id.isEmpty() && !excludeIds.contains(shortcutInfo.id)) {
                 qWarning() << "Shortcut conflict detected during init:"
                             << "Config appId:" << config.appId
                             << "Config displayName:" << config.displayName
@@ -718,34 +926,55 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config)
     return registered;
 }
 
-QString KeybindingManager::checkConflictForConfig(const KeyConfig &config, const QString &excludeId)
+void KeybindingManager::unregisterShortcut(const QString &id)
 {
-    QString currentId = config.getId();
-    
-    // Check each hotkey in the config
-    for (const QString &hotkey : config.hotkeys) {
-        // Search through all registered shortcuts
-        for (const KeyConfig &existingConfig : m_keyConfigsMap) {
-            QString existingId = existingConfig.getId();
-            
-            // Skip if this is the config we're excluding (self-check)
-            if (!excludeId.isEmpty() && existingId == excludeId) {
-                continue;
-            }
-            
-            // Skip if not enabled
-            if (!existingConfig.enabled) {
-                continue;
-            }
-            
-            // Check if hotkey conflicts
-            if (existingConfig.hotkeys.contains(hotkey)) {
-                return existingId; // Return the conflicting shortcut ID
-            }
-        }
+    m_keyHandler->unregisterKey(id);
+    m_specialKeyHandler->unregisterKey(id);
+}
+
+bool KeybindingManager::isRuntimeCustomShortcut(const KeyConfig &config) const
+{
+    return config.category == QLatin1String(CategoryKey::Custom)
+            && config.modifiable
+            && config.subPath.startsWith(QStringLiteral("org.deepin.dde.keybinding.shortcut.custom."));
+}
+
+bool KeybindingManager::canPersistShortcutHotkeys(const KeyConfig &config) const
+{
+    return config.modifiable && m_loader->canUpdateValue(config.getId());
+}
+
+int KeybindingManager::runtimeCustomShortcutCount() const
+{
+    int count = 0;
+    for (const KeyConfig &config : m_keyConfigsMap) {
+        if (isRuntimeCustomShortcut(config))
+            ++count;
     }
-    
-    return QString(); // No conflict
+    return count;
+}
+
+QString KeybindingManager::createCustomShortcutId() const
+{
+    QString id;
+    do {
+        id = QStringLiteral("org.deepin.dde.keybinding.shortcut.custom.")
+                + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    } while (m_keyConfigsMap.contains(id));
+    return id;
+}
+
+void KeybindingManager::updateCustomShortcutConfigFields(KeyConfig &config, const QString &displayName,
+                                                         const QString &commandText,
+                                                         const QString &normalizedHotkey) const
+{
+    config.displayName = displayName;
+    config.category = QString::fromLatin1(CategoryKey::Custom);
+    config.enabled = true;
+    config.modifiable = true;
+    config.triggerType = static_cast<int>(TriggerType::Command);
+    config.triggerValue = QStringList{commandText};
+    config.hotkeys = normalizedHotkey.isEmpty() ? QStringList() : QStringList{normalizedHotkey};
 }
 
 ShortcutInfo KeybindingManager::toShortcutInfo(const KeyConfig &config)
@@ -813,4 +1042,48 @@ void KeybindingManager::SetCapsLockState(uint state)
             emit CapsLockStateChanged(state);
         }
     }
+}
+
+bool KeybindingManager::prepareConflictShortcutChange(const QString &hotkey, CustomShortcutChange &change,
+                                                      const QString &selfId)
+{
+    change.hasConflict = false;
+    change.oldConflict = KeyConfig();
+    change.newConflict = KeyConfig();
+
+    const QString normalizedHotkey = normalizeHotkey(hotkey);
+    if (normalizedHotkey.isEmpty())
+        return true;
+
+    ShortcutInfo conflictInfo = LookupConflictShortcut(normalizedHotkey);
+    if (conflictInfo.id.isEmpty() || conflictInfo.id == selfId) {
+        return true;
+    }
+
+    if (!m_keyConfigsMap.contains(conflictInfo.id)) {
+        qWarning() << "prepareConflictShortcutChange: conflict shortcut is missing:" << conflictInfo.id;
+        return false;
+    }
+
+    KeyConfig conflictConfig = m_keyConfigsMap.value(conflictInfo.id);
+    if (!canPersistShortcutHotkeys(conflictConfig)) {
+        qWarning() << "prepareConflictShortcutChange: conflict shortcut can not be replaced:"
+                    << conflictInfo.id
+                    << "modifiable:" << conflictConfig.modifiable
+                    << "has writable config:" << m_loader->canUpdateValue(conflictInfo.id);
+        return false;
+    }
+
+    KeyConfig newConflictConfig = conflictConfig;
+    if (!newConflictConfig.hotkeys.removeOne(normalizedHotkey)) {
+        qWarning() << "prepareConflictShortcutChange: hotkey not found in conflict shortcut:"
+                   << normalizedHotkey << conflictInfo.id;
+        return false;
+    }
+
+    change.hasConflict = true;
+    change.oldConflict = conflictConfig;
+    change.newConflict = newConflictConfig;
+
+    return true;
 }

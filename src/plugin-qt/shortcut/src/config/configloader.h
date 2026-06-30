@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include "config/customshortcutstore.h"
 #include "core/shortcutconfig.h"
 
 #include <QObject>
 #include <QMap>
 #include <QList>
+#include <QSet>
 
 #include <DConfig>
 
@@ -29,8 +31,14 @@ public:
     void reload();
     QStringList resettableHotkeyIds() const;
     void resetHotkeys(const QStringList &ids);
-    void updateValue(const QString &id, const QString &key, const QVariant &value);
+    bool updateValue(const QString &id, const QString &key, const QVariant &value);
+    bool canUpdateValue(const QString &id) const;
     void dumpConfigs();
+
+    // Custom shortcut persistence (user-level DConfig + INI)
+    bool saveCustomShortcut(const KeyConfig &config);
+    bool updateCustomShortcut(const KeyConfig &config);
+    bool removeCustomShortcut(const QString &subPath);
 
     QList<KeyConfig> keys() const { return m_keys; }
     QList<GestureConfig> gestures() const { return m_gestures; }
@@ -45,7 +53,7 @@ signals:
 
 private:
     QSet<QString> discoverSubPaths();
-    bool needLoad(const QString &subPath);
+    QSet<QString> scanIniSubPaths(const QString &dirPath);
     void loadConfig(const QString &subPath, bool newOne = false);
     KeyConfig parseKeyConfig(DConfig *config);
     GestureConfig parseGestureConfig(DConfig *config);
@@ -54,4 +62,6 @@ private:
     QList<GestureConfig> m_gestures;
     QMap<QString, DConfig*> m_configs; // subPath(id) -> config, key has no leading /
     QSet<QString> m_loadedSubPaths; // Track all loaded subPaths
+
+    CustomShortcutStore m_customStore;
 };
