@@ -32,6 +32,7 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/core/actionexecutor.cpp
     ${SHORTCUT_SRC_DIR}/core/translationmanager.cpp
     ${SHORTCUT_SRC_DIR}/config/configloader.cpp
+    ${SHORTCUT_SRC_DIR}/config/customshortcutstore.cpp
     ${SHORTCUT_SRC_DIR}/backend/abstractkeyhandler.h
     ${SHORTCUT_SRC_DIR}/backend/abstractgesturehandler.h
     ${SHORTCUT_SRC_DIR}/backend/specialkeyhandler.cpp
@@ -112,6 +113,12 @@ foreach(SUBDIR_PATH ${SHORTCUT_CONFIG_SUBDIRS})
         FILES "${SUBDIR_PATH}/org.deepin.shortcut.json"
     )
 endforeach()
+
+# install base json config
+dtk_add_config_meta_files(
+    APPID "org.deepin.dde.keybinding"
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/configs/org.deepin.shortcut.json"
+)
 
 foreach(SUBDIR_PATH ${GESTURE_CONFIG_SUBDIRS})
     dtk_add_config_meta_files(

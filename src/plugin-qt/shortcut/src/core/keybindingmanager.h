@@ -76,11 +76,15 @@ public slots:
     Q_SCRIPTABLE QList<CategoryInfo> ListCategories();
 
     Q_SCRIPTABLE ShortcutInfo GetShortcut(const QString &id);
+    Q_SCRIPTABLE QString GetShortcutCommand(const QString &id);
     Q_SCRIPTABLE ShortcutInfo LookupConflictShortcut(const QString &hotkey);
     
     Q_SCRIPTABLE QList<ShortcutInfo> SearchShortcuts(const QString &keyword);
     Q_SCRIPTABLE bool ModifyHotkeys(const QString &id, const QStringList &newHotkeys);
     Q_SCRIPTABLE bool Disable(const QString &id);
+    Q_SCRIPTABLE QString AddCustomShortcut(const QString &name, const QString &command, const QString &hotkey);
+    Q_SCRIPTABLE bool ModifyCustomShortcut(const QString &id, const QString &name, const QString &command, const QString &hotkey);
+    Q_SCRIPTABLE bool DeleteCustomShortcut(const QString &id);
 
     // Atomically swap the hotkeys of two shortcuts in a single compositor commit.
     Q_SCRIPTABLE bool SwapHotkeys(const QString &id1, const QString &id2);
@@ -112,11 +116,27 @@ private slots:
     ShortcutInfo toShortcutInfo(const KeyConfig &config);
 
 private:
-    bool registerShortcut(const KeyConfig &config);
-    QString checkConflictForConfig(const KeyConfig &config, const QString &excludeId = QString());
+    bool registerShortcut(const KeyConfig &config, const QStringList &excludeIds = QStringList());
+    void unregisterShortcut(const QString &id);
     void rollbackRegistration(const QString &id1, const QString &id2,
                               KeyConfig &config1, KeyConfig &config2,
                               const QStringList &hotkeys1, const QStringList &hotkeys2);
+    bool isRuntimeCustomShortcut(const KeyConfig &config) const;
+    bool canPersistShortcutHotkeys(const KeyConfig &config) const;
+    int runtimeCustomShortcutCount() const;
+    QString createCustomShortcutId() const;
+    void updateCustomShortcutConfigFields(KeyConfig &config, const QString &displayName,
+                                          const QString &commandText,
+                                          const QString &normalizedHotkey) const;
+
+    struct ConflictShortcutState {
+        bool handled = false;
+        QString id;
+        KeyConfig config;
+        QStringList oldHotkeys;
+    };
+    bool tryHandleConflictShortcut(const QString &hotkey, ConflictShortcutState &state,
+                                   const QString &selfId = QString());
 
 
     ConfigLoader *m_loader;
@@ -160,5 +180,3 @@ inline const QDBusArgument &operator>>(const QDBusArgument &argument, CategoryIn
     argument.endStructure();
     return argument;
 }
-
-
