@@ -9,5 +9,9 @@
         <source>Default terminal</source>
         <translation>Standard-Terminal</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
