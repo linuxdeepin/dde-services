@@ -9,5 +9,9 @@
         <source>Default terminal</source>
         <translation>Terminal parazgjedhje</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
