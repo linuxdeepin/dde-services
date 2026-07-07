@@ -3,7 +3,7 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Display switch</source>
-        <translation>Interruptor de pantalla</translation>
+        <translation>Canviador de pantalla</translation>
     </message>
     <message>
         <source>Default terminal</source>
