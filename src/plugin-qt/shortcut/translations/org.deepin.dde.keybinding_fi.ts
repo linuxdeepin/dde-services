@@ -9,5 +9,9 @@
         <source>Default terminal</source>
         <translation>Oletuspääte</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
