@@ -3,7 +3,7 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Display switch</source>
-        <translation type="unfinished"/>
+        <translation>Ndërrim ekrani</translation>
     </message>
     <message>
         <source>Default terminal</source>
@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Asnjë</translation>
     </message>
 </context>
 </TS>
