@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum</translation>
     </message>
 </context>
 </TS>
