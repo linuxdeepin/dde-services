@@ -9,5 +9,9 @@
         <source>Default terminal</source>
         <translation>Domyślny terminal</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation>Brak</translation>
+    </message>
 </context>
 </TS>
