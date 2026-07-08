@@ -70,10 +70,6 @@
         <translation>Shfaq Menu Dritaresh</translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation>Ndërrues Punësh</translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation>Shfaq/Fshih Pamjen Shumëpunëshe</translation>
     </message>
@@ -108,6 +104,18 @@
     <message>
         <source>OCR Screenshot</source>
         <translation>Foto Ekrani OCR</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
