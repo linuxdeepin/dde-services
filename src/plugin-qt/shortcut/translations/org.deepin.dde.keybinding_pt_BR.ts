@@ -11,19 +11,19 @@
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"/>
+        <translation>Personalizado</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>Sistema</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Janela</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Espaço de trabalho</translation>
     </message>
     <message>
         <source>None</source>
