@@ -70,10 +70,6 @@
         <translation>Exibir menu da janela</translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation>Alternador de tarefas</translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation>Alternar multitarefas</translation>
     </message>
@@ -108,6 +104,18 @@
     <message>
         <source>OCR Screenshot</source>
         <translation>Capturar texto por OCR</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
