@@ -70,10 +70,6 @@
         <translation>Näytä ikkunan valikot</translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation>Tehtävien vaihtaja</translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation>Vaihda työtilat näkymä</translation>
     </message>
@@ -108,6 +104,18 @@
     <message>
         <source>OCR Screenshot</source>
         <translation>OCR-tekstintunnistus</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
