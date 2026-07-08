@@ -70,10 +70,6 @@
         <translation>Mostra el menú de la finestra</translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation>Canviador de tasques</translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation>Commuta la vista de multitasca</translation>
     </message>
@@ -108,6 +104,18 @@
     <message>
         <source>OCR Screenshot</source>
         <translation>Captura de reconeixement òptic de caràcters</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
