@@ -70,10 +70,6 @@
         <translation>Pokaż menu okna</translation>
     </message>
     <message>
-        <source>Task Switcher</source>
-        <translation>Przełączanie zadań</translation>
-    </message>
-    <message>
         <source>Toggle Multitask View</source>
         <translation>Przełącz widok wielozadaniowości</translation>
     </message>
@@ -108,6 +104,18 @@
     <message>
         <source>OCR Screenshot</source>
         <translation>Zrzut OCR (Tekst z obrazu)</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
