@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
@@ -10,6 +8,10 @@
     <message>
         <source>Default terminal</source>
         <translation>终端</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation>自定义</translation>
     </message>
     <message>
         <source>System</source>
@@ -22,10 +24,6 @@
     <message>
         <source>Workspace</source>
         <translation>工作空间</translation>
-    </message>
-    <message>
-        <source>Custom</source>
-        <translation>自定义</translation>
     </message>
     <message>
         <source>None</source>
