@@ -1,3 +1,18 @@
+dde-services (1.0.31) unstable; urgency=medium
+
+  * feat(shortcut): support unassigned hotkeys
+  * fix(shortcut): skip ddm default session when counting display
+    sessions
+  * feat(shortcut): add dynamic category metadata
+  * feat(shortcut): add custom shortcut CRUD and display-only support
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#99)
+  * chore: Sync by
+    https://github.com/linuxdeepin/.github/commit/126af434677bcf06252378
+    4e2f8e98ecab832e15
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 09 Jul 2026 21:55:35 +0800
+
 dde-services (1.0.30) unstable; urgency=medium
 
   * fix: add Wayland screen-off in systemTurnOffScreen
