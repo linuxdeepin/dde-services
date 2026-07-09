@@ -1,15 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="de">
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Display switch</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildschirm-Wechsel</translation>
     </message>
     <message>
         <source>Default terminal</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard-Terminal</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
