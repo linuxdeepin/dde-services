@@ -1,123 +1,121 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pl">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
         <source>Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Schowek</translation>
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekran blokady</translation>
     </message>
     <message>
         <source>Notification Center</source>
-        <translation type="unfinished"></translation>
+        <translation>Centrum powiadomień</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Interfejs wyłączania</translation>
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Okno terminala Quake</translation>
     </message>
     <message>
         <source>launcher</source>
-        <translation type="unfinished"></translation>
+        <translation>Launcher</translation>
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć okno</translation>
     </message>
     <message>
         <source>Close Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij okno</translation>
     </message>
     <message>
         <source>Maximize Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalizuj okno</translation>
     </message>
     <message>
         <source>Next Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Następne okno</translation>
     </message>
     <message>
         <source>Next Window of Same App</source>
-        <translation type="unfinished"></translation>
+        <translation>Następne okno tej samej aplikacji</translation>
     </message>
     <message>
         <source>Next Workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>Następny obszar roboczy</translation>
     </message>
     <message>
         <source>Previous Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzednie okno</translation>
     </message>
     <message>
         <source>Previous Window of Same App</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzednie okno tej samej aplikacji</translation>
     </message>
     <message>
         <source>Previous Workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzedni obszar roboczy</translation>
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż pulpit</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż menu okna</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Opóźniony zrzutu ekranu</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Menedżer plików</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrzut pełnego ekranu</translation>
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyszukiwanie globalne</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrzut ekranu</translation>
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitor systemu</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrzut okna</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrzut OCR (Tekst z obrazu)</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
