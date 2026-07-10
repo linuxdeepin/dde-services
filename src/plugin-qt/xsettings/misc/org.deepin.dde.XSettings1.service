@@ -3,6 +3,7 @@ Description=org.deepin.dde.XSettings1
 RefuseManualStart=no
 RefuseManualStop=no
 CollectMode=inactive-or-failed
+ConditionEnvironment=XDG_SESSION_TYPE=x11
 
 PartOf=dde-session-pre.target
 Before=dde-session-pre.target
