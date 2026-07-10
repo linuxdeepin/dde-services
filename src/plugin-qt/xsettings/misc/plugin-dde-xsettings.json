@@ -3,6 +3,9 @@
   "libPath": "libplugin-dde-xsettings.so",
   "startType": "Resident",
   "pluginType": "qt",
+  "condition": {
+    "sessionType": "x11"
+  },
   "policy": [
     {
       "path": "/org/deepin/dde/XSettings1"
