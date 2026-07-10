@@ -1,3 +1,9 @@
+dde-services (1.0.32) unstable; urgency=medium
+
+  * fix(xsettings): restrict service to X11 session only
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 10 Jul 2026 11:24:33 +0800
+
 dde-services (1.0.31) unstable; urgency=medium
 
   * feat(shortcut): support unassigned hotkeys
