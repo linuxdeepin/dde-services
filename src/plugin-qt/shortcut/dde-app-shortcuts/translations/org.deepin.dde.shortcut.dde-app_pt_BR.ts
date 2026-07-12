@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>System Monitor</source>
-        <translation>Monitor de Sistema</translation>
+        <translation>Monitor do Sistema</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
