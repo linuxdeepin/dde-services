@@ -11,19 +11,19 @@
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"/>
+        <translation>Vetjake</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>Sistem</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Dritare</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Hapësirë pune</translation>
     </message>
     <message>
         <source>None</source>

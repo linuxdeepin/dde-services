@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Vonoje Foton e Ekranit</translation>
     </message>
     <message>
         <source>File Manager</source>
@@ -107,15 +107,15 @@
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>Sistem</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Dritare</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Hapësirë pune</translation>
     </message>
 </context>
 </TS>

@@ -11,19 +11,19 @@
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"/>
+        <translation>Własny</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>System</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Okno</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Obszar roboczy</translation>
     </message>
     <message>
         <source>None</source>
