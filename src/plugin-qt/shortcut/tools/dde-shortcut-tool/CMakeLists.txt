@@ -28,6 +28,8 @@ add_executable(dde-shortcut-tool
     touchpadcontroller.h
     powercontroller.cpp
     powercontroller.h
+    treelandbrightnesscontroller.cpp
+    treelandbrightnesscontroller.h
     treelandlockscreenwrapper.cpp
     treelandlockscreenwrapper.h
     kbdlightcontroller.cpp
@@ -51,6 +53,7 @@ qt6_generate_wayland_protocol_client_sources(dde-shortcut-tool
     NO_INCLUDE_CORE_ONLY
     FILES
         ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-dde-shell-v1.xml
+        ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-output-manager-v1.xml
 )
 
 target_link_libraries(dde-shortcut-tool PRIVATE

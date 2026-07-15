@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "displaycontroller.h"
+#include "treelandbrightnesscontroller.h"
 
 #include <QDebug>
 #include <QDBusInterface>
@@ -23,8 +24,8 @@ DisplayController::DisplayController(QObject *parent)
     , m_isWayland(qEnvironmentVariable("XDG_SESSION_TYPE").toLower() == "wayland")
 {
     if (m_isWayland) {
-        // TODO: Display1 is not available on Wayland. Adapt display actions to
-        // Treeland/compositor APIs instead of using org.deepin.dde.Display1.
+        // Brightness uses Treeland directly on Wayland. Other display actions
+        // still avoid the unavailable org.deepin.dde.Display1 service.
         qInfo() << "DisplayController: skip Display1 initialization on Wayland";
         return;
     }
@@ -101,13 +102,7 @@ QString DisplayController::actionHelp(const QString &action) const
 
 bool DisplayController::changeBrightness(bool raised)
 {
-    if (m_isWayland) {
-        // TODO: Implement Wayland brightness control without Display1.
-        qWarning() << "DisplayController: brightness control is not supported on Wayland";
-        return false;
-    }
-
-    if (!m_displayInterface || !m_displayInterface->isValid()) {
+    if (!m_isWayland && (!m_displayInterface || !m_displayInterface->isValid())) {
         qWarning() << "Display interface not available";
         return false;
     }
@@ -115,28 +110,40 @@ bool DisplayController::changeBrightness(bool raised)
     auto *powerConfig = DConfig::create("org.deepin.dde.daemon", "org.deepin.dde.daemon.power", "", this);
     if (!powerConfig->isValid()) {
         qWarning() << "daemon power config is not valid";
+        powerConfig->deleteLater();
         return false;
     }
 
-    // Check if ambient light auto-adjustment is enabled, disable it first if so
-    QVariant autoAdjustValue = powerConfig->value("ambientLightAdjustBrightness");
-    if (autoAdjustValue.toBool()) {
+    const bool autoAdjustEnabled =
+            powerConfig->value("ambientLightAdjustBrightness").toBool();
+
+    bool success = false;
+    if (m_isWayland) {
+        TreelandBrightnessController controller;
+        success = controller.changeBrightness(raised);
+    } else {
+        // Call Display1's ChangeBrightness method directly
+        QDBusReply<void> reply = m_displayInterface->call("ChangeBrightness", raised);
+        if (!reply.isValid()) {
+            qWarning() << "Failed to change brightness:" << reply.error().message();
+        } else {
+            success = true;
+        }
+    }
+
+    if (!success) {
+        powerConfig->deleteLater();
+        return false;
+    }
+
+    if (autoAdjustEnabled) {
         powerConfig->setValue("ambientLightAdjustBrightness", false);
         qDebug() << "Disabled ambient light auto brightness adjustment";
     }
+    powerConfig->deleteLater();
 
-    // Call Display1's ChangeBrightness method directly
-    QDBusReply<void> reply = m_displayInterface->call("ChangeBrightness", raised);
-    if (!reply.isValid()) {
-        qWarning() << "Failed to change brightness:" << reply.error().message();
-        return false;
-    }
-    
     qDebug() << "Changed brightness:" << (raised ? "up" : "down");
     showOSD(raised ? "BrightnessUp" : "BrightnessDown");
-
-    powerConfig->deleteLater();
-    
     return true;
 }
 
