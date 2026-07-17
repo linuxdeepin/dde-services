@@ -1,0 +1,112 @@
+{
+  "magic": "dsg.config.meta",
+  "version": "1.0",
+  "contents": {
+    "appId": {
+      "value": "org.deepin.dde.shortcut.dde-app",
+      "serial": 0,
+      "flags": [],
+      "name": "appId",
+      "name[zh_CN]": "提供快捷键应用Id",
+      "description": "Provide shortcut application ID",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "displayName": {
+      "value": "Switch Window Effects",
+      "serial": 0,
+      "flags": [],
+      "name": "displayName",
+      "name[zh_CN]": "切换窗口效果",
+      "description": "切换窗口效果快捷键",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "displayOrder": {
+      "value": 210,
+      "serial": 0,
+      "flags": [],
+      "name": "displayOrder",
+      "name[zh_CN]": "显示顺序",
+      "description": "Display order within the category",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "hotkeys": {
+      "value": [
+        "Ctrl+Meta+Tab"
+      ],
+      "permissions": "readwrite",
+      "serial": 0,
+      "flags": [],
+      "name": "hotkeys",
+      "name[zh_CN]": "快捷键组合",
+      "description": "Shortcut key combinations",
+      "visibility": "private"
+    },
+    "triggerType": {
+      "value": 1,
+      "serial": 0,
+      "flags": [],
+      "name": "triggerType",
+      "name[zh_CN]": "快捷键触发动作类型",
+      "description": "1=command, 2=application, 3=compositor action",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "triggerValue": {
+      "value": [
+        "/usr/bin/dde-shortcut-tool",
+        "wm",
+        "switch-effects"
+      ],
+      "serial": 0,
+      "flags": [],
+      "name": "triggerValue",
+      "name[zh_CN]": "快捷键触发动作",
+      "description": "Command arguments, application ID, or action value",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "keyEventFlags": {
+      "value": 2,
+      "serial": 0,
+      "flags": [],
+      "name": "keyEventFlags",
+      "name[zh_CN]": "按键事件标志",
+      "description": "Key event flags: 1=press, 2=release, 4=repeat",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "category": {
+      "value": "System",
+      "serial": 0,
+      "flags": [],
+      "name": "category",
+      "name[zh_CN]": "快捷键类别",
+      "description": "Shortcut category",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "enabled": {
+      "value": true,
+      "serial": 0,
+      "flags": [],
+      "name": "enabled",
+      "name[zh_CN]": "使能",
+      "description": "Whether the shortcut is enabled",
+      "permissions": "",
+      "visibility": "private"
+    },
+    "modifiable": {
+      "value": true,
+      "serial": 0,
+      "flags": [],
+      "name": "modifiable",
+      "name[zh_CN]": "能否修改快捷键",
+      "description": "Whether shortcut hotkeys can be modified",
+      "permissions": "",
+      "visibility": "private"
+    }
+  }
+}

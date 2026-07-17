@@ -17,8 +17,18 @@
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "OCR截图",
-            "description": "OCR截图快捷键",
+            "name[zh_CN]": "图文识别",
+            "description": "图文识别快捷键",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 90,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },

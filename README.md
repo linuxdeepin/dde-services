@@ -7,8 +7,9 @@ Manage DBus service on Deepin.
 
 ### Build dependencies
 
-* Qt >= 5.11
-* cmake >= 3.13
+* Qt >= 6
+* DTK >= 6
+* cmake >= 3.16
 * systemd >= 241.46
 
 ## Build and install
@@ -27,6 +28,11 @@ cmake --build build
 ```bash
 sudo cmake --build build --target install
 ```
+
+## Documentation
+
+* [Service framework development guide](develop-guide.md)
+* [Shortcut and gesture integration guide](src/plugin-qt/shortcut/DEVELOPER_GUIDE.md)
 
 ## Getting help
 

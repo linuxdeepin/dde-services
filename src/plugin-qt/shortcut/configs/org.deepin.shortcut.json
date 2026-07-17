@@ -22,6 +22,16 @@
             "permissions": "readwrite",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": -1,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
         "hotkeys": {
             "value": [],
             "serial": 0,

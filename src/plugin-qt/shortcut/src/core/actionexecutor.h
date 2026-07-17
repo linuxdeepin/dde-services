@@ -13,10 +13,10 @@ class ActionExecutor : public QObject
     Q_OBJECT
 public:
     explicit ActionExecutor(QObject *parent = nullptr);
-    
+
     void execute(const BaseConfig &config);
+    bool executeCommand(const QStringList &command);
 
 private:
-    void runCommand(const QStringList &cmd);
     void runApp(const QString &appId);
 };

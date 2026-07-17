@@ -14,6 +14,8 @@ class GestureManager;
 class AbstractKeyHandler;
 class AbstractGestureHandler;
 class TreelandShortcutWrapper;
+class X11GestureActionExecutor;
+class ServiceActionExecutor;
 
 /**
  * @brief ShortcutManager - Shortcut service coordinator
@@ -59,6 +61,8 @@ private:
     ConfigLoader *m_loader = nullptr;
     ActionExecutor *m_executor = nullptr;
     TranslationManager *m_translationManager = nullptr;
+    X11GestureActionExecutor *m_x11GestureActionExecutor = nullptr;
+    ServiceActionExecutor *m_serviceActionExecutor = nullptr;
 
     // Handler (created by ShortcutManager, passed to Manager)
     AbstractKeyHandler *m_keyHandler = nullptr;

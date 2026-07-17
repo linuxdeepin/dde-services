@@ -10,7 +10,6 @@
 #include <QMap>
 #include <QSet>
 
-
 /**
  * @brief Handler for special keycodes via org.deepin.dde.KeyEvent1 DBus signal
  * 
@@ -39,6 +38,8 @@ public:
      * @return true if unregistration successful
      */
     bool unregisterKey(const QString &shortcutId);
+    void clear();
+    void setEnabled(bool enabled);
 
     /**
      * @brief Check if a keycode is already registered
@@ -89,6 +90,8 @@ private:
     
     // Track currently held keys for repeat detection
     QSet<uint32_t> m_keysHeld;
-    
+    QSet<uint32_t> m_suppressedKeys;
+
     bool m_connected;
+    bool m_enabled = true;
 };

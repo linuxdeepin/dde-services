@@ -6,6 +6,8 @@
 #include "constant.h"
 #include "treelandlockscreenwrapper.h"
 
+#include <DGuiApplicationHelper>
+
 #include <QDBusArgument>
 #include <QDBusConnection>
 #include <QDBusInterface>
@@ -20,6 +22,7 @@
 #include <DConfig>
 
 DCORE_USE_NAMESPACE
+DGUI_USE_NAMESPACE
 
 // Power1 SetPrepareSuspend states (match dde-daemon keybinding1/utils.go).
 static constexpr int kSuspendStateFinish      = 3;
@@ -35,7 +38,7 @@ namespace {
 
 bool isWaylandSession()
 {
-    return qEnvironmentVariable("XDG_SESSION_TYPE").toLower() == "wayland";
+    return DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform);
 }
 
 DConfig *createPowerConfig(QObject *parent)
@@ -489,9 +492,10 @@ void PowerController::showShutdownUI()
         return;
     }
 
-    // X11: dde-shutdown.sh releases the keyboard grab before showing the dialog
-    // so the keys inside the dialog (Tab, Enter, Esc) reach the GUI.
-    QProcess::startDetached("/usr/lib/deepin-daemon/dde-shutdown.sh", {});
+    const bool started = QProcess::startDetached(QStringLiteral("/usr/bin/dde-am"),
+            {QStringLiteral("-c"), QStringLiteral("/usr/lib/deepin-daemon/dde-shutdown.sh")});
+    if (!started)
+        qWarning() << "PowerController: failed to start shutdown UI via dde-am";
 }
 
 void PowerController::systemAway()

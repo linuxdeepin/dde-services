@@ -1,0 +1,100 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "appId": {
+            "value": "org.deepin.dde.keybinding",
+            "serial": 0,
+            "flags": [],
+            "name": "appId",
+            "name[zh_CN]": "提供快捷键应用Id",
+            "description": "provide shortcut app id",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayName": {
+            "value": "Translation",
+            "serial": 0,
+            "flags": [],
+            "name": "displayName",
+            "name[zh_CN]": "文本翻译",
+            "description": "Translate selected text",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 30,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "hotkeys": {
+            "value": [
+                "Ctrl+Alt+U"
+            ],
+            "serial": 0,
+            "flags": [],
+            "name": "hotkeys",
+            "name[zh_CN]": "快捷键组合",
+            "description": "Translation shortcut",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "triggerType": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "triggerType",
+            "name[zh_CN]": "快捷键触发动作类型",
+            "description": "Command type",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "triggerValue": {
+            "value": [
+                "/usr/share/uos-ai-assistant/shell/translation.sh"
+            ],
+            "serial": 0,
+            "flags": [],
+            "name": "triggerValue",
+            "name[zh_CN]": "快捷键触发动作",
+            "description": "Translation action",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "category": {
+            "value": "AssistiveTools",
+            "serial": 1,
+            "flags": [],
+            "name": "category",
+            "name[zh_CN]": "快捷键类别（辅助功能）",
+            "description": "Assistive tools shortcut category",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "enabled": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "enabled",
+            "name[zh_CN]": "使能",
+            "description": "Whether the shortcut is enabled",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "modifiable": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "modifiable",
+            "name[zh_CN]": "能否修改快捷键",
+            "description": "Whether the shortcut can be modified",
+            "permissions": "",
+            "visibility": "private"
+        }
+    }
+}

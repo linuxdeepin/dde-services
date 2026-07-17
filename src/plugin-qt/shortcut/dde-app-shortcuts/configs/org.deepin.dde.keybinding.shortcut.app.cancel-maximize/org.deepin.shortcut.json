@@ -17,8 +17,18 @@
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "取消最大化窗口",
-            "description": "取消最大化窗口",
+            "name[zh_CN]": "恢复窗口",
+            "description": "恢复窗口",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 30,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },

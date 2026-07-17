@@ -173,6 +173,7 @@ void CommandParser::printHelp()
     out << "  dde-shortcut-tool audio mute-toggle\n";
     out << "  dde-shortcut-tool display brightness-up\n";
     out << "  dde-shortcut-tool power system-away\n";
+    out << "  dde-shortcut-tool wm switch-effects\n";
     out << "\nUse 'dde-shortcut-tool <command> --help' for more information about a command.\n";
 }
 

@@ -17,6 +17,7 @@ public:
 
     virtual bool registerGesture(const GestureConfig &config) = 0;
     virtual bool unregisterGesture(const QString &appId) = 0;
+    virtual bool isAvailable() const { return true; }
 
     // commit() async (may be debounced); commitSync() returns compositor ack.
     virtual bool commit() { return true; }
@@ -24,4 +25,5 @@ public:
 
 signals:
     void activated(const QString &name);
+    void availabilityChanged(bool available);
 };

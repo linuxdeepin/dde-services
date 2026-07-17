@@ -13,7 +13,7 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Previous Window",
+            "value": "Switch Windows Reversely",
             "serial": 0,
             "flags": [],
             "name": "displayName",
@@ -22,11 +22,22 @@
             "permissions": "",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": 160,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
         "hotkeys": {
             "value": [
-                "Alt+Shift+Backtab"
+                "Shift+Meta+Tab",
+                "Shift+Alt+Tab"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "hotkeys",
             "name[zh_CN]": "快捷键组合",
@@ -67,12 +78,12 @@
             "visibility": "private"
         },
         "category": {
-            "value": "Window",
+            "value": "System",
             "serial": 1,
             "flags": [],
             "name": "category",
-            "name[zh_CN]": "快捷键类别（Window）",
-            "description": "Window shortcut category",
+            "name[zh_CN]": "快捷键类别（System）",
+            "description": "System shortcut category",
             "permissions": "",
             "visibility": "private"
         },

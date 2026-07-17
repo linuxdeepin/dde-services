@@ -14,6 +14,7 @@
 #include "lockkeycontroller.h"
 #include "launchcontroller.h"
 #include "networkcontroller.h"
+#include "wmcontroller.h"
 
 namespace {
 
@@ -48,6 +49,7 @@ int main(int argc, char *argv[])
     registerControllerFactory<LockKeyController>(parser);
     registerControllerFactory<LaunchController>(parser);
     registerControllerFactory<NetworkController>(parser);
+    registerControllerFactory<WmController>(parser);
 
     // Execute command and return result
     return parser.run(argc, argv);

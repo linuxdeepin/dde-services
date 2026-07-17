@@ -6,7 +6,7 @@
 include(GNUInstallDirs)
 
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui WaylandClient)
-find_package(Dtk6 REQUIRED COMPONENTS Core)
+find_package(Dtk6 REQUIRED COMPONENTS Core Gui)
 find_package(PkgConfig REQUIRED)
 find_package(TreelandProtocols REQUIRED)
 
@@ -42,6 +42,8 @@ add_executable(dde-shortcut-tool
     launchcontroller.h
     networkcontroller.cpp
     networkcontroller.h
+    wmcontroller.cpp
+    wmcontroller.h
     constant.h
 )
 
@@ -62,6 +64,7 @@ target_link_libraries(dde-shortcut-tool PRIVATE
     Qt6::Gui
     Qt6::WaylandClient
     Dtk6::Core
+    Dtk6::Gui
     ${XCB_LIBRARIES}
     ${WAYLAND_CLIENT_LIBRARIES}
 )

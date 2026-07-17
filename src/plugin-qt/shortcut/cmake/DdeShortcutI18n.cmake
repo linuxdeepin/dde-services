@@ -17,6 +17,7 @@
 #       APP_ID "org.deepin.myapp"                          # Required: Application identifier
 #       CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/configs"   # Optional: Path to JSON configs
 #       TS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/translations"  # Optional: Path to .ts files
+#       EXTRA_SOURCES "src/service_display_text.cpp"       # Optional: Additional service display text
 #       LANGUAGES "zh_CN" "en_US" "fr"                     # Required: List of languages
 #   )
 #
@@ -24,6 +25,7 @@
 #   APP_ID      - (Required) Application identifier, used for naming translation files
 #   CONFIG_DIR  - (Optional) Directory containing shortcut JSON configs (default: ./configs)
 #   TS_DIR      - (Optional) Directory for .ts translation files (default: ./translations)
+#   EXTRA_SOURCES - (Optional) Additional service-side sources scanned by lupdate
 #   LANGUAGES   - (Required) List of language codes (e.g., "zh_CN" "en_US")
 #
 # Generated Targets:
@@ -33,8 +35,8 @@
 # Example:
 #   cmake --build build --target update_shortcut_i18n
 #
-# Note: This function ONLY handles shortcut configuration translations from DConfig JSON files.
-#       Application UI translations should be handled separately using standard Qt translation tools.
+# Note: This function handles DConfig display text and explicitly listed service-side display text.
+#       Client UI translations should be handled separately by the client application.
 #       The update_shortcut_i18n target will update ALL applications that use this function.
 
 set(_DDE_I18N_MODULE_DIR "${CMAKE_CURRENT_LIST_DIR}")
@@ -42,7 +44,7 @@ set(_DDE_I18N_MODULE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 function(dde_shortcut_add_translations)
     set(options)
     set(oneValueArgs APP_ID CONFIG_DIR TS_DIR)
-    set(multiValueArgs LANGUAGES)
+    set(multiValueArgs LANGUAGES EXTRA_SOURCES)
     cmake_parse_arguments(DDE_I18N "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     # Validate required parameters
@@ -71,13 +73,15 @@ function(dde_shortcut_add_translations)
     string(REPLACE "." "-" _sanitized_app_id "${DDE_I18N_APP_ID}")
     set(SHORTCUT_I18N_SRC "${CMAKE_CURRENT_BINARY_DIR}/shortcut_i18n_strings_${_sanitized_app_id}.cpp")
 
-    # Find extraction tool
-    find_program(EXTRACT_TOOL NAMES extract_shortcuts_i18n)
-    if(NOT EXTRACT_TOOL)
-        # Fallback for local development if not installed yet
-        set(EXTRACT_TOOL "${_DDE_I18N_MODULE_DIR}/../tools/extract_shortcuts_i18n.py")
-        if(NOT EXISTS "${EXTRACT_TOOL}")
-             message(FATAL_ERROR "dde_shortcut_add_translations: extract_shortcuts_i18n tool not found")
+    # Prefer the source-tree tool so local changes are not shadowed by an older
+    # installed version. Installed consumers fall back to PATH lookup.
+    set(_local_extract_tool "${_DDE_I18N_MODULE_DIR}/../tools/extract_shortcuts_i18n.py")
+    if(EXISTS "${_local_extract_tool}")
+        set(_extract_tool "${_local_extract_tool}")
+    else()
+        find_program(_extract_tool NAMES extract_shortcuts_i18n)
+        if(NOT _extract_tool)
+            message(FATAL_ERROR "dde_shortcut_add_translations: extract_shortcuts_i18n tool not found")
         endif()
     endif()
 
@@ -85,11 +89,11 @@ function(dde_shortcut_add_translations)
     file(GLOB_RECURSE JSON_CONFIGS "${DDE_I18N_CONFIG_DIR}/*.json")
     add_custom_command(
         OUTPUT ${SHORTCUT_I18N_SRC}
-        COMMAND ${EXTRACT_TOOL} 
+        COMMAND ${_extract_tool}
                 ${DDE_I18N_CONFIG_DIR} 
                 ${SHORTCUT_I18N_SRC} 
                 ${DDE_I18N_APP_ID}
-        DEPENDS ${EXTRACT_TOOL} ${JSON_CONFIGS}
+        DEPENDS ${_extract_tool} ${JSON_CONFIGS}
         COMMENT "Extracting shortcut names for translation for ${DDE_I18N_APP_ID}"
         VERBATIM
     )
@@ -127,7 +131,7 @@ function(dde_shortcut_add_translations)
     if(COMMAND qt6_add_translations)
         qt6_add_translations(${_translation_target}
             TS_FILES ${TS_FILES}
-            SOURCES ${SHORTCUT_I18N_SRC}
+            SOURCES ${SHORTCUT_I18N_SRC} ${DDE_I18N_EXTRA_SOURCES}
             LUPDATE_OPTIONS "-locations" "none"
             LRELEASE_OPTIONS "-silent"
             QM_FILES_OUTPUT_VARIABLE QM_FILES
@@ -135,7 +139,7 @@ function(dde_shortcut_add_translations)
     elseif(COMMAND qt_add_translations)
         qt_add_translations(${_translation_target}
             TS_FILES ${TS_FILES}
-            SOURCES ${SHORTCUT_I18N_SRC}
+            SOURCES ${SHORTCUT_I18N_SRC} ${DDE_I18N_EXTRA_SOURCES}
             LUPDATE_OPTIONS "-locations" "none"
             LRELEASE_OPTIONS "-silent"
             QM_FILES_OUTPUT_VARIABLE QM_FILES
@@ -156,10 +160,10 @@ function(dde_shortcut_add_translations)
 
         if(NOT TARGET ${_app_update_target})
             add_custom_target(${_app_update_target}
-                COMMAND ${LUPDATE_EXECUTABLE} ${SHORTCUT_I18N_SRC} -ts ${TS_FILES} -locations none
-                DEPENDS ${SHORTCUT_I18N_SRC}
+                COMMAND ${LUPDATE_EXECUTABLE} ${SHORTCUT_I18N_SRC} ${DDE_I18N_EXTRA_SOURCES} -ts ${TS_FILES} -locations none
+                DEPENDS ${SHORTCUT_I18N_SRC} ${DDE_I18N_EXTRA_SOURCES}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMENT "Updating shortcut i18n for ${DDE_I18N_APP_ID} (DConfig JSON only)"
+                COMMENT "Updating shortcut i18n for ${DDE_I18N_APP_ID}"
                 VERBATIM
             )
         endif()
@@ -168,7 +172,7 @@ function(dde_shortcut_add_translations)
         if(NOT TARGET update_shortcut_i18n)
             add_custom_target(update_shortcut_i18n
                 DEPENDS ${_app_update_target}
-                COMMENT "Update shortcut translations (DConfig JSON only)"
+                COMMENT "Update shortcut translations"
             )
             message(STATUS "Created shortcut i18n update target: update_shortcut_i18n")
         else()

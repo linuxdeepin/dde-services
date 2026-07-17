@@ -110,6 +110,17 @@ static const QMap<QString, QString>& getQtToXkbMap() {
         map.insert("Backspace", "BackSpace");
         map.insert("Esc", "Escape");
         map.insert("Ins", "Insert");
+        map.insert("Space", "space");
+        map.insert("Backtab", "ISO_Left_Tab");
+        map.insert("Enter", "KP_Enter");
+        map.insert("SysReq", "Sys_Req");
+
+        // Symbol keys must use XKB key names on the wire. Literal '+' and '-'
+        // are separators in the control center's legacy formatter and would
+        // otherwise produce empty key chips.
+        map.insert("+", "plus");
+        map.insert("-", "minus");
+        map.insert("=", "equal");
         
         // Modifiers
         map.insert("Meta", "Super_L");
@@ -182,7 +193,14 @@ QString QKeySequenceConverter::xkbToQKeySequence(const QString &xkbString)
 QString QKeySequenceConverter::qKeySequenceToXkb(const QString &qksString)
 {
     if (qksString.isEmpty()) return QString();
-    
+
+    const auto &map = getQtToXkbMap();
+    if (qksString == QLatin1String("Meta") || qksString == QLatin1String("Super")
+            || qksString == QLatin1String("Alt") || qksString == QLatin1String("Control")
+            || qksString == QLatin1String("Shift")) {
+        return map.value(qksString);
+    }
+
     QKeySequence seq = QKeySequence::fromString(qksString, QKeySequence::PortableText);
     if (!seq.isEmpty()) {
         QKeyCombination combo = seq[0];
@@ -197,7 +215,6 @@ QString QKeySequenceConverter::qKeySequenceToXkb(const QString &qksString)
         
         QString qtKeyName = QKeySequence(key).toString(QKeySequence::PortableText);
         
-        const auto &map = getQtToXkbMap();
         if (map.contains(qtKeyName)) {
             result += map.value(qtKeyName);
         } else {

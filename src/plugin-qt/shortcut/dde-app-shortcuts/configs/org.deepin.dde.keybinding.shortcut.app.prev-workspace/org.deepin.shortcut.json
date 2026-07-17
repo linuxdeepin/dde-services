@@ -13,7 +13,7 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Previous Workspace",
+            "value": "Switch to Left Workspace",
             "serial": 0,
             "flags": [],
             "name": "displayName",
@@ -22,9 +22,19 @@
             "permissions": "",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": 10,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
         "hotkeys": {
             "value": [
-                "Meta+Left"
+                "Ctrl+Alt+Left"
             ],
             "serial": 0,
             "flags": [],

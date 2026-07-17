@@ -39,56 +39,55 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
         return false;
     }
 
-    // Register DBus service
-    // Note: In plugin mode, ShortcutManager::init() does not register DBus service
-    // We need to use the connection provided by the plugin to register
-    
-    // Get KeybindingManager and GestureManager
-    auto keybindingManager = m_shortcutManager->keybindingManager();
-    auto gestureManager = m_shortcutManager->gestureManager();
+    // In plugin mode ShortcutManager does not register D-Bus services itself;
+    // use the connection provided by deepin-service-manager here.
+    const auto registerEndpoint = [connection](const QString &service,
+                                               const QString &path,
+                                               QObject *object) {
+        if (!connection->registerService(service)) {
+            qCritical() << "[PluginShortcutManager] Failed to register service" << service << ":"
+                        << connection->lastError().message();
+            return false;
+        }
 
+        if (!connection->registerObject(path, object,
+                                        QDBusConnection::ExportScriptableContents)) {
+            qCritical() << "[PluginShortcutManager] Failed to register object" << path << ":"
+                        << connection->lastError().message();
+            connection->unregisterService(service);
+            return false;
+        }
+
+        qInfo() << "[PluginShortcutManager] Registered" << service << "at" << path;
+        return true;
+    };
+
+    auto *keybindingManager = m_shortcutManager->keybindingManager();
+    auto *gestureManager = m_shortcutManager->gestureManager();
+
+    bool keybindingRegistered = false;
     if (!keybindingManager) {
         qCritical() << "[PluginShortcutManager] KeybindingManager not found";
+    } else {
+        keybindingRegistered = registerEndpoint(
+                QStringLiteral("org.deepin.dde.Keybinding1"),
+                QStringLiteral("/org/deepin/dde/Keybinding1"),
+                keybindingManager);
+    }
+
+    bool gestureRegistered = false;
+    if (!gestureManager) {
+        qWarning() << "[PluginShortcutManager] GestureManager not found";
+    } else {
+        gestureRegistered = registerEndpoint(
+                QStringLiteral("org.deepin.dde.Gesture1"),
+                QStringLiteral("/org/deepin/dde/Gesture1"),
+                gestureManager);
+    }
+
+    if (!keybindingRegistered && !gestureRegistered) {
+        qCritical() << "[PluginShortcutManager] Failed to register any DBus endpoint";
         return false;
-    }
-
-    // Register Keybinding DBus object
-    if (!connection->registerObject("/org/deepin/dde/Keybinding1",
-                                    keybindingManager,
-                                    QDBusConnection::ExportScriptableContents)) {
-        qCritical() << "[PluginShortcutManager] Failed to register Keybinding1 object:"
-                    << connection->lastError().message();
-        return false;
-    }
-
-    qInfo() << "[PluginShortcutManager] Registered Keybinding1 object at /org/deepin/dde/Keybinding1";
-
-    // Register Gesture DBus object (if exists)
-    if (gestureManager) {
-        if (!connection->registerObject("/org/deepin/dde/Gesture1",
-                                        gestureManager,
-                                        QDBusConnection::ExportScriptableContents)) {
-            qCritical() << "[PluginShortcutManager] Failed to register Gesture1 object:"
-                        << connection->lastError().message();
-            return false;
-        }
-        qInfo() << "[PluginShortcutManager] Registered Gesture1 object at /org/deepin/dde/Gesture1";
-    }
-
-    // Register DBus service names
-    if (!connection->registerService("org.deepin.dde.Keybinding1")) {
-        qCritical() << "[PluginShortcutManager] Failed to register service org.deepin.dde.Keybinding1:"
-                    << connection->lastError().message();
-        return false;
-    }
-
-    if (gestureManager) {
-        if (!connection->registerService("org.deepin.dde.Gesture1")) {
-            qCritical() << "[PluginShortcutManager] Failed to register service org.deepin.dde.Gesture1:"
-                        << connection->lastError().message();
-            return false;
-        }
-        qInfo() << "[PluginShortcutManager] Registered Gesture1 service name";
     }
 
     qInfo() << "[PluginShortcutManager] Plugin initialized successfully";

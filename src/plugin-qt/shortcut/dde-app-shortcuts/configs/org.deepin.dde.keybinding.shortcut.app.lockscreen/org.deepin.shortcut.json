@@ -17,8 +17,18 @@
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "锁屏",
-            "description": "锁屏快捷键",
+            "name[zh_CN]": "锁屏界面",
+            "description": "锁屏界面快捷键",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 190,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },

@@ -6,7 +6,6 @@
 
 #include "core/shortcutconfig.h"
 
-#include <QSet>
 #include <QString>
 #include <QStringList>
 
@@ -21,7 +20,7 @@ class CustomShortcutStore
 public:
     CustomShortcutStore();
 
-    QSet<QString> discoverSubPaths() const;
+    QStringList orderedSubPaths() const;
     DConfig *createConfig(const QString &subPath, QObject *parent) const;
 
     bool save(const KeyConfig &config, DConfig *configObject) const;
@@ -32,7 +31,6 @@ public:
     static QString normalizeSubPath(const QString &raw);
 
 private:
-    QStringList subPaths() const;
     bool writeSubPaths(const QStringList &subPaths) const;
 
     QString m_iniPath;

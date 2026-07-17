@@ -6,24 +6,32 @@
 #include "keybindingmanager.h"
 #include "gesturemanager.h"
 #include "actionexecutor.h"
+#include "serviceactionexecutor.h"
 #include "translationmanager.h"
 #include "config/configloader.h"
 #include "backend/x11/x11keyhandler.h"
+#include "backend/x11/x11gesturehandler.h"
+#include "backend/x11/x11gestureactionexecutor.h"
 #include "backend/wayland/waylandkeyhandler.h"
 #include "backend/wayland/waylandgesturehandler.h"
 #include "backend/wayland/treelandshortcutwrapper.h"
 
+#include <DGuiApplicationHelper>
+
 #include <QDBusConnection>
 #include <QDebug>
 #include <qobjectdefs.h>
+
+DGUI_USE_NAMESPACE
 
 ShortcutManager::ShortcutManager(QObject *parent)
     : QObject(parent)
     , m_loader(new ConfigLoader(this))
     , m_executor(new ActionExecutor(this))
     , m_translationManager(new TranslationManager(this))
+    , m_serviceActionExecutor(new ServiceActionExecutor(m_executor, this))
 {
-    m_isWayland = (qgetenv("XDG_SESSION_TYPE").toLower() == "wayland");
+    m_isWayland = DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform);
 }
 
 ShortcutManager::~ShortcutManager()
@@ -42,17 +50,20 @@ bool ShortcutManager::init()
         m_gestureHandler = new WaylandGestureHandler(m_treelandShortcutWrapper, this);
     } else {
         m_keyHandler = new X11KeyHandler(this);
-        // X11 no need gestures, m_gestureHandler remains nullptr
-        m_gestureHandler = nullptr;
+        m_x11GestureActionExecutor = new X11GestureActionExecutor(this);
+        m_gestureHandler = new X11GestureHandler(m_x11GestureActionExecutor, this);
     }
 
-    m_keybindingManager = new KeybindingManager(m_loader, m_executor,
-         m_translationManager, m_keyHandler, this);
-    
-    if (m_isWayland) {
-        m_gestureManager = new GestureManager(m_loader, m_executor,
-             m_translationManager, m_gestureHandler, this);
+    if (!m_keyHandler || !m_keyHandler->isAvailable()) {
+        qCritical() << "ShortcutManager: Key handler backend not available";
+        return false;
     }
+
+    m_keybindingManager = new KeybindingManager(m_loader, m_executor, m_translationManager,
+                                                m_keyHandler, m_x11GestureActionExecutor, this);
+
+    m_gestureManager = new GestureManager(m_loader, m_executor, m_translationManager, m_gestureHandler,
+                                          m_x11GestureActionExecutor, m_serviceActionExecutor, this);
 
     // Note: In plugin mode, DBus registration is handled by PluginShortcutManager
     // Uncomment the following lines for standalone application mode
@@ -99,7 +110,7 @@ bool ShortcutManager::registerDBusService()
     qInfo() << "Deepin Keybinding Service started.";
 
     // Register Gesture service
-    if (m_isWayland) {
+    if (m_gestureManager) {
         if (!connection.registerService("org.deepin.dde.Gesture1")) {
             qCritical() << "Failed to register DBus service org.deepin.dde.Gesture1";
             return false;
