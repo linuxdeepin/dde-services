@@ -22,6 +22,7 @@ const QString CUSTOM_CONFIG_INI = "custom-shortcuts.ini";
 const QStringList CustomShortcutKeys = {
     QStringLiteral("appId"),
     QStringLiteral("displayName"),
+    QStringLiteral("displayOrder"),
     QStringLiteral("enabled"),
     QStringLiteral("modifiable"),
     QStringLiteral("triggerType"),
@@ -30,25 +31,61 @@ const QStringList CustomShortcutKeys = {
     QStringLiteral("hotkeys")
 };
 
+bool configValuesEqual(const QVariant &actual, const QVariant &expected)
+{
+    if (expected.metaType().id() == QMetaType::QStringList)
+        return actual.toStringList() == expected.toStringList();
+
+    return actual == expected;
+}
+
+QList<QPair<QString, QVariant>> shortcutFields(const KeyConfig &config)
+{
+    return {
+        {QStringLiteral("appId"), config.appId},
+        {QStringLiteral("displayName"), config.displayName},
+        {QStringLiteral("displayOrder"), config.displayOrder},
+        {QStringLiteral("enabled"), config.enabled},
+        {QStringLiteral("modifiable"), config.modifiable},
+        {QStringLiteral("triggerType"), config.triggerType},
+        {QStringLiteral("triggerValue"), config.triggerValue},
+        {QStringLiteral("category"), config.category},
+        {QStringLiteral("hotkeys"), config.hotkeys},
+    };
+}
+
+bool writeShortcutFields(DConfig *configObject, const KeyConfig &config)
+{
+    const QList<QPair<QString, QVariant>> fields = shortcutFields(config);
+    for (const auto &field : fields) {
+        if (configObject->isReadOnly(field.first)) {
+            qWarning() << "CustomShortcutStore: read-only field:" << field.first
+                       << config.subPath;
+            return false;
+        }
+    }
+
+    const QSignalBlocker blocker(configObject);
+    for (const auto &field : fields) {
+        if (!configValuesEqual(configObject->value(field.first), field.second))
+            configObject->setValue(field.first, field.second);
+    }
+    for (const auto &field : fields) {
+        if (!configValuesEqual(configObject->value(field.first), field.second)) {
+            qWarning() << "CustomShortcutStore: field verification failed:"
+                       << field.first << config.subPath;
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace
 
 CustomShortcutStore::CustomShortcutStore()
     : m_iniPath(QDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation))
                         .absoluteFilePath(CUSTOM_CONFIG_SUBPATH_DIR + QLatin1Char('/') + CUSTOM_CONFIG_INI))
 {
-}
-
-QSet<QString> CustomShortcutStore::discoverSubPaths() const
-{
-    QSet<QString> result;
-    const QFileInfo info(m_iniPath);
-    if (!info.exists())
-        return result;
-
-    const QStringList paths = subPaths();
-    for (const QString &subPath : paths)
-        result.insert(subPath);
-    return result;
 }
 
 DConfig *CustomShortcutStore::createConfig(const QString &subPath, QObject *parent) const
@@ -76,24 +113,14 @@ bool CustomShortcutStore::save(const KeyConfig &config, DConfig *configObject) c
              << "enabled:" << config.enabled
              << "modifiable:" << config.modifiable
              << "triggerType:" << config.triggerType
-             << "triggerValue count:" << config.triggerValue.size()
-             << "command length:" << (config.triggerValue.isEmpty() ? 0 : config.triggerValue.first().size())
+             << "argument count:" << config.triggerValue.size()
              << "category:" << config.category
              << "hotkeys:" << config.hotkeys;
 
-    {
-        const QSignalBlocker blocker(configObject);
-        configObject->setValue("appId", config.appId);
-        configObject->setValue("displayName", config.displayName);
-        configObject->setValue("enabled", config.enabled);
-        configObject->setValue("modifiable", config.modifiable);
-        configObject->setValue("triggerType", config.triggerType);
-        configObject->setValue("triggerValue", config.triggerValue);
-        configObject->setValue("category", config.category);
-        configObject->setValue("hotkeys", config.hotkeys);
-    }
+    if (!writeShortcutFields(configObject, config))
+        return false;
 
-    QStringList paths = subPaths();
+    QStringList paths = orderedSubPaths();
     if (!paths.contains(subPath))
         paths.append(subPath);
     return writeSubPaths(paths);
@@ -110,30 +137,15 @@ bool CustomShortcutStore::updateCustomShortcutFields(const KeyConfig &config, DC
     qDebug() << "CustomShortcutStore: updating custom shortcut fields"
              << "subPath:" << subPath
              << "displayName:" << config.displayName
-             << "triggerValue count:" << config.triggerValue.size()
-             << "command length:" << (config.triggerValue.isEmpty() ? 0 : config.triggerValue.first().size())
+             << "argument count:" << config.triggerValue.size()
              << "hotkeys:" << config.hotkeys;
 
-    const QSignalBlocker blocker(configObject);
-    const auto setIfChanged = [configObject](const QString &key, const QVariant &value) {
-        if (configObject->value(key) != value)
-            configObject->setValue(key, value);
-    };
-
-    setIfChanged(QStringLiteral("appId"), config.appId);
-    setIfChanged(QStringLiteral("displayName"), config.displayName);
-    setIfChanged(QStringLiteral("enabled"), config.enabled);
-    setIfChanged(QStringLiteral("modifiable"), config.modifiable);
-    setIfChanged(QStringLiteral("triggerType"), config.triggerType);
-    setIfChanged(QStringLiteral("triggerValue"), config.triggerValue);
-    setIfChanged(QStringLiteral("category"), config.category);
-    setIfChanged(QStringLiteral("hotkeys"), config.hotkeys);
-    return true;
+    return writeShortcutFields(configObject, config);
 }
 
 bool CustomShortcutStore::removeSubPath(const QString &subPath) const
 {
-    QStringList paths = subPaths();
+    QStringList paths = orderedSubPaths();
     paths.removeAll(normalizeSubPath(subPath));
     return writeSubPaths(paths);
 }
@@ -151,8 +163,10 @@ void CustomShortcutStore::reset(DConfig *configObject, const QString &subPath) c
     resetKeys.removeDuplicates();
 
     const QSignalBlocker blocker(configObject);
-    for (const QString &key : resetKeys)
-        configObject->reset(key);
+    for (const QString &key : resetKeys) {
+        if (!configObject->isReadOnly(key))
+            configObject->reset(key);
+    }
 }
 
 QString CustomShortcutStore::normalizeSubPath(const QString &raw)
@@ -170,7 +184,7 @@ QString CustomShortcutStore::normalizeSubPath(const QString &raw)
     return normalized;
 }
 
-QStringList CustomShortcutStore::subPaths() const
+QStringList CustomShortcutStore::orderedSubPaths() const
 {
     QSettings settings(m_iniPath, QSettings::IniFormat);
     settings.beginGroup("Config");
@@ -187,7 +201,6 @@ QStringList CustomShortcutStore::subPaths() const
         subPath = normalizeSubPath(subPath);
     paths.removeAll(QString());
     paths.removeDuplicates();
-    paths.sort();
     return paths;
 }
 
@@ -207,8 +220,6 @@ bool CustomShortcutStore::writeSubPaths(const QStringList &subPaths) const
         if (!value.isEmpty() && !normalized.contains(value))
             normalized.append(value);
     }
-    normalized.sort();
-
     QSettings settings(m_iniPath, QSettings::IniFormat);
     settings.beginGroup("Config");
     settings.setValue("SubPaths", normalized);

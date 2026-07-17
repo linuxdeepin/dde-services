@@ -22,6 +22,16 @@
             "permissions": "",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": 70,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
         "gestureType": {
             "value": 1,
             "serial": 0,

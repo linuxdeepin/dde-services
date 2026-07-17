@@ -12,12 +12,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui WaylandClient)
-find_package(Dtk6 REQUIRED COMPONENTS Core DConfig)
+find_package(Dtk6 REQUIRED COMPONENTS Core DConfig Gui)
 find_package(PkgConfig REQUIRED)
 find_package(TreelandProtocols REQUIRED)
 
-pkg_check_modules(XCB REQUIRED xcb xcb-keysyms xcb-xtest)
+pkg_check_modules(XCB REQUIRED xcb xcb-keysyms)
+pkg_check_modules(XCB_XINPUT REQUIRED xcb-xinput)
+pkg_check_modules(XCB_XTEST REQUIRED xcb-xtest)
 pkg_check_modules(X11 REQUIRED x11)
+pkg_check_modules(X11_XCB REQUIRED x11-xcb)
 pkg_check_modules(WAYLAND_CLIENT REQUIRED wayland-client)
 
 # Set source file path (using sources from plugin directory)
@@ -28,9 +31,15 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/core/shortcutmanager.cpp
     ${SHORTCUT_SRC_DIR}/core/keybindingmanager.cpp
     ${SHORTCUT_SRC_DIR}/core/customshortcuttransaction.cpp
+    ${SHORTCUT_SRC_DIR}/core/triggeractioncatalog.cpp
+    ${SHORTCUT_SRC_DIR}/core/gestureactioncatalog.cpp
     ${SHORTCUT_SRC_DIR}/core/gesturemanager.cpp
+    ${SHORTCUT_SRC_DIR}/core/sessiongestureguard.cpp
     ${SHORTCUT_SRC_DIR}/core/qkeysequenceconverter.cpp
+    ${SHORTCUT_SRC_DIR}/core/physicalkeyalias.cpp
+    ${SHORTCUT_SRC_DIR}/core/commandlineparser.cpp
     ${SHORTCUT_SRC_DIR}/core/actionexecutor.cpp
+    ${SHORTCUT_SRC_DIR}/core/serviceactionexecutor.cpp
     ${SHORTCUT_SRC_DIR}/core/translationmanager.cpp
     ${SHORTCUT_SRC_DIR}/config/configloader.cpp
     ${SHORTCUT_SRC_DIR}/config/customshortcutstore.cpp
@@ -39,7 +48,11 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/backend/specialkeyhandler.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11keyhandler.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11helper.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeystate.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeymonitor.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/systemgestureproxy.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/x11gestureactionexecutor.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/x11gesturehandler.cpp
     ${SHORTCUT_SRC_DIR}/backend/wayland/treelandshortcutwrapper.cpp
     ${SHORTCUT_SRC_DIR}/backend/wayland/waylandkeyhandler.cpp
     ${SHORTCUT_SRC_DIR}/backend/wayland/waylandgesturehandler.cpp
@@ -74,8 +87,12 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     Qt6::Gui
     Qt6::WaylandClient
     Dtk6::Core
+    Dtk6::Gui
     ${XCB_LIBRARIES}
+    ${XCB_XINPUT_LIBRARIES}
+    ${XCB_XTEST_LIBRARIES}
     ${X11_LIBRARIES}
+    ${X11_XCB_LIBRARIES}
     ${WAYLAND_CLIENT_LIBRARIES}
 )
 
@@ -83,7 +100,10 @@ target_include_directories(${PLUGIN_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${SHORTCUT_SRC_DIR}
     ${XCB_INCLUDE_DIRS}
+    ${XCB_XINPUT_INCLUDE_DIRS}
+    ${XCB_XTEST_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
+    ${X11_XCB_INCLUDE_DIRS}
     ${WAYLAND_CLIENT_INCLUDE_DIRS}
 )
 
@@ -158,12 +178,17 @@ set(I18N_LANGUAGES
 dde_shortcut_add_translations(
     APP_ID "org.deepin.dde.keybinding"
     CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/configs"
+    EXTRA_SOURCES "${SHORTCUT_SRC_DIR}/core/gestureactioncatalog.cpp"
     LANGUAGES ${I18N_LANGUAGES}
 )
 
 # subdirectory
 add_subdirectory(tools)
 add_subdirectory(dde-app-shortcuts)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
 
 # ============ Debug Standalone Binary (Optional) ============
 option(BUILD_SHORTCUT_DEBUG_BINARY "Build standalone debug binary for dde-shortcut" ON)
@@ -192,10 +217,13 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         Qt6::Gui
         Qt6::WaylandClient
         Dtk6::Core
+        Dtk6::Gui
         ${XCB_LIBRARIES}
+        ${XCB_XINPUT_LIBRARIES}
+        ${XCB_XTEST_LIBRARIES}
         ${X11_LIBRARIES}
+        ${X11_XCB_LIBRARIES}
         ${WAYLAND_CLIENT_LIBRARIES}
-        xcb-xtest  # Explicitly link xcb-xtest
     )
     
     target_include_directories(dde-shortcut-debug PRIVATE
@@ -203,7 +231,10 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         ${SHORTCUT_SRC_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}  # For generated Wayland headers
         ${XCB_INCLUDE_DIRS}
+        ${XCB_XINPUT_INCLUDE_DIRS}
+        ${XCB_XTEST_INCLUDE_DIRS}
         ${X11_INCLUDE_DIRS}
+        ${X11_XCB_INCLUDE_DIRS}
         ${WAYLAND_CLIENT_INCLUDE_DIRS}
     )
 endif()

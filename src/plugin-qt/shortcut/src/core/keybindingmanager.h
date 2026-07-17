@@ -11,6 +11,7 @@
 #include <QDBusContext>
 #include <QDBusArgument>
 #include <QDBusMetaType>
+#include <QSet>
 
 
 class ConfigLoader;
@@ -18,7 +19,7 @@ class ActionExecutor;
 class AbstractKeyHandler;
 class SpecialKeyHandler;
 class TranslationManager;
-
+class X11GestureActionExecutor;
 struct ShortcutInfo {
     QString id;
     QString displayName;
@@ -27,6 +28,7 @@ struct ShortcutInfo {
     QString localLanguageName;
     QString localLanguageCategory;
     bool isCustom = false;
+    bool modifiable = false;
 };
 Q_DECLARE_METATYPE(ShortcutInfo)
 
@@ -53,13 +55,11 @@ public:
     explicit KeybindingManager(ConfigLoader *loader, ActionExecutor *executor, 
                                TranslationManager *translationManager, 
                                AbstractKeyHandler *keyHandler,
+                               X11GestureActionExecutor *x11ActionExecutor = nullptr,
                                QObject *parent = nullptr);
     ~KeybindingManager() override;
 
-    /**
-     * @brief Register all shortcuts
-     * @param autoCommit Whether to auto-commit (Wayland), pass false when coordinated by ShortcutManager
-     */
+    /** Register all configured shortcuts in the current backend batch. */
     void registerAllShortcuts();
 
     /**
@@ -83,8 +83,16 @@ public slots:
     Q_SCRIPTABLE bool ModifyHotkeys(const QString &id, const QStringList &newHotkeys);
     Q_SCRIPTABLE bool Disable(const QString &id);
     Q_SCRIPTABLE QString AddCustomShortcut(const QString &name, const QString &action, const QString &hotkey);
+    Q_SCRIPTABLE QString AddCustomShortcutWithConflict(const QString &name, const QString &action,
+                                                       const QString &hotkey,
+                                                       const QString &expectedConflictId);
     Q_SCRIPTABLE bool ModifyCustomShortcut(const QString &id, const QString &name, const QString &action, const QString &hotkey);
+    Q_SCRIPTABLE bool ModifyCustomShortcutWithConflict(const QString &id, const QString &name,
+                                                       const QString &action, const QString &hotkey,
+                                                       const QString &expectedConflictId);
     Q_SCRIPTABLE bool DeleteCustomShortcut(const QString &id);
+    Q_SCRIPTABLE bool BeginCapture(uint timeoutMs = 30000);
+    Q_SCRIPTABLE void EndCapture();
 
     // Atomically swap the hotkeys of two shortcuts in a single compositor commit.
     Q_SCRIPTABLE bool SwapHotkeys(const QString &id1, const QString &id2);
@@ -104,30 +112,47 @@ signals:
     Q_SCRIPTABLE void ShortcutChanged(const QString &id, const ShortcutInfo &info);
     Q_SCRIPTABLE void ShortcutActivated(const QString &id, const QStringList &triggerValue);
     Q_SCRIPTABLE void ShortcutRemoved(const QString &id);
+    Q_SCRIPTABLE void KeyEvent(bool pressed, const QString &keystroke);
     
     // Lock key state signals (0=off, 1=on)
     Q_SCRIPTABLE void NumLockStateChanged(uint state);
     Q_SCRIPTABLE void CapsLockStateChanged(uint state);
 
 private slots:
+    void onKeyConfigAdded(const KeyConfig &config);
     void onKeyConfigChanged(const KeyConfig &config);
     void onConfigRemoved(const QString &id);
     void onKeyActivated(const QString &shortcutId);
+    void onCaptureKeyEvent(bool pressed, const QString &keystroke);
+    void onBackendKeymapAboutToChange();
+    void onBackendKeymapChanged();
     ShortcutInfo toShortcutInfo(const KeyConfig &config);
 
 private:
+    enum class RollbackResult {
+        Success,
+        RebuildRequired,
+    };
+
     bool registerShortcut(const KeyConfig &config, const QStringList &excludeIds = QStringList());
     void unregisterShortcut(const QString &id);
-    void rollbackRegistration(const QString &id1, const QString &id2,
-                              KeyConfig &config1, KeyConfig &config2,
-                              const QStringList &hotkeys1, const QStringList &hotkeys2);
+    QString lookupRuntimeConflict(const QString &hotkey, const QStringList &excludeIds) const;
+    RollbackResult rollbackRegistration(const QString &id1, const QString &id2,
+                                        KeyConfig &config1, KeyConfig &config2,
+                                        const QStringList &hotkeys1, const QStringList &hotkeys2);
+    void rebuildPersistedShortcutPair(const QString &id1, const QString &id2);
     QString localizedNoHotkeyText() const;
     bool isRuntimeCustomShortcut(const KeyConfig &config) const;
     bool canPersistShortcutHotkeys(const KeyConfig &config) const;
     int runtimeCustomShortcutCount() const;
+    int nextCustomShortcutDisplayOrder() const;
     QString createCustomShortcutId() const;
+    QString addCustomShortcut(const QString &name, const QString &action, const QString &hotkey,
+                              const QString &expectedConflictId);
+    bool modifyCustomShortcut(const QString &id, const QString &name, const QString &action,
+                              const QString &hotkey, const QString &expectedConflictId);
     void updateCustomShortcutConfigFields(KeyConfig &config, const QString &displayName,
-                                          const QString &commandText,
+                                          const QStringList &commandArguments,
                                           const QString &normalizedHotkey) const;
 
     struct CustomShortcutChange {
@@ -142,17 +167,20 @@ private:
     class CustomShortcutTransaction;
 
     bool prepareConflictShortcutChange(const QString &hotkey, CustomShortcutChange &change,
-                                       const QString &selfId = QString());
-
+                                       const QString &selfId,
+                                       const QString &expectedConflictId);
 
     ConfigLoader *m_loader;
     AbstractKeyHandler *m_keyHandler;
     SpecialKeyHandler *m_specialKeyHandler;
     ActionExecutor *m_executor;
     TranslationManager *m_translationManager;
+    X11GestureActionExecutor *m_x11ActionExecutor;
 
     // id(shortcutId) -> KeyConfig
     QMap<QString, KeyConfig> m_keyConfigsMap;
+    QSet<QString> m_activeShortcutIds;
+    bool m_isWayland = false;
 };
 
 Q_DECLARE_METATYPE(QList<ShortcutInfo>)
@@ -160,7 +188,8 @@ Q_DECLARE_METATYPE(QList<ShortcutInfo>)
 inline QDBusArgument &operator<<(QDBusArgument &argument, const ShortcutInfo &info) {
     argument.beginStructure();
     argument << info.id << info.displayName << info.category << info.hotkeys
-             << info.localLanguageName << info.localLanguageCategory << info.isCustom;
+             << info.localLanguageName << info.localLanguageCategory << info.isCustom
+             << info.modifiable;
     argument.endStructure();
     return argument;
 }
@@ -168,7 +197,8 @@ inline QDBusArgument &operator<<(QDBusArgument &argument, const ShortcutInfo &in
 inline const QDBusArgument &operator>>(const QDBusArgument &argument, ShortcutInfo &info) {
     argument.beginStructure();
     argument >> info.id >> info.displayName >> info.category >> info.hotkeys
-             >> info.localLanguageName >> info.localLanguageCategory >> info.isCustom;
+             >> info.localLanguageName >> info.localLanguageCategory >> info.isCustom
+             >> info.modifiable;
     argument.endStructure();
     return argument;
 }

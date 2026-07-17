@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "waylandkeyhandler.h"
+#include "core/triggeractioncatalog.h"
 #include "core/shortcutconfig.h"
 
 #include <QDebug>
@@ -45,6 +46,22 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
         unregisterKey(config.getId());
     }
 
+    int action = QtWayland::treeland_shortcut_manager_v2::action_notify;
+    if (config.triggerType == static_cast<int>(TriggerType::Action)) {
+        const TriggerActionId actionId = config.triggerValue.isEmpty()
+                ? TriggerActionId::Invalid
+                : TriggerActionCatalog::resolve(config.triggerValue.first());
+        const std::optional<int> treelandAction = TriggerActionCatalog::treelandActionId(actionId);
+        if (!treelandAction) {
+            // TODO: register this action after Treeland adds the corresponding
+            // compositor protocol support.  Keep the config visible meanwhile.
+            qInfo() << "WaylandKeyHandler: compositor action is not supported by Treeland:"
+                    << config.getId() << config.triggerValue.value(0);
+            return false;
+        }
+        action = *treelandAction;
+    }
+
     QStringList bindings;
     bool allSuccess = true;
 
@@ -57,26 +74,6 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
 
         QString name = config.getId() + "_" + hotkey;
         
-        // Determine action: if triggerType is Action (3), use value? 
-        // But KeyConfig usually maps to Command/App, which means we want 'notify' action (1).
-        // If triggerType is Action (3), we might want to pass that action ID to compositor?
-        // Design doc says: "WaylandGestureHandler ... if config.triggerType == 3 (Action), action = config.triggerValue[0].toInt()"
-        // For KeyHandler, it says "WaylandKeyHandler uses bind_key".
-        // And "ActionExecutor ... triggerType 3 (Action) is handled by compositor".
-        // So if triggerType is 3, we should bind with that action ID.
-        // If triggerType is 1 or 2, we bind with 'notify' (1) and handle execution ourselves.
-        
-        int action = QtWayland::treeland_shortcut_manager_v2::action_notify; // notify
-        if (config.triggerType == (int)TriggerType::Action && !config.triggerValue.isEmpty()) {
-             // Try to parse action enum value from string? 
-             // Or assumes triggerValue contains the integer value as string?
-             // Design doc example for gesture says "action = config.triggerValue[0].toInt()".
-             // I'll assume the same for keys.
-             bool ok;
-             int val = config.triggerValue.first().toInt(&ok);
-             if (ok) action = val;
-        }
-
         // Use keyEventFlags from config, default to key_release (0x2)
         int flags = config.keyEventFlags;
         if (m_wrapper->bindKey(name, hotkey, flags, action)) {
@@ -131,7 +128,8 @@ void WaylandKeyHandler::onActivated(const QString &name, uint32_t flags)
     // Forward the activation signal to KeybindingManager
     if (m_nameToId.contains(name)) {
         QString id = m_nameToId.value(name);
-        qDebug() << "WaylandKeyHandler::onActivated name:" << name << "id:" << id << "flags:" << flags;
+        qDebug() << "WaylandKeyHandler::onActivated name:" << name << "id:" << id
+                 << "flags:" << flags;
         
         emit keyActivated(id);
     }

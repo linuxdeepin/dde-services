@@ -37,12 +37,6 @@ bool WaylandGestureHandler::registerGesture(const GestureConfig &config)
 
     if (config.triggerType == (int)TriggerType::Action && !config.triggerValue.isEmpty()) {
         const QString &first = config.triggerValue.first();
-        // "Disable" sentinel (X11 compatibility): keep the gesture in the upper-layer map
-        // for ListAllGestures, but do not bind to compositor. Treated as logical success.
-        if (first.compare(QStringLiteral("Disable"), Qt::CaseInsensitive) == 0) {
-            qDebug() << "WaylandGestureHandler: gesture disabled, not binding to compositor:" << name;
-            return true;
-        }
         bool ok;
         int val = first.toInt(&ok);
         if (ok) action = val;

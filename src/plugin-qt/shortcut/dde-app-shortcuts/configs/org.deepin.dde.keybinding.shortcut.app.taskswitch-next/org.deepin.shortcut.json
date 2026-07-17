@@ -13,12 +13,22 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Next Window",
+            "value": "Switch Windows",
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "下一个窗口",
-            "description": "下一个窗口",
+            "name[zh_CN]": "切换窗口",
+            "description": "切换窗口",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 150,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },
@@ -26,7 +36,7 @@
             "value": [
                 "Alt+Tab"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "hotkeys",
             "name[zh_CN]": "快捷键组合",
@@ -67,12 +77,12 @@
             "visibility": "private"
         },
         "category": {
-            "value": "Window",
+            "value": "System",
             "serial": 1,
             "flags": [],
             "name": "category",
-            "name[zh_CN]": "快捷键类别（Window）",
-            "description": "Window shortcut category",
+            "name[zh_CN]": "快捷键类别（System）",
+            "description": "System shortcut category",
             "permissions": "",
             "visibility": "private"
         },

@@ -22,11 +22,22 @@
             "permissions": "",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": 70,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
         "hotkeys": {
             "value": [
-                "Alt+Print"
+                "Alt+Print",
+                "Alt+SysReq"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "hotkeys",
             "name[zh_CN]": "快捷键组合",
@@ -57,6 +68,16 @@
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
             "description": "触发动作",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "keyEventFlags": {
+            "value": 1,
+            "serial": 0,
+            "flags": [],
+            "name": "keyEventFlags",
+            "name[zh_CN]": "按键事件标志",
+            "description": "按下按键时触发窗口截图",
             "permissions": "",
             "visibility": "private"
         },

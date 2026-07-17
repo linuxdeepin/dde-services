@@ -4,6 +4,8 @@
 
 #include "lockkeycontroller.h"
 
+#include <DGuiApplicationHelper>
+
 #include <QDebug>
 #include <QDBusConnection>
 #include <QDBusMessage>
@@ -20,6 +22,7 @@
 #include <X11/keysymdef.h>
 
 DCORE_USE_NAMESPACE
+DGUI_USE_NAMESPACE
 
 LockKeyController::LockKeyController(QObject *parent) 
     : BaseController(parent)
@@ -53,8 +56,7 @@ LockKeyController::~LockKeyController()
 
 bool LockKeyController::isWayland() const
 {
-    QString sessionType = qEnvironmentVariable("XDG_SESSION_TYPE");
-    return sessionType.toLower() == "wayland";
+    return DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform);
 }
 
 void LockKeyController::initX11()

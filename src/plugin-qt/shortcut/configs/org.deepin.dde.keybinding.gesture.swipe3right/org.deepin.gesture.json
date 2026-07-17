@@ -22,6 +22,16 @@
             "permissions": "",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": 40,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
         "gestureType": {
             "value": 1,
             "serial": 0,
@@ -63,12 +73,12 @@
             "visibility": "private"
         },
         "triggerValue": {
-            "value": [24],
+            "value": [101],
             "serial": 0,
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
-            "description": "触发动作,TODO:taskswitch_next",
+            "description": "触发动作,split_window_right",
             "permissions": "readwrite",
             "visibility": "private"
         },

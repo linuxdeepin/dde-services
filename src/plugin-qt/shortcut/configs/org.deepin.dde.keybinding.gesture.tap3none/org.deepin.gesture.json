@@ -13,12 +13,22 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Tap with three fingers",
+            "value": "Three-finger tap",
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "三指点击",
+            "name[zh_CN]": "三指短按",
             "description": "tap3none gesture",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 50,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },
@@ -63,12 +73,12 @@
             "visibility": "private"
         },
         "triggerValue": {
-            "value": [23],
+            "value": [103],
             "serial": 0,
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
-            "description": "触发动作,TODO:taskswitch_enter",
+            "description": "触发动作,toggle_grand_search",
             "permissions": "readwrite",
             "visibility": "private"
         },

@@ -22,6 +22,16 @@
             "permissions": "",
             "visibility": "private"
         },
+        "displayOrder": {
+            "value": 50,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
+            "permissions": "",
+            "visibility": "private"
+        },
         "hotkeys": {
             "value": [
                 "Ctrl+Print"

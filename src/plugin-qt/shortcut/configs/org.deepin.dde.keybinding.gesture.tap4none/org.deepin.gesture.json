@@ -13,12 +13,22 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Tap with four fingers",
+            "value": "Four-finger tap",
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "四指点击",
+            "name[zh_CN]": "四指短按",
             "description": "tap4none gesture",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 100,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },
@@ -63,12 +73,12 @@
             "visibility": "private"
         },
         "triggerValue": {
-            "value": [16],
+            "value": [104],
             "serial": 0,
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
-            "description": "触发动作,TODO:",
+            "description": "触发动作,toggle_launcher",
             "permissions": "readwrite",
             "visibility": "private"
         },

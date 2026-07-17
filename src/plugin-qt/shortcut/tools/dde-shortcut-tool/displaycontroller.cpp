@@ -5,6 +5,8 @@
 #include "displaycontroller.h"
 #include "treelandbrightnesscontroller.h"
 
+#include <DGuiApplicationHelper>
+
 #include <QDebug>
 #include <QDBusInterface>
 #include <QDBusReply>
@@ -17,11 +19,12 @@
 #include <QThread>
 
 DCORE_USE_NAMESPACE
+DGUI_USE_NAMESPACE
 
 DisplayController::DisplayController(QObject *parent) 
     : BaseController(parent)
     , m_displayInterface(nullptr)
-    , m_isWayland(qEnvironmentVariable("XDG_SESSION_TYPE").toLower() == "wayland")
+    , m_isWayland(DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform))
 {
     if (m_isWayland) {
         // Brightness uses Treeland directly on Wayland. Other display actions

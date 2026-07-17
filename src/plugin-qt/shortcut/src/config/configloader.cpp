@@ -3,15 +3,18 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "configloader.h"
+#include "core/commandlineparser.h"
 
 #include <algorithm>
 
 #include <QDir>
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QTemporaryFile>
 #include <QSettings>
 #include <QSet>
+#include <QStandardPaths>
 #include <QRegularExpression>
 
 #include <DConfig>
@@ -27,6 +30,32 @@ static DConfig *createDConfig(const QString &name, const QString &subPath, QObje
 {
     const QString normalized = CustomShortcutStore::normalizeSubPath(subPath);
     return DConfig::create(APP_ID, name, QStringLiteral("/") + normalized, parent);
+}
+
+static bool configValuesEqual(const QVariant &actual, const QVariant &expected)
+{
+    if (expected.metaType().id() == QMetaType::QStringList)
+        return actual.toStringList() == expected.toStringList();
+
+    return actual == expected;
+}
+
+static QStringList normalizeLegacyCustomCommand(const QStringList &storedCommand)
+{
+    if (storedCommand.size() != 1
+            || !storedCommand.constFirst().contains(QRegularExpression(QStringLiteral("\\s")))) {
+        return storedCommand;
+    }
+
+    const QString combinedCommand = storedCommand.constFirst();
+    const QFileInfo programInfo(combinedCommand);
+    if ((programInfo.isAbsolute() && programInfo.isFile() && programInfo.isExecutable())
+            || !QStandardPaths::findExecutable(combinedCommand).isEmpty()) {
+        return storedCommand;
+    }
+
+    const auto parsedCommand = CommandLineParser::split(combinedCommand);
+    return parsedCommand.value_or(storedCommand);
 }
 
 ConfigLoader::ConfigLoader(QObject *parent)
@@ -90,9 +119,15 @@ QStringList ConfigLoader::resettableHotkeyIds() const
     QStringList ids;
 
     for (const KeyConfig &key : m_keys) {
-        if (!key.modifiable) continue;
+        // Runtime custom shortcuts are created from an empty DConfig template.
+        // Resetting their hotkeys would therefore clear the user-defined binding
+        // instead of restoring a meaningful default.
+        if (!key.modifiable || key.category == QLatin1String(CategoryKey::Custom))
+            continue;
         DConfig *config = m_configs.value(key.subPath);
-        if (config && !config->isDefaultValue("hotkeys")) {
+        if (config && config->isValid()
+                && !config->isReadOnly(QStringLiteral("hotkeys"))
+                && !config->isDefaultValue(QStringLiteral("hotkeys"))) {
             ids.append(key.getId());
         }
     }
@@ -102,36 +137,70 @@ QStringList ConfigLoader::resettableHotkeyIds() const
 
 void ConfigLoader::resetHotkeys(const QStringList &ids)
 {
-    // Reset key hotkeys to defaults.
+    // DConfig emits valueChanged after reset; do not reload or emit keyConfigChanged here.
     for (const QString &id : ids) {
         DConfig *config = m_configs.value(id);
-        if (config) {
+        if (config && config->isValid() && !config->isReadOnly(QStringLiteral("hotkeys"))) {
             config->reset("hotkeys");
+        } else {
+            qWarning() << "ConfigLoader: hotkeys can not be reset:" << id;
         }
     }
 }
 
+bool ConfigLoader::reloadKeyConfig(const QString &id, KeyConfig *result)
+{
+    const QString normalizedId = CustomShortcutStore::normalizeSubPath(id);
+    DConfig *config = m_configs.value(normalizedId);
+    if (!config || !config->isValid()) {
+        qWarning() << "ConfigLoader: key config can not be reloaded:" << id;
+        return false;
+    }
+
+    const KeyConfig reloadedConfig = parseKeyConfig(config);
+    auto existing = std::find_if(m_keys.begin(), m_keys.end(),
+                                 [&](const KeyConfig &item) { return item.subPath == normalizedId; });
+    if (existing != m_keys.end())
+        *existing = reloadedConfig;
+    else
+        m_keys.append(reloadedConfig);
+
+    if (result)
+        *result = reloadedConfig;
+    return true;
+}
+
 bool ConfigLoader::updateValue(const QString &id, const QString &key, const QVariant &value)
 {
-    if (!m_configs.contains(id)) {
+    DConfig *config = m_configs.value(id);
+    if (!config || !config->isValid() || config->isReadOnly(key)) {
         qWarning() << "ConfigLoader: config not found or can not be changed:" << id << key << value;
         return false;
     }
-    
-    m_configs[id]->setValue(key, value);
+
+    config->setValue(key, value);
+    const QVariant actualValue = config->value(key);
+    if (!configValuesEqual(actualValue, value)) {
+        qWarning() << "ConfigLoader: value verification failed:" << id << key
+                   << "expected:" << value << "actual:" << actualValue;
+        return false;
+    }
     return true;
 }
 
 bool ConfigLoader::canUpdateValue(const QString &id) const
 {
-    return m_configs.contains(id);
+    DConfig *config = m_configs.value(id);
+    return config && config->isValid() && !config->isReadOnly(QStringLiteral("hotkeys"));
 }
 
 QSet<QString> ConfigLoader::discoverSubPaths()
 {
     QSet<QString> foundSubPaths;
     foundSubPaths.unite(scanIniSubPaths(CONFIG_SUBPATH_DIR));
-    foundSubPaths.unite(m_customStore.discoverSubPaths());
+    m_customShortcutSubPaths = m_customStore.orderedSubPaths();
+    for (const QString &subPath : std::as_const(m_customShortcutSubPaths))
+        foundSubPaths.insert(subPath);
 
     return foundSubPaths;
 }
@@ -226,6 +295,8 @@ bool ConfigLoader::saveCustomShortcut(const KeyConfig &config)
         }
         return false;
     }
+    if (!m_customShortcutSubPaths.contains(subPath))
+        m_customShortcutSubPaths.append(subPath);
 
     auto existing = std::find_if(m_keys.begin(), m_keys.end(),
                                  [&](const KeyConfig &item) { return item.subPath == subPath; });
@@ -291,20 +362,21 @@ bool ConfigLoader::removeCustomShortcut(const QString &subPath)
         return false;
     }
 
-    DConfig *config = m_configs.take(normalized);
+    DConfig *config = m_configs.value(normalized);
     if (!config || !config->isValid()) {
         qWarning() << "ConfigLoader: custom shortcut config not found for removal:" << subPath;
-        if (config) config->deleteLater();
         return false;
-    } else {
-        disconnect(config, nullptr, this, nullptr);
     }
 
-    m_customStore.reset(config, normalized);
     if (!m_customStore.removeSubPath(normalized)) {
-        qWarning() << "ConfigLoader: failed to remove custom shortcut subPath after reset,"
-                   << "leaving a stale ini entry:" << normalized;
+        qWarning() << "ConfigLoader: failed to remove custom shortcut subPath:" << normalized;
+        return false;
     }
+    m_customShortcutSubPaths.removeAll(normalized);
+
+    m_configs.remove(normalized);
+    disconnect(config, nullptr, this, nullptr);
+    m_customStore.reset(config, normalized);
 
     m_loadedSubPaths.remove(normalized);
     m_keys.erase(std::remove_if(m_keys.begin(), m_keys.end(),
@@ -326,11 +398,6 @@ void ConfigLoader::loadConfig(const QString &subPath, bool newOne)
 
     if (!isKey && !isGesture) {
         qWarning() << "Skipping" << subPath << "(not shortcut or gesture)";
-        return;
-    }
-
-    if (isGesture && qgetenv("XDG_SESSION_TYPE").toLower() != "wayland") {
-        qWarning() << "Skipping" << subPath << "(not wayland session)";
         return;
     }
 
@@ -437,11 +504,16 @@ KeyConfig ConfigLoader::parseKeyConfig(DConfig *config)
     keyConfig.subPath = CustomShortcutStore::normalizeSubPath(config->subpath());
     keyConfig.appId = config->value("appId").toString();
     keyConfig.displayName = config->value("displayName").toString();
+    keyConfig.displayOrder = config->value("displayOrder", -1).toInt();
     keyConfig.enabled = config->value("enabled").toBool();
     keyConfig.modifiable = config->value("modifiable").toBool();
     keyConfig.triggerType = config->value("triggerType").toInt();
     keyConfig.triggerValue = config->value("triggerValue").toStringList();
     keyConfig.category = config->value("category").toString();
+    if (keyConfig.category == QLatin1String(CategoryKey::Custom)
+            && keyConfig.triggerType == static_cast<int>(TriggerType::Command)) {
+        keyConfig.triggerValue = normalizeLegacyCustomCommand(keyConfig.triggerValue);
+    }
     keyConfig.hotkeys = config->value("hotkeys").toStringList();
 
     if (config->keyList().contains("keyEventFlags")) {
@@ -458,6 +530,7 @@ GestureConfig ConfigLoader::parseGestureConfig(DConfig *config)
     gestureConfig.subPath = CustomShortcutStore::normalizeSubPath(config->subpath());
     gestureConfig.appId = config->value("appId").toString();
     gestureConfig.displayName = config->value("displayName").toString();
+    gestureConfig.displayOrder = config->value("displayOrder", -1).toInt();
     gestureConfig.enabled = config->value("enabled").toBool();
     gestureConfig.modifiable = config->value("modifiable").toBool();
     gestureConfig.triggerType = config->value("triggerType").toInt();

@@ -4,8 +4,15 @@
 
 #include <X11/Xlib.h>
 
+#include <cstring>
+
 extern "C" {
     unsigned long x11StringToKeysym(const char* str) {
-        return XStringToKeysym(str);
+        const KeySym keysym = XStringToKeysym(str);
+        if (keysym != NoSymbol)
+            return keysym;
+        if (str && std::strlen(str) == 1)
+            return static_cast<unsigned char>(str[0]);
+        return NoSymbol;
     }
 }

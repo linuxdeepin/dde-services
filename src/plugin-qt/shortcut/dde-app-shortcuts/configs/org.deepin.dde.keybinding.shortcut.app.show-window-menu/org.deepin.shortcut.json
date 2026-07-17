@@ -17,8 +17,18 @@
             "serial": 0,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "显示窗口菜单",
-            "description": "显示窗口菜单",
+            "name[zh_CN]": "打开窗口菜单",
+            "description": "打开窗口菜单",
+            "permissions": "",
+            "visibility": "private"
+        },
+        "displayOrder": {
+            "value": 10,
+            "serial": 1,
+            "flags": [],
+            "name": "displayOrder",
+            "name[zh_CN]": "显示顺序",
+            "description": "Display order within the category",
             "permissions": "",
             "visibility": "private"
         },
@@ -52,7 +62,7 @@
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
-            "description": "15=显示窗口菜单(show_window_menu)",
+            "description": "15=打开窗口菜单(show_window_menu)",
             "permissions": "",
             "visibility": "private"
         },

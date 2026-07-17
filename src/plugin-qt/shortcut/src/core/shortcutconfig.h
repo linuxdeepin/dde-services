@@ -26,6 +26,7 @@ namespace CategoryKey {
     inline constexpr const char *System = "System";
     inline constexpr const char *Window = "Window";
     inline constexpr const char *Workspace = "Workspace";
+    inline constexpr const char *AssistiveTools = "AssistiveTools";
     inline constexpr const char *Custom = "Custom";
 }
 
@@ -35,6 +36,7 @@ struct BaseConfig
     QString appId;              // Application ID
     QString subPath;            // DConfig subPath (e.g. [appId].shortcut.xxx)
     QString displayName;        // Localized name
+    int displayOrder = -1;      // Display order within the category; negative means unspecified
     QString category;           // Logical category key (e.g. "System", "Window", app-defined)
     bool enabled;
     bool modifiable;
@@ -46,6 +48,7 @@ struct BaseConfig
         return appId == other.appId
                 && subPath == other.subPath
                 && displayName == other.displayName
+                && displayOrder == other.displayOrder
                 && category == other.category
                 && enabled == other.enabled
                 && modifiable == other.modifiable

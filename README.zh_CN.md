@@ -7,8 +7,9 @@ Deepin 平台上的服务管理的插件模块。
 
 ### 编译依赖
 
-* Qt >= 5.11
-* cmake >= 3.13
+* Qt >= 6
+* DTK >= 6
+* cmake >= 3.16
 * systemd >= 241.46
 
 ## 构建安装
@@ -27,6 +28,11 @@ cmake --build build
 ```bash
 sudo cmake --build build --target install
 ```
+
+## 开发文档
+
+* [服务框架开发指南](develop-guide.md)
+* [快捷键与手势适配指南](src/plugin-qt/shortcut/DEVELOPER_GUIDE.md)
 
 ## 帮助
 
@@ -47,4 +53,3 @@ sudo cmake --build build --target install
 ## 协议
 
 Deepin 服务插件遵循协议 [LGPL-3.0-or-later](LICENSE).
-

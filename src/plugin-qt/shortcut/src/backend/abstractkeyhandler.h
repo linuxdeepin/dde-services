@@ -17,6 +17,7 @@ public:
 
     virtual bool registerKey(const KeyConfig &config) = 0;
     virtual bool unregisterKey(const QString &shortcutId) = 0;
+    virtual bool isAvailable() const { return true; }
 
     // commit(): async; backend may debounce. Returns true on scheduling, not
     //   on compositor ack. X11 backend is a no-op (XGrabKey is immediate).
@@ -24,6 +25,18 @@ public:
     //   pending changes. Use when you need to roll back on failure.
     virtual bool commit() { return true; }
     virtual bool commitSync() { return commit(); }
+
+    virtual bool beginCapture(uint timeoutMs, const QString &owner)
+    {
+        Q_UNUSED(timeoutMs);
+        Q_UNUSED(owner);
+        return false;
+    }
+    virtual bool endCapture(const QString &owner)
+    {
+        Q_UNUSED(owner);
+        return false;
+    }
 
     // Lock key state operations (X11 only, default no-op for other backends)
     virtual bool getCapsLockState() const { return false; }
@@ -33,4 +46,9 @@ public:
 
 signals:
     void keyActivated(const QString &shortcutId);
+    void captureStarted();
+    void captureKeyEvent(bool pressed, const QString &keystroke);
+    void captureFinished();
+    void keymapAboutToChange();
+    void keymapChanged();
 };

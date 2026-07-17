@@ -31,6 +31,7 @@ public:
     void reload();
     QStringList resettableHotkeyIds() const;
     void resetHotkeys(const QStringList &ids);
+    bool reloadKeyConfig(const QString &id, KeyConfig *result = nullptr);
     bool updateValue(const QString &id, const QString &key, const QVariant &value);
     bool canUpdateValue(const QString &id) const;
     void dumpConfigs();
@@ -40,8 +41,9 @@ public:
     bool updateCustomShortcut(const KeyConfig &config);
     bool removeCustomShortcut(const QString &subPath);
 
-    QList<KeyConfig> keys() const { return m_keys; }
-    QList<GestureConfig> gestures() const { return m_gestures; }
+    const QList<KeyConfig> &keys() const { return m_keys; }
+    const QList<GestureConfig> &gestures() const { return m_gestures; }
+    const QStringList &customShortcutSubPaths() const { return m_customShortcutSubPaths; }
 
 signals:
     void keyConfigChanged(const KeyConfig &config);
@@ -62,6 +64,7 @@ private:
     QList<GestureConfig> m_gestures;
     QMap<QString, DConfig*> m_configs; // subPath(id) -> config, key has no leading /
     QSet<QString> m_loadedSubPaths; // Track all loaded subPaths
+    QStringList m_customShortcutSubPaths; // Persisted order for legacy custom shortcuts
 
     CustomShortcutStore m_customStore;
 };

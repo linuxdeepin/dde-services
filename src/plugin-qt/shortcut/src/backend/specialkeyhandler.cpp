@@ -6,6 +6,7 @@
 
 #include <QDebug>
 #include <QDBusConnection>
+#include <QDBusServiceWatcher>
 
 SpecialKeyHandler::SpecialKeyHandler(QObject *parent)
     : QObject(parent)
@@ -26,6 +27,16 @@ SpecialKeyHandler::SpecialKeyHandler(QObject *parent)
     } else {
         qWarning() << "SpecialKeyHandler: Failed to connect to org.deepin.dde.KeyEvent1";
     }
+
+    auto *serviceWatcher = new QDBusServiceWatcher(QStringLiteral("org.deepin.dde.KeyEvent1"),
+                                                   QDBusConnection::systemBus(),
+                                                   QDBusServiceWatcher::WatchForUnregistration,
+                                                   this);
+    connect(serviceWatcher, &QDBusServiceWatcher::serviceUnregistered,
+            this, [this]() {
+                m_keysHeld.clear();
+                m_suppressedKeys.clear();
+            });
 }
 
 SpecialKeyHandler::~SpecialKeyHandler()
@@ -49,18 +60,23 @@ bool SpecialKeyHandler::registerKey(const KeyConfig &config)
         return false;
     }
 
+    if (m_shortcutKeycodes.contains(config.getId()))
+        unregisterKey(config.getId());
+
     QList<uint32_t> keycodes;
-    
     for (const QString &hotkey : config.hotkeys) {
         if (!isKeycode(hotkey)) {
             continue;  // Skip non-keycode hotkeys
         }
-        
+
         uint32_t keycode = parseKeycode(hotkey);
         if (keycode == 0) {
             qWarning() << "SpecialKeyHandler: Invalid keycode:" << hotkey;
             continue;
         }
+
+        if (keycodes.contains(keycode))
+            continue;
         
         // Check for conflict
         if (m_keycodeBindings.contains(keycode)) {
@@ -98,14 +114,35 @@ bool SpecialKeyHandler::unregisterKey(const QString &shortcutId)
         return false;
     }
     
-    QList<uint32_t> keycodes = m_shortcutKeycodes.take(shortcutId);
+    const QList<uint32_t> keycodes = m_shortcutKeycodes.take(shortcutId);
     for (uint32_t keycode : keycodes) {
         m_keycodeBindings.remove(keycode);
         m_keysHeld.remove(keycode);
+        m_suppressedKeys.remove(keycode);
     }
     
     qDebug() << "SpecialKeyHandler: Unregistered" << shortcutId;
     return true;
+}
+
+void SpecialKeyHandler::clear()
+{
+    m_keycodeBindings.clear();
+    m_shortcutKeycodes.clear();
+    m_keysHeld.clear();
+    m_suppressedKeys.clear();
+}
+
+void SpecialKeyHandler::setEnabled(bool enabled)
+{
+    if (m_enabled == enabled)
+        return;
+
+    if (!enabled) {
+        m_suppressedKeys.unite(m_keysHeld);
+        m_keysHeld.clear();
+    }
+    m_enabled = enabled;
 }
 
 QString SpecialKeyHandler::lookupConflict(uint32_t keycode) const
@@ -158,6 +195,20 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
     Q_UNUSED(shiftPressed)
     Q_UNUSED(altPressed)
     Q_UNUSED(superPressed)
+
+    if (!m_enabled) {
+        if (pressed)
+            m_suppressedKeys.insert(keycode);
+        else
+            m_suppressedKeys.remove(keycode);
+        return;
+    }
+
+    if (m_suppressedKeys.contains(keycode)) {
+        if (!pressed)
+            m_suppressedKeys.remove(keycode);
+        return;
+    }
     
     if (!m_keycodeBindings.contains(keycode)) {
         return;
@@ -186,8 +237,9 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
             }
         }
     } else {
-        // Key release
-        m_keysHeld.remove(keycode);
+        const bool wasHeld = m_keysHeld.remove(keycode);
+        if (!wasHeld)
+            return;
         
         if (flags & KeyEventFlag::Release) {
             qDebug() << "SpecialKeyHandler: Key released, keycode:" << keycode;
