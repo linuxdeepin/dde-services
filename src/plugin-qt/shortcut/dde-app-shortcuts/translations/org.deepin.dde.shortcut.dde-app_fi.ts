@@ -107,15 +107,15 @@
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>Järjestelmä</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Ikkuna</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Työtila</translation>
     </message>
 </context>
 </TS>
