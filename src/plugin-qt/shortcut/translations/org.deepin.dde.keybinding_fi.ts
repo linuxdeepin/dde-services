@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Ei mitään</translation>
     </message>
 </context>
 </TS>
