@@ -11,19 +11,19 @@
     </message>
     <message>
         <source>Swipe down with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para baixo com quatro dedos</translation>
     </message>
     <message>
         <source>Swipe down with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para baixo com três dedos</translation>
     </message>
     <message>
         <source>Swipe left with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para a esquerda com quatro dedos</translation>
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para a esquerda com três dedos</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
