@@ -27,15 +27,15 @@
     </message>
     <message>
         <source>Swipe right with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para a direita com quatro dedos</translation>
     </message>
     <message>
         <source>Swipe right with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para a direita com três dedos</translation>
     </message>
     <message>
         <source>Swipe up with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para cima com quatro dedos</translation>
     </message>
     <message>
         <source>Swipe up with three fingers</source>
