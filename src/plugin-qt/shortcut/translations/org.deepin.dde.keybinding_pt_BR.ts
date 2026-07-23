@@ -95,15 +95,15 @@
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Exibir/ocultar pesquisa global</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Exibir/ocultar launcher</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Exibir/ocultar área de transferência</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
