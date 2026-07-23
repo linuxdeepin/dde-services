@@ -55,11 +55,11 @@
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maximizar janela</translation>
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Restaurar janela</translation>
     </message>
     <message>
         <source>Current window left split</source>
