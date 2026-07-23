@@ -119,7 +119,7 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Ferramentas assistivas</translation>
     </message>
 </context>
 </TS>
