@@ -63,11 +63,11 @@
     </message>
     <message>
         <source>Current window left split</source>
-        <translation type="unfinished"/>
+        <translation>Encaixar janela atual à esquerda</translation>
     </message>
     <message>
         <source>Current window right split</source>
-        <translation type="unfinished"/>
+        <translation>Encaixar janela atual à direita</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
