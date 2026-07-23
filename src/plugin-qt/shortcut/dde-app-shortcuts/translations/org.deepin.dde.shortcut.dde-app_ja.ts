@@ -117,5 +117,9 @@
         <source>Workspace</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>AssistiveTools</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
