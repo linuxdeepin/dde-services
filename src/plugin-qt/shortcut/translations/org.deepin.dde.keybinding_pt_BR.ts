@@ -175,11 +175,11 @@
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Fechar janela</translation>
     </message>
     <message>
         <source>Show window menu</source>
-        <translation type="unfinished"/>
+        <translation>Exibir menu da janela</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
