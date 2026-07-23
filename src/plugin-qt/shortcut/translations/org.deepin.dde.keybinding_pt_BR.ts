@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Exibir visão multitarefa</translation>
     </message>
     <message>
         <source>Hide multitasking view</source>
