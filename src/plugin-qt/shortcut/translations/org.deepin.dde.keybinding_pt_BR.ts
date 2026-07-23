@@ -39,19 +39,19 @@
     </message>
     <message>
         <source>Swipe up with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Deslize para cima com três dedos</translation>
     </message>
     <message>
         <source>Four-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Toque com quatro dedos</translation>
     </message>
     <message>
         <source>Three-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Toque com três dedos</translation>
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
-        <translation type="unfinished"/>
+        <translation>Esta ação de gesto não é compatível atualmente</translation>
     </message>
     <message>
         <source>Maximize window</source>
