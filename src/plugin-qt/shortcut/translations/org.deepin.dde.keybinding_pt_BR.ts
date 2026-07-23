@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Hide multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Ocultar visão multitarefa</translation>
     </message>
     <message>
         <source>Switch to previous workspace</source>
@@ -183,7 +183,7 @@
     </message>
     <message>
         <source>Toggle multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Alternar visão multitarefa</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
