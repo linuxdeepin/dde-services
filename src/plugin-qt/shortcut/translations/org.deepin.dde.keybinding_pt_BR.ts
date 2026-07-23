@@ -107,11 +107,11 @@
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Exibir/ocultar notificações</translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Desativar</translation>
     </message>
     <message>
         <source>Custom</source>
