@@ -203,7 +203,7 @@
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation type="unfinished"/>
+        <translation>Abrir alternador de tarefas</translation>
     </message>
     <message>
         <source>Select next task</source>
