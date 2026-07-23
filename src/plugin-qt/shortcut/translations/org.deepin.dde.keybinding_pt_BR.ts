@@ -147,15 +147,15 @@
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o espaço de trabalho 1</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o espaço de trabalho 2</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o espaço de trabalho 3</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
