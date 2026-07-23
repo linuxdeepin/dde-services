@@ -207,15 +207,15 @@
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar próxima tarefa</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar tarefa anterior</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar próxima janela do aplicativo atual</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
