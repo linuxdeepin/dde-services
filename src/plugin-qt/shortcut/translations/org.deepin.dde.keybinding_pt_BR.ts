@@ -79,19 +79,19 @@
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o espaço de trabalho anterior</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o próximo espaço de trabalho</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Exibir área de trabalho</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Ocultar área de trabalho</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
