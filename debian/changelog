@@ -1,3 +1,9 @@
+dde-services (1.0.34) unstable; urgency=medium
+
+  * feat(shortcut): complete X11 shortcut and gesture migration
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 23 Jul 2026 21:48:33 +0800
+
 dde-services (1.0.33) unstable; urgency=medium
 
   * i18n: [Transifex] Updates for project Deepin Desktop Environment
