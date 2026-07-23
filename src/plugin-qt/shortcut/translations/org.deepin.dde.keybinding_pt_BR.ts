@@ -119,19 +119,19 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Ferramentas assistivas</translation>
     </message>
     <message>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Texto para fala</translation>
     </message>
     <message>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Fala para texto</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"/>
+        <translation>Tradução</translation>
     </message>
     <message>
         <source>None</source>
@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Notificar</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
