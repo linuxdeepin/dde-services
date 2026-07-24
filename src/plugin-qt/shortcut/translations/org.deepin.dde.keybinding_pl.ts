@@ -203,15 +203,15 @@
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation>Otwórz przełączanie zadań</translation>
+        <translation>Otwórz przełącznik aplikacji</translation>
     </message>
     <message>
         <source>Select next task</source>
-        <translation>Wybierz następne zadanie</translation>
+        <translation>Wybierz następną aplikację</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation>Wybierz poprzednie zadanie</translation>
+        <translation>Wybierz poprzednią aplikację</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
