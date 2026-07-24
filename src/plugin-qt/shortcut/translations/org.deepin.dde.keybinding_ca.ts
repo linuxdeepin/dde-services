@@ -23,27 +23,27 @@
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Llisqueu a l&apos;esquerra amb tres dits</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Llisqueu a la dreta amb quatre dits</translation>
     </message>
     <message>
         <source>Swipe right with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Llisqueu a la dreta amb tres dits</translation>
     </message>
     <message>
         <source>Swipe up with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Llisqueu amunt amb quatre dits</translation>
     </message>
     <message>
         <source>Swipe up with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Llisqueu amunt amb tres dits</translation>
     </message>
     <message>
         <source>Four-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Toc amb quatre dits</translation>
     </message>
     <message>
         <source>Three-finger tap</source>
