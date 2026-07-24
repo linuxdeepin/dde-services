@@ -11,35 +11,35 @@
     </message>
     <message>
         <source>Swipe down with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w dół czterema palcami</translation>
     </message>
     <message>
         <source>Swipe down with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w dół trzema palcami</translation>
     </message>
     <message>
         <source>Swipe left with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w lewo czterema palcami</translation>
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w lewo trzema palcami</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w prawo czterema palcami</translation>
     </message>
     <message>
         <source>Swipe right with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w prawo trzema palcami</translation>
     </message>
     <message>
         <source>Swipe up with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w górę czterema palcami</translation>
     </message>
     <message>
         <source>Swipe up with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w górę trzema palcami</translation>
     </message>
     <message>
         <source>Four-finger tap</source>
