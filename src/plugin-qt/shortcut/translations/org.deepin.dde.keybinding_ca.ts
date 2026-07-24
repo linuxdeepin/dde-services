@@ -207,19 +207,19 @@
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Selecciona la tasca següent</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Selecciona la tasca anterior</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Seleccioneu la finestra següent de l&apos;aplicació actual</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Selecciona la finestra anterior de l&apos;aplicació actual</translation>
     </message>
 </context>
 </TS>
