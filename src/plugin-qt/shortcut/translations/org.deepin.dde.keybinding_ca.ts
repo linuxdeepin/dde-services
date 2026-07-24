@@ -67,51 +67,51 @@
     </message>
     <message>
         <source>Current window right split</source>
-        <translation type="unfinished"/>
+        <translation>Divisió a la dreta de la finestra actual</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Mostra la vista de multitasca</translation>
     </message>
     <message>
         <source>Hide multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Amaga la vista de multitasca</translation>
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball anterior</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball següent</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Mostra l&apos;escriptori</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Amaga l&apos;escriptori</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Mostra / amaga la cerca general</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Mostra / amaga el llançador</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Mostra / amaga el porta-retalls</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Mostra / amaga el centre de notificacions</translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Inhabilita</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -119,15 +119,15 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Eines d&apos;assistència</translation>
     </message>
     <message>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>De text a discurs</translation>
     </message>
     <message>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>De discurs a text</translation>
     </message>
     <message>
         <source>Translation</source>
