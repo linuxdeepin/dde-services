@@ -187,7 +187,7 @@
     </message>
     <message>
         <source>Toggle FPS display</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz licznik FPS</translation>
     </message>
     <message>
         <source>Lock screen</source>
