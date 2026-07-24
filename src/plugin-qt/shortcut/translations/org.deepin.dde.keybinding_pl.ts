@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
-        <translation type="unfinished"/>
+        <translation>Obsługa gestów nie jest obecnie wspierana</translation>
     </message>
     <message>
         <source>Maximize window</source>
@@ -71,19 +71,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Hide multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Ukryj widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na poprzedni obszar roboczy</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na następny obszar roboczy</translation>
     </message>
     <message>
         <source>Show desktop</source>
