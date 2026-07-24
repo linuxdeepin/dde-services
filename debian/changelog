@@ -1,3 +1,9 @@
+dde-services (1.0.36) unstable; urgency=medium
+
+  * fix(build): add libx11-xcb-dev to Build-Depends
+
+ -- zhaoyingzhen <zhaoyingzhen@uniontech.com>  Fri, 24 Jul 2026 10:55:16 +0800
+
 dde-services (1.0.35) unstable; urgency=medium
 
   * fix(build): add libxcb-xinput-dev to Build-Depends
