@@ -107,14 +107,18 @@
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>Järjestelmä</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Ikkuna</translation>
     </message>
     <message>
         <source>Workspace</source>
+        <translation>Työtila</translation>
+    </message>
+    <message>
+        <source>AssistiveTools</source>
         <translation type="unfinished"/>
     </message>
 </context>
