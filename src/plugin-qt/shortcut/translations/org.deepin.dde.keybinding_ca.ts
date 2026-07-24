@@ -171,19 +171,19 @@
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Mou la finestra</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Tanca la finestra</translation>
     </message>
     <message>
         <source>Show window menu</source>
-        <translation type="unfinished"/>
+        <translation>Mostra el menú de la finestra</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Commuta la vista de multitasca</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
