@@ -47,23 +47,23 @@
     </message>
     <message>
         <source>Three-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Toc amb tres dits</translation>
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
-        <translation type="unfinished"/>
+        <translation>Actualment, aquesta acció de gest no és compatible.</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimitza la finestra</translation>
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Restaura la finestra</translation>
     </message>
     <message>
         <source>Current window left split</source>
-        <translation type="unfinished"/>
+        <translation>Divisió a l&apos;esquerra de la finestra actual</translation>
     </message>
     <message>
         <source>Current window right split</source>
