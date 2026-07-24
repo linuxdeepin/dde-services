@@ -191,15 +191,15 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"/>
+        <translation>Ekran blokady</translation>
     </message>
     <message>
         <source>Show shutdown menu</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż interfejs wyłączania</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Wyjdź</translation>
     </message>
     <message>
         <source>Enter task switcher</source>
