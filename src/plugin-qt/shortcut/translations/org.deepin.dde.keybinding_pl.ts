@@ -43,11 +43,11 @@
     </message>
     <message>
         <source>Four-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Stuknięcie czterema palcami</translation>
     </message>
     <message>
         <source>Three-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Stuknięcie trzema palcami</translation>
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
@@ -55,11 +55,11 @@
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maksymalizuj okno</translation>
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć okno</translation>
     </message>
     <message>
         <source>Current window left split</source>
