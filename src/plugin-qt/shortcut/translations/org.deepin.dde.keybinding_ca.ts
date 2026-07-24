@@ -215,7 +215,7 @@
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation>Seleccioneu la finestra següent de l&apos;aplicació actual</translation>
+        <translation>Selecciona la finestra següent de l&apos;aplicació actual</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
