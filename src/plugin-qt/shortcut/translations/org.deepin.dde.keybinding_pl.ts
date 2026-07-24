@@ -171,19 +171,19 @@
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś okno</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Zamknij okno</translation>
     </message>
     <message>
         <source>Show window menu</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż menu okna</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
