@@ -117,5 +117,9 @@
         <source>Workspace</source>
         <translation>Espai de treball</translation>
     </message>
+    <message>
+        <source>AssistiveTools</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
