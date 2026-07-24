@@ -63,11 +63,11 @@
     </message>
     <message>
         <source>Current window left split</source>
-        <translation type="unfinished"/>
+        <translation>Podział do lewej bieżącego okna</translation>
     </message>
     <message>
         <source>Current window right split</source>
-        <translation type="unfinished"/>
+        <translation>Podział do prawej bieżącego okna</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Powiadomienia</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
