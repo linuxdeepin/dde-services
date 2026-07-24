@@ -131,7 +131,7 @@
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"/>
+        <translation>Traducció</translation>
     </message>
     <message>
         <source>None</source>
@@ -143,31 +143,31 @@
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Notifica</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball 1</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball 2</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball 3</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball 4</translation>
     </message>
     <message>
         <source>Switch to workspace 5</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball 5</translation>
     </message>
     <message>
         <source>Switch to workspace 6</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball 6</translation>
     </message>
     <message>
         <source>Move window</source>
