@@ -10,24 +10,216 @@
         <translation>Terminal padrão</translation>
     </message>
     <message>
+        <source>Swipe down with four fingers</source>
+        <translation>Deslize para baixo com quatro dedos</translation>
+    </message>
+    <message>
+        <source>Swipe down with three fingers</source>
+        <translation>Deslize para baixo com três dedos</translation>
+    </message>
+    <message>
+        <source>Swipe left with four fingers</source>
+        <translation>Deslize para a esquerda com quatro dedos</translation>
+    </message>
+    <message>
+        <source>Swipe left with three fingers</source>
+        <translation>Deslize para a esquerda com três dedos</translation>
+    </message>
+    <message>
+        <source>Swipe right with four fingers</source>
+        <translation>Deslize para a direita com quatro dedos</translation>
+    </message>
+    <message>
+        <source>Swipe right with three fingers</source>
+        <translation>Deslize para a direita com três dedos</translation>
+    </message>
+    <message>
+        <source>Swipe up with four fingers</source>
+        <translation>Deslize para cima com quatro dedos</translation>
+    </message>
+    <message>
+        <source>Swipe up with three fingers</source>
+        <translation>Deslize para cima com três dedos</translation>
+    </message>
+    <message>
+        <source>Four-finger tap</source>
+        <translation>Toque com quatro dedos</translation>
+    </message>
+    <message>
+        <source>Three-finger tap</source>
+        <translation>Toque com três dedos</translation>
+    </message>
+    <message>
+        <source>This gesture action is not currently supported</source>
+        <translation>Esta ação de gesto não é compatível atualmente</translation>
+    </message>
+    <message>
+        <source>Maximize window</source>
+        <translation>Maximizar janela</translation>
+    </message>
+    <message>
+        <source>Restore window</source>
+        <translation>Restaurar janela</translation>
+    </message>
+    <message>
+        <source>Current window left split</source>
+        <translation>Encaixar janela atual à esquerda</translation>
+    </message>
+    <message>
+        <source>Current window right split</source>
+        <translation>Encaixar janela atual à direita</translation>
+    </message>
+    <message>
+        <source>Show multitasking view</source>
+        <translation>Exibir visão multitarefa</translation>
+    </message>
+    <message>
+        <source>Hide multitasking view</source>
+        <translation>Ocultar visão multitarefa</translation>
+    </message>
+    <message>
+        <source>Switch to previous workspace</source>
+        <translation>Alternar para o espaço de trabalho anterior</translation>
+    </message>
+    <message>
+        <source>Switch to next workspace</source>
+        <translation>Alternar para o próximo espaço de trabalho</translation>
+    </message>
+    <message>
+        <source>Show desktop</source>
+        <translation>Exibir área de trabalho</translation>
+    </message>
+    <message>
+        <source>Hide desktop</source>
+        <translation>Ocultar área de trabalho</translation>
+    </message>
+    <message>
+        <source>Show/hide grand search</source>
+        <translation>Exibir/ocultar pesquisa global</translation>
+    </message>
+    <message>
+        <source>Show/hide launcher</source>
+        <translation>Exibir/ocultar launcher</translation>
+    </message>
+    <message>
+        <source>Show/hide clipboard</source>
+        <translation>Exibir/ocultar área de transferência</translation>
+    </message>
+    <message>
+        <source>Show/hide notification center</source>
+        <translation>Exibir/ocultar notificações</translation>
+    </message>
+    <message>
+        <source>Disable</source>
+        <translation>Desativar</translation>
+    </message>
+    <message>
         <source>Custom</source>
         <translation>Personalizado</translation>
+    </message>
+    <message>
+        <source>AssistiveTools</source>
+        <translation>Ferramentas assistivas</translation>
+    </message>
+    <message>
+        <source>Text to Speech</source>
+        <translation>Texto para fala</translation>
+    </message>
+    <message>
+        <source>Speech to Text</source>
+        <translation>Fala para texto</translation>
+    </message>
+    <message>
+        <source>Translation</source>
+        <translation>Tradução</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Nenhum</translation>
     </message>
     <message>
         <source>System</source>
         <translation>Sistema</translation>
     </message>
     <message>
-        <source>Window</source>
-        <translation>Janela</translation>
+        <source>Notify</source>
+        <translation>Notificar</translation>
     </message>
     <message>
-        <source>Workspace</source>
-        <translation>Espaço de trabalho</translation>
+        <source>Switch to workspace 1</source>
+        <translation>Alternar para o espaço de trabalho 1</translation>
     </message>
     <message>
-        <source>None</source>
-        <translation>Nenhum</translation>
+        <source>Switch to workspace 2</source>
+        <translation>Alternar para o espaço de trabalho 2</translation>
+    </message>
+    <message>
+        <source>Switch to workspace 3</source>
+        <translation>Alternar para o espaço de trabalho 3</translation>
+    </message>
+    <message>
+        <source>Switch to workspace 4</source>
+        <translation>Alternar para o espaço de trabalho 4</translation>
+    </message>
+    <message>
+        <source>Switch to workspace 5</source>
+        <translation>Alternar para o espaço de trabalho 5</translation>
+    </message>
+    <message>
+        <source>Switch to workspace 6</source>
+        <translation>Alternar para o espaço de trabalho 6</translation>
+    </message>
+    <message>
+        <source>Move window</source>
+        <translation>Mover janela</translation>
+    </message>
+    <message>
+        <source>Close window</source>
+        <translation>Fechar janela</translation>
+    </message>
+    <message>
+        <source>Show window menu</source>
+        <translation>Exibir menu da janela</translation>
+    </message>
+    <message>
+        <source>Toggle multitasking view</source>
+        <translation>Alternar visão multitarefa</translation>
+    </message>
+    <message>
+        <source>Toggle FPS display</source>
+        <translation>Alternar exibição de FPS</translation>
+    </message>
+    <message>
+        <source>Lock screen</source>
+        <translation>Bloquear tela</translation>
+    </message>
+    <message>
+        <source>Show shutdown menu</source>
+        <translation>Exibir menu de desligamento</translation>
+    </message>
+    <message>
+        <source>Quit</source>
+        <translation>Sair</translation>
+    </message>
+    <message>
+        <source>Enter task switcher</source>
+        <translation>Abrir alternador de tarefas</translation>
+    </message>
+    <message>
+        <source>Select next task</source>
+        <translation>Selecionar próxima tarefa</translation>
+    </message>
+    <message>
+        <source>Select previous task</source>
+        <translation>Selecionar tarefa anterior</translation>
+    </message>
+    <message>
+        <source>Select next window of current application</source>
+        <translation>Selecionar próxima janela do aplicativo atual</translation>
+    </message>
+    <message>
+        <source>Select previous window of current application</source>
+        <translation>Selecionar janela anterior do aplicativo atual</translation>
     </message>
 </context>
 </TS>
