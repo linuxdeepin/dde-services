@@ -52,7 +52,6 @@ private:
     QVector<QTimer *> m_timers;
     QMap<QString, double> m_oldBrightness;
     bool m_screensaverRunning = false;
-    bool m_isIdle = false;
     bool m_allowScreenSaver = true;
     bool m_psmEnabled = false;
     uint m_psmDrop = 0;

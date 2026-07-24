@@ -124,14 +124,24 @@ void PowerSavePlan::Update(int screenSaverStartDelay, int lockDelay,
         }
     }
 
-    setScreenSaverTimeout(min);
-
-    for (auto &t : m_metaTasks) {
-        int nSecs = t.delay - min;
-        t.realDelay = nSecs > 0 ? nSecs * 1000 : 1;
+    
+    bool isIdle = false;
+    if (m_powerManager) {
+        auto *iw = m_powerManager->idleWatcher();
+        isIdle = iw && iw->isIdle();
     }
-
-    if (m_isIdle) {
+    
+    for (auto &t : m_metaTasks) {
+        if (isIdle) { // 已经处于 idleon 状态的update（可能是插拔电源或者用户重新设置延迟）, 重排任务
+            t.realDelay = t.delay > 0 ? t.delay * 1000 : 1;
+        } else { // 到达 idleOn 后立即执行动作
+            int nSecs = t.delay - min;
+            t.realDelay = nSecs > 0 ? nSecs * 1000 : 1;
+        }
+    }
+    
+    setScreenSaverTimeout(min);
+    if (isIdle) {
         HandleIdleOn();
     }
 }
@@ -149,8 +159,6 @@ void PowerSavePlan::HandleIdleOn()
         return;
     }
 
-    m_isIdle = true;
-
     for (const auto &t : m_metaTasks) {
         scheduleTask(t);
     }
@@ -162,7 +170,6 @@ void PowerSavePlan::HandleIdleOn()
 void PowerSavePlan::HandleIdleOff()
 {
     qDebug(logPowerSession) << "HandleIdleOff";
-    m_isIdle = false;
     interruptTasks();
     if (!m_powerManager) return;
     m_powerManager->SetPrepareSuspend(static_cast<int>(PS_Normal));
@@ -174,7 +181,7 @@ void PowerSavePlan::HandleIdleOff()
 
 void PowerSavePlan::scheduleTask(const MetaTask &t)
 {
-    qDebug(logPowerSession) << "Scheduling task" << t.name << "to run in" << t.realDelay << "ms";
+    qWarning(logPowerSession) << "Scheduling task" << t.name << "to run in" << t.realDelay << "ms";
     auto *timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, this, t.fn);
