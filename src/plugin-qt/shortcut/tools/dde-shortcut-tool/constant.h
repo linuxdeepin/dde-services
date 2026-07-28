@@ -45,6 +45,26 @@ enum PowerAction {
     PowerActionShowUI = 4
 };
 
+namespace Brightness {
+
+constexpr double Step = 5.0;
+constexpr double Minimum = 10.0;
+constexpr double Maximum = 100.0;
+
+inline double adjustedValue(double current, bool raised)
+{
+    const double value = current + (raised ? Step : -Step);
+    if (value < Minimum) {
+        return Minimum;
+    }
+    if (value > Maximum) {
+        return Maximum;
+    }
+    return value;
+}
+
+} // namespace Brightness
+
 namespace Config {
 
 // DConfig App ID

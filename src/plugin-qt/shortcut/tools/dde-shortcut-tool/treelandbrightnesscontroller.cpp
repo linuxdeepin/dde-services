@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "treelandbrightnesscontroller.h"
+#include "constant.h"
 
 #include <QDebug>
 #include <QDir>
@@ -17,7 +18,6 @@
 
 namespace {
 
-constexpr double BrightnessStep = 5.0;
 constexpr int BrightnessCommitTimeoutMs = 1000;
 constexpr int BrightnessLockTimeoutMs = 1500;
 
@@ -49,8 +49,7 @@ double TreelandColorControl::brightness() const
 
 double TreelandColorControl::changeBrightness(bool raised)
 {
-    const double delta = raised ? BrightnessStep : -BrightnessStep;
-    const double target = std::clamp(m_brightness + delta, 0.0, 100.0);
+    const double target = Brightness::adjustedValue(m_brightness, raised);
 
     set_brightness(wl_fixed_from_double(target));
     commit();
