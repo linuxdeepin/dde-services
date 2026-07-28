@@ -4,6 +4,21 @@
 
 find_package(Qt6 REQUIRED COMPONENTS Test)
 
+add_executable(tst-brightnesspolicy
+    tst_brightnesspolicy.cpp
+)
+
+target_include_directories(tst-brightnesspolicy PRIVATE
+    ../tools/dde-shortcut-tool
+)
+
+target_link_libraries(tst-brightnesspolicy PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+add_test(NAME shortcut-brightnesspolicy COMMAND tst-brightnesspolicy)
+
 add_executable(tst-physicalkeyalias
     tst_physicalkeyalias.cpp
     ../src/core/physicalkeyalias.cpp
