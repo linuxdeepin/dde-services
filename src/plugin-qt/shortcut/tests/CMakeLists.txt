@@ -10,12 +10,17 @@ add_executable(tst-brightnesspolicy
 
 target_include_directories(tst-brightnesspolicy PRIVATE
     ../tools/dde-shortcut-tool
+    $<TARGET_PROPERTY:dde-shortcut-tool,BINARY_DIR>
 )
 
 target_link_libraries(tst-brightnesspolicy PRIVATE
     Qt6::Core
+    Qt6::Gui
     Qt6::Test
+    Qt6::WaylandClient
 )
+
+add_dependencies(tst-brightnesspolicy dde-shortcut-tool)
 
 add_test(NAME shortcut-brightnesspolicy COMMAND tst-brightnesspolicy)
 
