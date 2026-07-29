@@ -30,12 +30,28 @@ public:
     double changeBrightness(bool raised);
     void setResultHandler(std::function<void(bool)> handler);
 
+    static constexpr double adjustedValue(double current, bool raised)
+    {
+        const double value = current + (raised ? BrightnessStep : -BrightnessStep);
+        if (value < MinimumBrightness) {
+            return MinimumBrightness;
+        }
+        if (value > MaximumBrightness) {
+            return MaximumBrightness;
+        }
+        return value;
+    }
+
 protected:
     void treeland_output_color_control_v1_result(uint32_t success) override;
     void treeland_output_color_control_v1_color_temperature(uint32_t temperature) override;
     void treeland_output_color_control_v1_brightness(wl_fixed_t brightness) override;
 
 private:
+    static constexpr double BrightnessStep = 5.0;
+    static constexpr double MinimumBrightness = 10.0;
+    static constexpr double MaximumBrightness = 100.0;
+
     double m_brightness = -1.0;
     std::function<void(bool)> m_resultHandler;
 };

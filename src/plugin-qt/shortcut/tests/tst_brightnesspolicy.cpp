@@ -4,7 +4,9 @@
 
 #include <QtTest>
 
-#include "constant.h"
+#include "treelandbrightnesscontroller.h"
+
+using TreelandBrightnessPrivate::TreelandColorControl;
 
 class BrightnessPolicyTest : public QObject
 {
@@ -18,19 +20,19 @@ private Q_SLOTS:
 
 void BrightnessPolicyTest::clampsAtLowerBound()
 {
-    QCOMPARE(Brightness::adjustedValue(10.0, false), 10.0);
-    QCOMPARE(Brightness::adjustedValue(12.0, false), 10.0);
+    QCOMPARE(TreelandColorControl::adjustedValue(10.0, false), 10.0);
+    QCOMPARE(TreelandColorControl::adjustedValue(12.0, false), 10.0);
 }
 
 void BrightnessPolicyTest::clampsAtUpperBound()
 {
-    QCOMPARE(Brightness::adjustedValue(100.0, true), 100.0);
+    QCOMPARE(TreelandColorControl::adjustedValue(100.0, true), 100.0);
 }
 
 void BrightnessPolicyTest::keepsValueInsideRange()
 {
-    QCOMPARE(Brightness::adjustedValue(50.0, false), 45.0);
-    QCOMPARE(Brightness::adjustedValue(50.0, true), 55.0);
+    QCOMPARE(TreelandColorControl::adjustedValue(50.0, false), 45.0);
+    QCOMPARE(TreelandColorControl::adjustedValue(50.0, true), 55.0);
 }
 
 QTEST_APPLESS_MAIN(BrightnessPolicyTest)

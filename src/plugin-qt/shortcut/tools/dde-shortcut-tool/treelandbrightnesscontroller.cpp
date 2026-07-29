@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "treelandbrightnesscontroller.h"
-#include "constant.h"
 
 #include <QDebug>
 #include <QDir>
@@ -49,7 +48,7 @@ double TreelandColorControl::brightness() const
 
 double TreelandColorControl::changeBrightness(bool raised)
 {
-    const double target = Brightness::adjustedValue(m_brightness, raised);
+    const double target = adjustedValue(m_brightness, raised);
 
     set_brightness(wl_fixed_from_double(target));
     commit();
