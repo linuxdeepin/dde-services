@@ -11,11 +11,8 @@
 #include <QProcess>
 #include <QSysInfo>
 
-#include <DConfig>
 #include <qlogging.h>
 #include <QThread>
-
-DCORE_USE_NAMESPACE
 
 DisplayController::DisplayController(QObject *parent) 
     : BaseController(parent)
@@ -112,31 +109,15 @@ bool DisplayController::changeBrightness(bool raised)
         return false;
     }
 
-    auto *powerConfig = DConfig::create("org.deepin.dde.daemon", "org.deepin.dde.daemon.power", "", this);
-    if (!powerConfig->isValid()) {
-        qWarning() << "daemon power config is not valid";
-        return false;
-    }
-
-    // Check if ambient light auto-adjustment is enabled, disable it first if so
-    QVariant autoAdjustValue = powerConfig->value("ambientLightAdjustBrightness");
-    if (autoAdjustValue.toBool()) {
-        powerConfig->setValue("ambientLightAdjustBrightness", false);
-        qDebug() << "Disabled ambient light auto brightness adjustment";
-    }
-
     // Call Display1's ChangeBrightness method directly
     QDBusReply<void> reply = m_displayInterface->call("ChangeBrightness", raised);
     if (!reply.isValid()) {
         qWarning() << "Failed to change brightness:" << reply.error().message();
         return false;
     }
-    
+
     qDebug() << "Changed brightness:" << (raised ? "up" : "down");
     showOSD(raised ? "BrightnessUp" : "BrightnessDown");
-
-    powerConfig->deleteLater();
-    
     return true;
 }
 
