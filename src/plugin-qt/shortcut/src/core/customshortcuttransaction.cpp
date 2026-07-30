@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "customshortcuttransaction.h"
 
 #include "backend/abstractkeyhandler.h"
@@ -34,21 +36,21 @@ bool KeybindingManager::CustomShortcutTransaction::applyRuntime()
 
     const QStringList excludeIds = changedIds();
     if (!registerIfNeeded(m_change.newTarget, excludeIds)) {
-        qWarning() << "CustomShortcutTransaction: failed to register target shortcut"
+        qCWarning(logShortcut) << "CustomShortcutTransaction: failed to register target shortcut"
                    << m_change.newTarget.getId();
         restoreRuntime();
         return false;
     }
 
     if (m_change.hasConflict && !registerIfNeeded(m_change.newConflict, excludeIds)) {
-        qWarning() << "CustomShortcutTransaction: failed to register conflict shortcut"
+        qCWarning(logShortcut) << "CustomShortcutTransaction: failed to register conflict shortcut"
                    << m_change.oldConflict.getId();
         restoreRuntime();
         return false;
     }
 
     if (!m_manager->m_keyHandler->commitSync()) {
-        qWarning() << "CustomShortcutTransaction: runtime commit failed, rolling back"
+        qCWarning(logShortcut) << "CustomShortcutTransaction: runtime commit failed, rolling back"
                    << m_change.newTarget.getId();
         restoreRuntime();
         return false;
@@ -61,7 +63,7 @@ bool KeybindingManager::CustomShortcutTransaction::applyRuntime()
 bool KeybindingManager::CustomShortcutTransaction::persistAdd()
 {
     if (!m_manager->m_loader->saveCustomShortcut(m_change.newTarget)) {
-        qWarning() << "AddCustomShortcut: failed to persist custom shortcut, rolling back"
+        qCWarning(logShortcut) << "AddCustomShortcut: failed to persist custom shortcut, rolling back"
                    << m_change.newTarget.getId();
         restoreRuntime();
         return false;
@@ -72,11 +74,11 @@ bool KeybindingManager::CustomShortcutTransaction::persistAdd()
         if (!m_manager->m_loader->updateValue(m_change.oldConflict.getId(),
                                               "hotkeys",
                                               m_change.newConflict.hotkeys)) {
-            qWarning() << "AddCustomShortcut: failed to persist conflict shortcut, rolling back"
+            qCWarning(logShortcut) << "AddCustomShortcut: failed to persist conflict shortcut, rolling back"
                        << m_change.oldConflict.getId();
             restoreConflictMap();
             if (!m_manager->m_loader->removeCustomShortcut(m_change.newTarget.getId())) {
-                qCritical() << "AddCustomShortcut: failed to remove persisted custom shortcut during rollback"
+                qCCritical(logShortcut) << "AddCustomShortcut: failed to remove persisted custom shortcut during rollback"
                             << m_change.newTarget.getId();
             }
             restoreRuntime();
@@ -91,10 +93,10 @@ bool KeybindingManager::CustomShortcutTransaction::persistAdd()
 bool KeybindingManager::CustomShortcutTransaction::persistModify()
 {
     if (!m_manager->m_loader->updateCustomShortcut(m_change.newTarget)) {
-        qWarning() << "ModifyCustomShortcut: failed to persist custom shortcut, rolling back"
+        qCWarning(logShortcut) << "ModifyCustomShortcut: failed to persist custom shortcut, rolling back"
                    << m_change.newTarget.getId();
         if (!m_manager->m_loader->updateCustomShortcut(m_change.oldTarget)) {
-            qCritical() << "ModifyCustomShortcut: failed to restore persisted custom shortcut during rollback"
+            qCCritical(logShortcut) << "ModifyCustomShortcut: failed to restore persisted custom shortcut during rollback"
                         << m_change.oldTarget.getId();
         }
         restoreRuntime();
@@ -106,11 +108,11 @@ bool KeybindingManager::CustomShortcutTransaction::persistModify()
         if (!m_manager->m_loader->updateValue(m_change.oldConflict.getId(),
                                               "hotkeys",
                                               m_change.newConflict.hotkeys)) {
-            qWarning() << "ModifyCustomShortcut: failed to persist conflict shortcut, rolling back"
+            qCWarning(logShortcut) << "ModifyCustomShortcut: failed to persist conflict shortcut, rolling back"
                        << m_change.oldConflict.getId();
             restoreConflictMap();
             if (!m_manager->m_loader->updateCustomShortcut(m_change.oldTarget)) {
-                qCritical() << "ModifyCustomShortcut: failed to restore persisted custom shortcut during conflict rollback"
+                qCCritical(logShortcut) << "ModifyCustomShortcut: failed to restore persisted custom shortcut during conflict rollback"
                             << m_change.oldTarget.getId();
             }
             restoreRuntime();
@@ -180,11 +182,11 @@ void KeybindingManager::CustomShortcutTransaction::restoreRuntime()
         restored = registerIfNeeded(m_change.oldTarget, excludeIds) && restored;
 
     if (!restored) {
-        qCritical() << "CustomShortcutTransaction: failed to restore shortcut registration"
+        qCCritical(logShortcut) << "CustomShortcutTransaction: failed to restore shortcut registration"
                     << m_change.newTarget.getId();
     }
     if (!m_manager->m_keyHandler->commitSync()) {
-        qCritical() << "CustomShortcutTransaction: rollback commit failed,"
+        qCCritical(logShortcut) << "CustomShortcutTransaction: rollback commit failed,"
                     << "runtime state may diverge from compositor";
     }
 }

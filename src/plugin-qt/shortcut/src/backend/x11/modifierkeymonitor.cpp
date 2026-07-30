@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "modifierkeymonitor.h"
 
 #include <QDebug>
@@ -56,7 +58,7 @@ bool ModifierKeyMonitor::initializeRawEvents()
 {
     m_eventConnection = xcb_connect(nullptr, nullptr);
     if (!m_eventConnection || xcb_connection_has_error(m_eventConnection)) {
-        qWarning() << "ModifierMonitor: Failed to connect to X server";
+        qCWarning(logShortcut) << "ModifierMonitor: Failed to connect to X server";
         return false;
     }
 
@@ -69,7 +71,7 @@ bool ModifierKeyMonitor::initializeRawEvents()
     m_keySymbols = xcb_key_symbols_alloc(m_eventConnection);
     const xcb_query_extension_reply_t *extension = xcb_get_extension_data(m_eventConnection, &xcb_input_id);
     if (!m_screen || !m_keySymbols || !extension || !extension->present) {
-        qWarning() << "ModifierMonitor: XInput2 is unavailable";
+        qCWarning(logShortcut) << "ModifierMonitor: XInput2 is unavailable";
         return false;
     }
     m_inputOpcode = extension->major_opcode;
@@ -79,7 +81,7 @@ bool ModifierKeyMonitor::initializeRawEvents()
     xcb_input_xi_query_version_reply_t *versionReply =
             xcb_input_xi_query_version_reply(m_eventConnection, versionCookie, &versionError);
     if (!versionReply || versionError) {
-        qWarning() << "ModifierMonitor: XInput2 version negotiation failed";
+        qCWarning(logShortcut) << "ModifierMonitor: XInput2 version negotiation failed";
         free(versionReply);
         free(versionError);
         return false;
@@ -102,7 +104,7 @@ bool ModifierKeyMonitor::initializeRawEvents()
                 m_eventConnection, rootWindow, 1, &eventMask.header);
         xcb_generic_error_t *selectError = xcb_request_check(m_eventConnection, selectCookie);
         if (selectError) {
-            qWarning() << "ModifierMonitor: Failed to select XInput2 raw events:"
+            qCWarning(logShortcut) << "ModifierMonitor: Failed to select XInput2 raw events:"
                        << selectError->error_code << "on root" << rootWindow;
             free(selectError);
             return false;
@@ -189,7 +191,7 @@ void ModifierKeyMonitor::handleEvents()
         if (parseModifierKeyEvent(pendingEvent, pressed, keycode) && pressed
                 && pressIndex < statesBeforePresses.size()) {
             if (m_state.reconcileAtEventBoundary(statesBeforePresses.at(pressIndex))) {
-                qInfo() << "ModifierMonitor: recovered stale state before key press"
+                qCInfo(logShortcut) << "ModifierMonitor: recovered stale state before key press"
                         << int(keycode);
             }
             ++pressIndex;
@@ -200,7 +202,7 @@ void ModifierKeyMonitor::handleEvents()
 
     if (physicallyPressed && !mappingChanged
             && m_state.reconcileAtEventBoundary(physicallyPressed.value())) {
-        qInfo() << "ModifierMonitor: recovered stale state after event batch";
+        qCInfo(logShortcut) << "ModifierMonitor: recovered stale state after event batch";
     }
 }
 

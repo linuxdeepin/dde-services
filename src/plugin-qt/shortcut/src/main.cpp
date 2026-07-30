@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include <QGuiApplication>
 #include <QDebug>
 
@@ -27,7 +29,7 @@ int main(int argc, char *argv[])
     // Create and initialize ShortcutManager
     auto *shortcutManager = new ShortcutManager(&a);
     if (!shortcutManager->init()) {
-        qCritical() << "Failed to initialize ShortcutManager";
+        qCCritical(logShortcut) << "Failed to initialize ShortcutManager";
         return 1;
     }
 

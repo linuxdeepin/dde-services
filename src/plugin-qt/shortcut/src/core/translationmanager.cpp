@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "translationmanager.h"
 
 #include <QCoreApplication>
@@ -36,7 +38,7 @@ void TranslationManager::reload()
     
     QDir dir(getTranslationPath());
     if (!dir.exists()) {
-        qWarning() << "Translation directory does not exist:" << dir.absolutePath();
+        qCWarning(logShortcut) << "Translation directory does not exist:" << dir.absolutePath();
         return;
     }
 
@@ -48,16 +50,16 @@ void TranslationManager::reload()
         // Look for {appId}_{lang}.qm
         QString fileName = QString("%1_%2.qm").arg(appId).arg(currentLanguage);
         if (!appDir.exists(fileName)) {
-            qWarning() << "Translation file does not exist:" << fileName << "for language:" << currentLanguage;
+            qCWarning(logShortcut) << "Translation file does not exist:" << fileName << "for language:" << currentLanguage;
             continue;
         }
         
         QTranslator *translator = new QTranslator(this);
         if (translator->load(appDir.absoluteFilePath(fileName))) {
-            qInfo() << "Loaded translator for appId:" << appId << "from" << appDir.absoluteFilePath(fileName);
+            qCInfo(logShortcut) << "Loaded translator for appId:" << appId << "from" << appDir.absoluteFilePath(fileName);
             m_translators.insert(appId, translator);
         } else {
-            qWarning() << "Failed to load translator for appId:" << appId << "from" << appDir.absoluteFilePath(fileName);
+            qCWarning(logShortcut) << "Failed to load translator for appId:" << appId << "from" << appDir.absoluteFilePath(fileName);
             delete translator;
         }
     }
@@ -73,7 +75,7 @@ QString TranslationManager::translate(const QString &appId, const QString &key) 
         }
     }
 
-    qDebug() << "Translation not found for key:" << key << "in appId:" << appId;
+    qCDebug(logShortcut) << "Translation not found for key:" << key << "in appId:" << appId;
     return key; // Fallback to key
 }
 

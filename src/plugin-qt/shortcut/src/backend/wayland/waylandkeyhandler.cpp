@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "waylandkeyhandler.h"
 #include "core/triggeractioncatalog.h"
 #include "core/shortcutconfig.h"
@@ -19,7 +21,7 @@ WaylandKeyHandler::WaylandKeyHandler(TreelandShortcutWrapper *wrapper, QObject *
 {
     connect(m_wrapper, &TreelandShortcutWrapper::activated, this, &WaylandKeyHandler::onActivated);
     connect(m_wrapper, &TreelandShortcutWrapper::protocolInactive, this, [this]() {
-        qWarning() << "WaylandKeyHandler: Protocol inactive, clearing all bindings";
+        qCWarning(logShortcut) << "WaylandKeyHandler: Protocol inactive, clearing all bindings";
         m_nameToId.clear();
         m_idToNames.clear();
     });
@@ -55,7 +57,7 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
         if (!treelandAction) {
             // TODO: register this action after Treeland adds the corresponding
             // compositor protocol support.  Keep the config visible meanwhile.
-            qInfo() << "WaylandKeyHandler: compositor action is not supported by Treeland:"
+            qCInfo(logShortcut) << "WaylandKeyHandler: compositor action is not supported by Treeland:"
                     << config.getId() << config.triggerValue.value(0);
             return false;
         }
@@ -67,7 +69,7 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
 
     for (const QString &hotkey : config.hotkeys) {
         if (isLockKey(hotkey)) {
-            qDebug() << "Skipping lock key registration on Wayland:" << hotkey
+            qCDebug(logShortcut) << "Skipping lock key registration on Wayland:" << hotkey
                      << "for" << config.getId();
             continue;
         }
@@ -81,7 +83,7 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
             bindings.append(name);
         } else {
             allSuccess = false;
-            qWarning() << "Failed to bind key:" << hotkey << "for" << config.getId();
+            qCWarning(logShortcut) << "Failed to bind key:" << hotkey << "for" << config.getId();
         }
     }
 
@@ -116,7 +118,7 @@ bool WaylandKeyHandler::commitSync()
 {
     bool success = m_wrapper->commitAndWait();
     if (!success) {
-        qWarning() << "WaylandKeyHandler::commitSync failed";
+        qCWarning(logShortcut) << "WaylandKeyHandler::commitSync failed";
     }
 
     return success;
@@ -128,7 +130,7 @@ void WaylandKeyHandler::onActivated(const QString &name, uint32_t flags)
     // Forward the activation signal to KeybindingManager
     if (m_nameToId.contains(name)) {
         QString id = m_nameToId.value(name);
-        qDebug() << "WaylandKeyHandler::onActivated name:" << name << "id:" << id
+        qCDebug(logShortcut) << "WaylandKeyHandler::onActivated name:" << name << "id:" << id
                  << "flags:" << flags;
         
         emit keyActivated(id);

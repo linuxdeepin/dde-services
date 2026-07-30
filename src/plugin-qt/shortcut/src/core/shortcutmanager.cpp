@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "shortcutmanager.h"
 #include "keybindingmanager.h"
 #include "gesturemanager.h"
@@ -55,7 +57,7 @@ bool ShortcutManager::init()
     }
 
     if (!m_keyHandler || !m_keyHandler->isAvailable()) {
-        qCritical() << "ShortcutManager: Key handler backend not available";
+        qCCritical(logShortcut) << "ShortcutManager: Key handler backend not available";
         return false;
     }
 
@@ -95,7 +97,7 @@ bool ShortcutManager::registerDBusService()
 
     // Register Keybinding service
     if (!connection.registerService("org.deepin.dde.Keybinding1")) {
-        qCritical() << "Failed to register DBus service org.deepin.dde.Keybinding1";
+        qCCritical(logShortcut) << "Failed to register DBus service org.deepin.dde.Keybinding1";
         return false;
     }
 
@@ -103,26 +105,26 @@ bool ShortcutManager::registerDBusService()
                                    QDBusConnection::ExportAllSlots | 
                                    QDBusConnection::ExportAllSignals |
                                    QDBusConnection::ExportAllProperties)) {
-        qCritical() << "Failed to register DBus object for Keybinding1";
+        qCCritical(logShortcut) << "Failed to register DBus object for Keybinding1";
         return false;
     }
 
-    qInfo() << "Deepin Keybinding Service started.";
+    qCInfo(logShortcut) << "Deepin Keybinding Service started.";
 
     // Register Gesture service
     if (m_gestureManager) {
         if (!connection.registerService("org.deepin.dde.Gesture1")) {
-            qCritical() << "Failed to register DBus service org.deepin.dde.Gesture1";
+            qCCritical(logShortcut) << "Failed to register DBus service org.deepin.dde.Gesture1";
             return false;
         }
 
         if (!connection.registerObject("/org/deepin/dde/Gesture1", m_gestureManager,
                                     QDBusConnection::ExportAllSlots | QDBusConnection::ExportAllSignals)) {
-            qCritical() << "Failed to register DBus object for Gesture1";
+            qCCritical(logShortcut) << "Failed to register DBus object for Gesture1";
             return false;
         }
 
-        qInfo() << "Deepin Gesture Service started.";
+        qCInfo(logShortcut) << "Deepin Gesture Service started.";
     }
 
     return true;
@@ -130,7 +132,7 @@ bool ShortcutManager::registerDBusService()
 
 void ShortcutManager::registerAll()
 {
-    qInfo() << "ShortcutManager: Protocol ready, registering all shortcuts and gestures...";
+    qCInfo(logShortcut) << "ShortcutManager: Protocol ready, registering all shortcuts and gestures...";
     // Register all shortcuts
     m_keybindingManager->registerAllShortcuts();
 
@@ -142,16 +144,16 @@ void ShortcutManager::registerAll()
     if (m_isWayland) {
         bool success = m_treelandShortcutWrapper->commitAndWait();
         if (success) {
-            qInfo() << "ShortcutManager: All shortcuts and gestures registered successfully";
+            qCInfo(logShortcut) << "ShortcutManager: All shortcuts and gestures registered successfully";
         } else {
-            qWarning() << "ShortcutManager: Commit failed";
+            qCWarning(logShortcut) << "ShortcutManager: Commit failed";
         }
     }
 }
 
 void ShortcutManager::onProtocolInactive()
 {
-    qWarning() << "ShortcutManager: Protocol inactive, clearing state...";
+    qCWarning(logShortcut) << "ShortcutManager: Protocol inactive, clearing state...";
     
     // Clear state in both managers
     if (m_keybindingManager) {

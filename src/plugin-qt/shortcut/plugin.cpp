@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "pluginshortcutmanager.h"
 
 #include <QDBusConnection>
@@ -20,10 +22,10 @@ static PluginShortcutManager *g_pluginManager = nullptr;
  */
 extern "C" int DSMRegister(const char *name, void *data)
 {
-    qInfo() << "[ShortcutPlugin] DSMRegister called with name:" << name;
+    qCInfo(logShortcut) << "[ShortcutPlugin] DSMRegister called with name:" << name;
 
     if (!data) {
-        qCritical() << "[ShortcutPlugin] Invalid data pointer";
+        qCCritical(logShortcut) << "[ShortcutPlugin] Invalid data pointer";
         return -1;
     }
 
@@ -35,13 +37,13 @@ extern "C" int DSMRegister(const char *name, void *data)
 
     // Initialize plugin
     if (!g_pluginManager->init(connection)) {
-        qCritical() << "[ShortcutPlugin] Failed to initialize plugin";
+        qCCritical(logShortcut) << "[ShortcutPlugin] Failed to initialize plugin";
         delete g_pluginManager;
         g_pluginManager = nullptr;
         return -1;
     }
 
-    qInfo() << "[ShortcutPlugin] Plugin registered successfully";
+    qCInfo(logShortcut) << "[ShortcutPlugin] Plugin registered successfully";
     return 0;
 }
 
@@ -60,7 +62,7 @@ extern "C" int DSMUnRegister(const char *name, void *data)
     Q_UNUSED(name);
     Q_UNUSED(data);
 
-    qInfo() << "[ShortcutPlugin] DSMUnRegister called";
+    qCInfo(logShortcut) << "[ShortcutPlugin] DSMUnRegister called";
 
     if (g_pluginManager) {
         g_pluginManager->cleanup();
@@ -68,6 +70,6 @@ extern "C" int DSMUnRegister(const char *name, void *data)
         g_pluginManager = nullptr;
     }
 
-    qInfo() << "[ShortcutPlugin] Plugin unregistered successfully";
+    qCInfo(logShortcut) << "[ShortcutPlugin] Plugin unregistered successfully";
     return 0;
 }

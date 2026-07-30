@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "gesturemanager.h"
 #include "actionexecutor.h"
 #include "gestureactioncatalog.h"
@@ -77,7 +79,7 @@ void GestureManager::registerAllGestures()
             setGestureActive(config);
     }
 
-    qInfo() << "GestureManager: configured" << m_configuredGestures.size()
+    qCInfo(logShortcut) << "GestureManager: configured" << m_configuredGestures.size()
             << "active" << m_activeGestureIds.size()
             << "backend" << (m_isWayland ? "treeland" : "x11");
 }
@@ -153,7 +155,7 @@ bool GestureManager::ModifyGesture(const QString &id, const QStringList &action)
 {
     const auto it = m_configuredGestures.constFind(id);
     if (it == m_configuredGestures.constEnd() || action.size() != 1) {
-        qWarning() << "GestureManager::ModifyGesture: invalid request:" << id << action;
+        qCWarning(logShortcut) << "GestureManager::ModifyGesture: invalid request:" << id << action;
         return false;
     }
 
@@ -171,7 +173,7 @@ bool GestureManager::ModifyGesture(const QString &id, const QStringList &action)
     const GestureActionMetadata *definition = GestureActionCatalog::find(
             newConfig, newActionId, backend);
     if (!definition) {
-        qWarning() << "GestureManager::ModifyGesture: unknown action:" << id << action.first();
+        qCWarning(logShortcut) << "GestureManager::ModifyGesture: unknown action:" << id << action.first();
         return false;
     }
 
@@ -264,7 +266,7 @@ void GestureManager::onGestureActivated(const QString &gestureId)
 
     const GestureConfig &config = it.value();
     if (config.triggerType == int(TriggerType::Action) && !isActionSupported(config)) {
-        qWarning() << "GestureManager: ignoring unsupported gesture action: gesture"
+        qCWarning(logShortcut) << "GestureManager: ignoring unsupported gesture action: gesture"
                    << gestureId << "configured action" << config.triggerValue.value(0)
                    << "backend" << (m_isWayland ? "treeland" : "x11");
         return;
@@ -314,7 +316,7 @@ bool GestureManager::registerGesture(const GestureConfig &config)
                                                       config.fingerCount,
                                                       config.direction);
     if (!conflictId.isEmpty() && conflictId != config.getId()) {
-        qWarning() << "GestureManager: gesture conflict:" << config.getId() << conflictId;
+        qCWarning(logShortcut) << "GestureManager: gesture conflict:" << config.getId() << conflictId;
         return false;
     }
     GestureConfig backendConfig = config;
@@ -323,7 +325,7 @@ bool GestureManager::registerGesture(const GestureConfig &config)
         const GestureActionMetadata *definition = GestureActionCatalog::find(
                 config, configuredAction, backend);
         if (!definition) {
-            qWarning() << "GestureManager: unsupported gesture action: gesture"
+            qCWarning(logShortcut) << "GestureManager: unsupported gesture action: gesture"
                        << config.getId() << "configured action"
                        << config.triggerValue.value(0) << "backend"
                        << (m_isWayland ? "treeland" : "x11");

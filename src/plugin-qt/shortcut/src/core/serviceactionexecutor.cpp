@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "serviceactionexecutor.h"
 #include "actionexecutor.h"
 
@@ -59,7 +61,7 @@ bool ServiceActionExecutor::execute(TriggerActionId actionId, const QString &con
     }
 
     if (!success) {
-        qWarning() << "ServiceActionExecutor: action failed:" << int(actionId)
+        qCWarning(logShortcut) << "ServiceActionExecutor: action failed:" << int(actionId)
                    << "context" << context;
     }
     return success;
@@ -79,10 +81,10 @@ bool ServiceActionExecutor::call(
             [actionId, context](QDBusPendingCallWatcher *finishedWatcher) {
         const QDBusPendingReply<> reply = *finishedWatcher;
         if (reply.isError()) {
-            qWarning() << "ServiceActionExecutor: action failed:" << int(actionId)
+            qCWarning(logShortcut) << "ServiceActionExecutor: action failed:" << int(actionId)
                        << "context" << context << reply.error().message();
         } else {
-            qDebug() << "ServiceActionExecutor: action completed:" << int(actionId)
+            qCDebug(logShortcut) << "ServiceActionExecutor: action completed:" << int(actionId)
                      << "context" << context;
         }
         finishedWatcher->deleteLater();

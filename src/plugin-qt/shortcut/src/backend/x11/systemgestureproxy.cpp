@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "systemgestureproxy.h"
 
 #include <QDBusConnection>
@@ -92,9 +94,9 @@ bool SystemGestureProxy::connectEventSignal()
             QLatin1String(Service), QLatin1String(Path), QLatin1String(Interface),
             QStringLiteral("SwipeStop"), this, SLOT(onSwipeStopped(int)));
     if (!m_connected)
-        qWarning() << "SystemGestureProxy: failed to subscribe to system gesture events";
+        qCWarning(logShortcut) << "SystemGestureProxy: failed to subscribe to system gesture events";
     if (!doubleClickConnected || !movingConnected || !stoppedConnected)
-        qWarning() << "SystemGestureProxy: failed to subscribe to window-move gesture events";
+        qCWarning(logShortcut) << "SystemGestureProxy: failed to subscribe to window-move gesture events";
     return m_connected;
 }
 

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "treelandshortcutwrapper.h"
 
 #include <QDebug>
@@ -52,12 +54,12 @@ TreelandShortcutWrapper::TreelandShortcutWrapper(QObject *parent)
 
     connect(this, &TreelandShortcutWrapper::activeChanged, this, [this]() {
         if (isActive()) {
-            qDebug() << "TreelandShortcutManager protocol is now active, acquiring...";
+            qCDebug(logShortcut) << "TreelandShortcutManager protocol is now active, acquiring...";
             acquire();
             m_boundObject = object();  // Save bound object for session recovery check
             emit ready();  // Emit signal directly since signal is connected before init() is called
         } else {
-            qWarning() << "TreelandShortcutManager protocol is now inactive!";
+            qCWarning(logShortcut) << "TreelandShortcutManager protocol is now inactive!";
             m_boundObject = nullptr;
             emit protocolInactive();
         }
@@ -116,7 +118,7 @@ bool TreelandShortcutWrapper::unbind(const QString &name)
 
     // Check if object changed (session recovery scenario)
     if (object() != m_boundObject) {
-        qWarning() << "TreelandShortcutWrapper::unbind: object changed, skip unbind for" << name;
+        qCWarning(logShortcut) << "TreelandShortcutWrapper::unbind: object changed, skip unbind for" << name;
         return false;
     }
 
@@ -166,12 +168,12 @@ bool TreelandShortcutWrapper::commitAndWait(int timeoutMs)
         loop.quit();
         success = status;
         responded = true;
-        qDebug() << "TreelandShortcutWrapper::commitAndWait response:" << status;
+        qCDebug(logShortcut) << "TreelandShortcutWrapper::commitAndWait response:" << status;
     }, Qt::SingleShotConnection);
 
     QTimer::singleShot(timeoutMs, &loop, [&]() {
         if (!responded) {
-            qWarning() << "TreelandShortcutWrapper::commitAndWait timeout after" << timeoutMs << "ms";
+            qCWarning(logShortcut) << "TreelandShortcutWrapper::commitAndWait timeout after" << timeoutMs << "ms";
             loop.quit();
         }
     });
@@ -184,7 +186,7 @@ bool TreelandShortcutWrapper::commitAndWait(int timeoutMs)
 
 void TreelandShortcutWrapper::treeland_shortcut_manager_v2_activated(const QString &name, uint32_t flags)
 {
-    qDebug() << "Treeland Shortcut Manager Activated:" << name << "flags:" << flags;
+    qCDebug(logShortcut) << "Treeland Shortcut Manager Activated:" << name << "flags:" << flags;
     emit activated(name, flags);
 }
 
@@ -195,7 +197,7 @@ void TreelandShortcutWrapper::treeland_shortcut_manager_v2_commit_success()
 
 void TreelandShortcutWrapper::treeland_shortcut_manager_v2_commit_failure(const QString &name, uint32_t error)
 {
-    qWarning() << "Treeland Shortcut Manager Commit Failed:" << name
+    qCWarning(logShortcut) << "Treeland Shortcut Manager Commit Failed:" << name
                << "Error:" << error << bindErrorName(error);
     emit commitStatus(false);
 }
