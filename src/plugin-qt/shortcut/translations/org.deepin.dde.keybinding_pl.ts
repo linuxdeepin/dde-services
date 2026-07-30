@@ -11,107 +11,107 @@
     </message>
     <message>
         <source>Swipe down with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w dół czterema palcami</translation>
     </message>
     <message>
         <source>Swipe down with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w dół trzema palcami</translation>
     </message>
     <message>
         <source>Swipe left with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w lewo czterema palcami</translation>
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w lewo trzema palcami</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w prawo czterema palcami</translation>
     </message>
     <message>
         <source>Swipe right with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w prawo trzema palcami</translation>
     </message>
     <message>
         <source>Swipe up with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w górę czterema palcami</translation>
     </message>
     <message>
         <source>Swipe up with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Przesunięcie w górę trzema palcami</translation>
     </message>
     <message>
         <source>Four-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Stuknięcie czterema palcami</translation>
     </message>
     <message>
         <source>Three-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Stuknięcie trzema palcami</translation>
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
-        <translation type="unfinished"/>
+        <translation>Obsługa gestów nie jest obecnie wspierana</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maksymalizuj okno</translation>
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć okno</translation>
     </message>
     <message>
         <source>Current window left split</source>
-        <translation type="unfinished"/>
+        <translation>Podział do lewej bieżącego okna</translation>
     </message>
     <message>
         <source>Current window right split</source>
-        <translation type="unfinished"/>
+        <translation>Podział do prawej bieżącego okna</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Hide multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Ukryj widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na poprzedni obszar roboczy</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na następny obszar roboczy</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż pulpit</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Ukryj pulpit</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż/ukryj wyszukiwarkę</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż/ukryj Launcher</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż/ukryj schowek</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż/ukryj Centrum powiadomień</translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Wyłącz</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -119,19 +119,19 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Narzędzia pomocnicze</translation>
     </message>
     <message>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Zmiana tekstu na mowę</translation>
     </message>
     <message>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Zmiana mowy na tekst</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"/>
+        <translation>Tłumaczenie</translation>
     </message>
     <message>
         <source>None</source>
@@ -143,83 +143,83 @@
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Powiadomienia</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Przejdź do obszaru roboczego 1</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Przejdź do obszaru roboczego 2</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Przejdź do obszaru roboczego 3</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
-        <translation type="unfinished"/>
+        <translation>Przejdź do obszaru roboczego 4</translation>
     </message>
     <message>
         <source>Switch to workspace 5</source>
-        <translation type="unfinished"/>
+        <translation>Przejdź do obszaru roboczego 5</translation>
     </message>
     <message>
         <source>Switch to workspace 6</source>
-        <translation type="unfinished"/>
+        <translation>Przejdź do obszaru roboczego 6</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś okno</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Zamknij okno</translation>
     </message>
     <message>
         <source>Show window menu</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż menu okna</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz licznik FPS</translation>
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"/>
+        <translation>Ekran blokady</translation>
     </message>
     <message>
         <source>Show shutdown menu</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż interfejs wyłączania</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Wyjdź</translation>
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation type="unfinished"/>
+        <translation>Otwórz przełącznik aplikacji</translation>
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz następną aplikację</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz poprzednią aplikację</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz następne okno bieżącej aplikacji</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz poprzednie okno bieżącej aplikacji</translation>
     </message>
 </context>
 </TS>

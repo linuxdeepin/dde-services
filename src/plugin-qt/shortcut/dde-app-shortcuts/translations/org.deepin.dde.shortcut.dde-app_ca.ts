@@ -119,7 +119,7 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Eines d&apos;assistència</translation>
     </message>
 </context>
 </TS>
