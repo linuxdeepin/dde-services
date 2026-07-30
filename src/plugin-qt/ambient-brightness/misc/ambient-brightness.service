@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.deepin.dde.AmbientBrightness1
+Exec=/usr/bin/deepin-service-manager -n org.deepin.dde.AmbientBrightness1
+SystemdService=org.deepin.dde.AmbientBrightness1.service

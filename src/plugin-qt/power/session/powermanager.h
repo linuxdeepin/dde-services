@@ -97,7 +97,6 @@ class PowerManager : public QObject
     Q_PROPERTY(int LowPowerNotifyThreshold READ lowPowerNotifyThreshold WRITE setLowPowerNotifyThreshold NOTIFY lowPowerNotifyThresholdChanged)
     Q_PROPERTY(int LowPowerAutoSleepThreshold READ lowPowerAutoSleepThreshold WRITE setLowPowerAutoSleepThreshold NOTIFY lowPowerAutoSleepThresholdChanged)
     Q_PROPERTY(int LowPowerAction READ lowPowerAction WRITE setLowPowerAction NOTIFY lowPowerActionChanged)
-    Q_PROPERTY(bool AmbientLightAdjustBrightness READ ambientLightAdjustBrightness WRITE setAmbientLightAdjustBrightness NOTIFY ambientLightAdjustBrightnessChanged)
 
     Q_PROPERTY(bool ScheduledShutdownState READ scheduledShutdownState WRITE setScheduledShutdownState NOTIFY scheduledShutdownStateChanged)
     Q_PROPERTY(QString ShutdownTime READ shutdownTime WRITE setShutdownTime NOTIFY shutdownTimeChanged)
@@ -167,8 +166,6 @@ public Q_SLOTS:
     void setLowPowerAutoSleepThreshold(int v);
     int lowPowerAction() const { return m_lowPowerAction; }
     void setLowPowerAction(int v);
-    bool ambientLightAdjustBrightness() const { return m_ambientLightAdjustBrightness; }
-    void setAmbientLightAdjustBrightness(bool v);
 
     bool scheduledShutdownState() const { return m_scheduledShutdownState; }
     void setScheduledShutdownState(bool v);
@@ -257,7 +254,6 @@ Q_SIGNALS:
     void lowPowerNotifyThresholdChanged();
     void lowPowerAutoSleepThresholdChanged();
     void lowPowerActionChanged();
-    void ambientLightAdjustBrightnessChanged();
     void scheduledShutdownStateChanged();
     void shutdownTimeChanged();
     void shutdownRepetitionChanged();
@@ -318,7 +314,6 @@ private:
     int m_lowPowerNotifyThreshold = 0;
     int m_lowPowerAutoSleepThreshold = 0;
     int m_lowPowerAction = 0;
-    bool m_ambientLightAdjustBrightness = false;
     bool m_scheduledShutdownState = false;
     QString m_shutdownTime;
     int m_shutdownRepetition = 0;

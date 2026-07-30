@@ -44,7 +44,6 @@ namespace PowerDConfig {
     inline constexpr auto kMode                            = "mode";
     inline constexpr auto kAdjustBrightnessEnabled         = "adjustBrightnessEnabled";
     inline constexpr auto kHighPerformanceEnabled           = "highPerformanceEnabled";
-    inline constexpr auto kAmbientLightAdjustBrightness    = "ambientLightAdjustBrightness";
 
     inline constexpr auto kScheduledShutdownState          = "scheduledShutdownState";
     inline constexpr auto kShutdownTime                    = "shutdownTime";
