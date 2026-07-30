@@ -14,11 +14,9 @@
 #include <QProcess>
 #include <QSysInfo>
 
-#include <DConfig>
 #include <qlogging.h>
 #include <QThread>
 
-DCORE_USE_NAMESPACE
 DGUI_USE_NAMESPACE
 
 DisplayController::DisplayController(QObject *parent) 
@@ -110,16 +108,6 @@ bool DisplayController::changeBrightness(bool raised)
         return false;
     }
 
-    auto *powerConfig = DConfig::create("org.deepin.dde.daemon", "org.deepin.dde.daemon.power", "", this);
-    if (!powerConfig->isValid()) {
-        qWarning() << "daemon power config is not valid";
-        powerConfig->deleteLater();
-        return false;
-    }
-
-    const bool autoAdjustEnabled =
-            powerConfig->value("ambientLightAdjustBrightness").toBool();
-
     bool success = false;
     if (m_isWayland) {
         TreelandBrightnessController controller;
@@ -135,15 +123,8 @@ bool DisplayController::changeBrightness(bool raised)
     }
 
     if (!success) {
-        powerConfig->deleteLater();
         return false;
     }
-
-    if (autoAdjustEnabled) {
-        powerConfig->setValue("ambientLightAdjustBrightness", false);
-        qDebug() << "Disabled ambient light auto brightness adjustment";
-    }
-    powerConfig->deleteLater();
 
     qDebug() << "Changed brightness:" << (raised ? "up" : "down");
     showOSD(raised ? "BrightnessUp" : "BrightnessDown");
