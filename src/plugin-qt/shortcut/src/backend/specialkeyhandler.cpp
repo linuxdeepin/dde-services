@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "specialkeyhandler.h"
 
 #include <QDebug>
@@ -23,9 +25,9 @@ SpecialKeyHandler::SpecialKeyHandler(QObject *parent)
     );
 
     if (m_connected) {
-        qInfo() << "SpecialKeyHandler: Connected to org.deepin.dde.KeyEvent1";
+        qCInfo(logShortcut) << "SpecialKeyHandler: Connected to org.deepin.dde.KeyEvent1";
     } else {
-        qWarning() << "SpecialKeyHandler: Failed to connect to org.deepin.dde.KeyEvent1";
+        qCWarning(logShortcut) << "SpecialKeyHandler: Failed to connect to org.deepin.dde.KeyEvent1";
     }
 
     auto *serviceWatcher = new QDBusServiceWatcher(QStringLiteral("org.deepin.dde.KeyEvent1"),
@@ -56,7 +58,7 @@ SpecialKeyHandler::~SpecialKeyHandler()
 bool SpecialKeyHandler::registerKey(const KeyConfig &config)
 {
     if (!m_connected) {
-        qWarning() << "SpecialKeyHandler: Not connected to KeyEvent1 service";
+        qCWarning(logShortcut) << "SpecialKeyHandler: Not connected to KeyEvent1 service";
         return false;
     }
 
@@ -71,7 +73,7 @@ bool SpecialKeyHandler::registerKey(const KeyConfig &config)
 
         uint32_t keycode = parseKeycode(hotkey);
         if (keycode == 0) {
-            qWarning() << "SpecialKeyHandler: Invalid keycode:" << hotkey;
+            qCWarning(logShortcut) << "SpecialKeyHandler: Invalid keycode:" << hotkey;
             continue;
         }
 
@@ -81,7 +83,7 @@ bool SpecialKeyHandler::registerKey(const KeyConfig &config)
         // Check for conflict
         if (m_keycodeBindings.contains(keycode)) {
             const KeyBinding &existing = m_keycodeBindings.value(keycode);
-            qWarning() << "SpecialKeyHandler: Keycode conflict detected:"
+            qCWarning(logShortcut) << "SpecialKeyHandler: Keycode conflict detected:"
                        << keycode << "(" << QString("0x%1").arg(keycode, 0, 16) << ")"
                        << "already registered by" << existing.shortcutId
                        << "- skipping" << config.getId();
@@ -95,7 +97,7 @@ bool SpecialKeyHandler::registerKey(const KeyConfig &config)
         m_keycodeBindings.insert(keycode, binding);
         keycodes.append(keycode);
         
-        qDebug() << "SpecialKeyHandler: Registered keycode" << keycode 
+        qCDebug(logShortcut) << "SpecialKeyHandler: Registered keycode" << keycode
                  << "(" << QString("0x%1").arg(keycode, 0, 16) << ")"
                  << "for" << config.getId();
     }
@@ -121,7 +123,7 @@ bool SpecialKeyHandler::unregisterKey(const QString &shortcutId)
         m_suppressedKeys.remove(keycode);
     }
     
-    qDebug() << "SpecialKeyHandler: Unregistered" << shortcutId;
+    qCDebug(logShortcut) << "SpecialKeyHandler: Unregistered" << shortcutId;
     return true;
 }
 
@@ -226,13 +228,13 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
             m_keysHeld.insert(keycode);
             
             if (flags & KeyEventFlag::Press) {
-                qDebug() << "SpecialKeyHandler: Key pressed, keycode:" << keycode;
+                qCDebug(logShortcut) << "SpecialKeyHandler: Key pressed, keycode:" << keycode;
                 emit keyActivated(binding.shortcutId);
             }
         } else {
             // Repeat event
             if (flags & KeyEventFlag::Repeat) {
-                qDebug() << "SpecialKeyHandler: Key repeat, keycode:" << keycode;
+                qCDebug(logShortcut) << "SpecialKeyHandler: Key repeat, keycode:" << keycode;
                 emit keyActivated(binding.shortcutId);
             }
         }
@@ -242,7 +244,7 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
             return;
         
         if (flags & KeyEventFlag::Release) {
-            qDebug() << "SpecialKeyHandler: Key released, keycode:" << keycode;
+            qCDebug(logShortcut) << "SpecialKeyHandler: Key released, keycode:" << keycode;
             emit keyActivated(binding.shortcutId);
         }
     }

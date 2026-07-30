@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "customshortcutstore.h"
 
 #include <QDebug>
@@ -59,7 +61,7 @@ bool writeShortcutFields(DConfig *configObject, const KeyConfig &config)
     const QList<QPair<QString, QVariant>> fields = shortcutFields(config);
     for (const auto &field : fields) {
         if (configObject->isReadOnly(field.first)) {
-            qWarning() << "CustomShortcutStore: read-only field:" << field.first
+            qCWarning(logShortcut) << "CustomShortcutStore: read-only field:" << field.first
                        << config.subPath;
             return false;
         }
@@ -72,7 +74,7 @@ bool writeShortcutFields(DConfig *configObject, const KeyConfig &config)
     }
     for (const auto &field : fields) {
         if (!configValuesEqual(configObject->value(field.first), field.second)) {
-            qWarning() << "CustomShortcutStore: field verification failed:"
+            qCWarning(logShortcut) << "CustomShortcutStore: field verification failed:"
                        << field.first << config.subPath;
             return false;
         }
@@ -92,7 +94,7 @@ DConfig *CustomShortcutStore::createConfig(const QString &subPath, QObject *pare
 {
     const QString normalized = normalizeSubPath(subPath);
     if (normalized.isEmpty()) {
-        qWarning() << "CustomShortcutStore: invalid custom shortcut subPath:" << subPath;
+        qCWarning(logShortcut) << "CustomShortcutStore: invalid custom shortcut subPath:" << subPath;
         return nullptr;
     }
     return DConfig::create(APP_ID, CONFIG_NAME_SHORTCUT, QStringLiteral("/") + normalized, parent);
@@ -101,12 +103,12 @@ DConfig *CustomShortcutStore::createConfig(const QString &subPath, QObject *pare
 bool CustomShortcutStore::save(const KeyConfig &config, DConfig *configObject) const
 {
     if (!configObject) {
-        qWarning() << "CustomShortcutStore: missing DConfig object for save:" << config.subPath;
+        qCWarning(logShortcut) << "CustomShortcutStore: missing DConfig object for save:" << config.subPath;
         return false;
     }
 
     const QString subPath = normalizeSubPath(config.subPath);
-    qDebug() << "CustomShortcutStore: saving custom shortcut"
+    qCDebug(logShortcut) << "CustomShortcutStore: saving custom shortcut"
              << "subPath:" << subPath
              << "appId:" << config.appId
              << "displayName:" << config.displayName
@@ -129,12 +131,12 @@ bool CustomShortcutStore::save(const KeyConfig &config, DConfig *configObject) c
 bool CustomShortcutStore::updateCustomShortcutFields(const KeyConfig &config, DConfig *configObject) const
 {
     if (!configObject) {
-        qWarning() << "CustomShortcutStore: missing DConfig object for update:" << config.subPath;
+        qCWarning(logShortcut) << "CustomShortcutStore: missing DConfig object for update:" << config.subPath;
         return false;
     }
 
     const QString subPath = normalizeSubPath(config.subPath);
-    qDebug() << "CustomShortcutStore: updating custom shortcut fields"
+    qCDebug(logShortcut) << "CustomShortcutStore: updating custom shortcut fields"
              << "subPath:" << subPath
              << "displayName:" << config.displayName
              << "argument count:" << config.triggerValue.size()
@@ -156,7 +158,7 @@ void CustomShortcutStore::reset(DConfig *configObject, const QString &subPath) c
         return;
 
     const QString normalized = normalizeSubPath(subPath);
-    qDebug() << "CustomShortcutStore: resetting custom shortcut DConfig:" << normalized;
+    qCDebug(logShortcut) << "CustomShortcutStore: resetting custom shortcut DConfig:" << normalized;
 
     QStringList resetKeys = configObject->keyList();
     resetKeys.append(CustomShortcutKeys);
@@ -178,7 +180,7 @@ QString CustomShortcutStore::normalizeSubPath(const QString &raw)
         || normalized.contains(QLatin1Char('/'))
         || normalized.contains(QLatin1Char('\\'))
         || normalized.contains(QChar::Null)) {
-        qWarning() << "CustomShortcutStore: rejected unsafe subPath:" << raw;
+        qCWarning(logShortcut) << "CustomShortcutStore: rejected unsafe subPath:" << raw;
         return QString();
     }
     return normalized;
@@ -209,7 +211,7 @@ bool CustomShortcutStore::writeSubPaths(const QStringList &subPaths) const
     const QFileInfo info(m_iniPath);
     QDir dir(info.absolutePath());
     if (!dir.exists() && !dir.mkpath(QStringLiteral("."))) {
-        qWarning() << "CustomShortcutStore: failed to create custom shortcut ini dir:" << info.absolutePath();
+        qCWarning(logShortcut) << "CustomShortcutStore: failed to create custom shortcut ini dir:" << info.absolutePath();
         return false;
     }
 
@@ -227,7 +229,7 @@ bool CustomShortcutStore::writeSubPaths(const QStringList &subPaths) const
     settings.sync();
 
     if (settings.status() != QSettings::NoError) {
-        qWarning() << "CustomShortcutStore: failed to write custom shortcut ini:" << m_iniPath;
+        qCWarning(logShortcut) << "CustomShortcutStore: failed to write custom shortcut ini:" << m_iniPath;
         return false;
     }
     return true;

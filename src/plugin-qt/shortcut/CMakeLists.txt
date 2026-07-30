@@ -28,6 +28,8 @@ set(SHORTCUT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Common sources shared between plugin and debug binary
 set(SHORTCUT_COMMON_SOURCES
+    shortcutlogging.cpp
+    shortcutlogging.h
     ${SHORTCUT_SRC_DIR}/core/shortcutmanager.cpp
     ${SHORTCUT_SRC_DIR}/core/keybindingmanager.cpp
     ${SHORTCUT_SRC_DIR}/core/customshortcuttransaction.cpp

@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "pluginshortcutmanager.h"
 #include "core/shortcutmanager.h"
 #include "core/keybindingmanager.h"
@@ -23,7 +25,7 @@ PluginShortcutManager::~PluginShortcutManager()
 bool PluginShortcutManager::init(QDBusConnection *connection)
 {
     if (!connection) {
-        qCritical() << "[PluginShortcutManager] Invalid DBus connection";
+        qCCritical(logShortcut) << "[PluginShortcutManager] Invalid DBus connection";
         return false;
     }
 
@@ -33,7 +35,7 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
     
     // Initialize ShortcutManager
     if (!m_shortcutManager->init()) {
-        qCritical() << "[PluginShortcutManager] Failed to initialize ShortcutManager";
+        qCCritical(logShortcut) << "[PluginShortcutManager] Failed to initialize ShortcutManager";
         delete m_shortcutManager;
         m_shortcutManager = nullptr;
         return false;
@@ -45,20 +47,20 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
                                                const QString &path,
                                                QObject *object) {
         if (!connection->registerService(service)) {
-            qCritical() << "[PluginShortcutManager] Failed to register service" << service << ":"
+            qCCritical(logShortcut) << "[PluginShortcutManager] Failed to register service" << service << ":"
                         << connection->lastError().message();
             return false;
         }
 
         if (!connection->registerObject(path, object,
                                         QDBusConnection::ExportScriptableContents)) {
-            qCritical() << "[PluginShortcutManager] Failed to register object" << path << ":"
+            qCCritical(logShortcut) << "[PluginShortcutManager] Failed to register object" << path << ":"
                         << connection->lastError().message();
             connection->unregisterService(service);
             return false;
         }
 
-        qInfo() << "[PluginShortcutManager] Registered" << service << "at" << path;
+        qCInfo(logShortcut) << "[PluginShortcutManager] Registered" << service << "at" << path;
         return true;
     };
 
@@ -67,7 +69,7 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
 
     bool keybindingRegistered = false;
     if (!keybindingManager) {
-        qCritical() << "[PluginShortcutManager] KeybindingManager not found";
+        qCCritical(logShortcut) << "[PluginShortcutManager] KeybindingManager not found";
     } else {
         keybindingRegistered = registerEndpoint(
                 QStringLiteral("org.deepin.dde.Keybinding1"),
@@ -77,7 +79,7 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
 
     bool gestureRegistered = false;
     if (!gestureManager) {
-        qWarning() << "[PluginShortcutManager] GestureManager not found";
+        qCWarning(logShortcut) << "[PluginShortcutManager] GestureManager not found";
     } else {
         gestureRegistered = registerEndpoint(
                 QStringLiteral("org.deepin.dde.Gesture1"),
@@ -86,18 +88,18 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
     }
 
     if (!keybindingRegistered && !gestureRegistered) {
-        qCritical() << "[PluginShortcutManager] Failed to register any DBus endpoint";
+        qCCritical(logShortcut) << "[PluginShortcutManager] Failed to register any DBus endpoint";
         return false;
     }
 
-    qInfo() << "[PluginShortcutManager] Plugin initialized successfully";
+    qCInfo(logShortcut) << "[PluginShortcutManager] Plugin initialized successfully";
     return true;
 }
 
 void PluginShortcutManager::cleanup()
 {
     if (m_shortcutManager) {
-        qInfo() << "[PluginShortcutManager] Cleaning up plugin";
+        qCInfo(logShortcut) << "[PluginShortcutManager] Cleaning up plugin";
         
         // Unregister DBus services
         if (m_connection) {

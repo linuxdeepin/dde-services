@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "x11gestureactionexecutor.h"
 #include "core/gestureactioncatalog.h"
 
@@ -65,7 +67,7 @@ bool X11GestureActionExecutor::execute(const GestureConfig &config)
     const QString actionValue = GestureActionCatalog::idString(actionId);
     const bool success = executeAction(actionId, actionValue);
     if (!success) {
-        qWarning() << "X11GestureActionExecutor: action failed: gesture" << config.getId()
+        qCWarning(logShortcut) << "X11GestureActionExecutor: action failed: gesture" << config.getId()
                    << "configured action" << config.triggerValue.value(0)
                    << "resolved action" << int(actionId);
     }
@@ -81,7 +83,7 @@ bool X11GestureActionExecutor::execute(const KeyConfig &config)
     const auto actionId = ok ? static_cast<GestureActionId>(value) : GestureActionId::Invalid;
     const bool success = executeAction(actionId, config.getId());
     if (!success)
-        qWarning() << "X11GestureActionExecutor: shortcut action failed:" << config.getId()
+        qCWarning(logShortcut) << "X11GestureActionExecutor: shortcut action failed:" << config.getId()
                    << value;
     return success;
 }
@@ -181,7 +183,7 @@ bool X11GestureActionExecutor::beginWindowMove()
             return;
 
         if (reply.isError()) {
-            qWarning() << "X11GestureActionExecutor: window move begin failed:"
+            qCWarning(logShortcut) << "X11GestureActionExecutor: window move begin failed:"
                        << reply.error().message();
             clearWindowMove();
             return;
@@ -244,7 +246,7 @@ bool X11GestureActionExecutor::sendWindowMoveUpdate()
 
         m_windowMoveUpdatePending = false;
         if (reply.isError()) {
-            qWarning() << "X11GestureActionExecutor: window move update failed:"
+            qCWarning(logShortcut) << "X11GestureActionExecutor: window move update failed:"
                        << reply.error().message();
             clearWindowMove();
             return;
@@ -280,7 +282,7 @@ bool X11GestureActionExecutor::clearWindowMove()
             [this](QDBusPendingCallWatcher *finishedWatcher) {
         const QDBusPendingReply<> reply = *finishedWatcher;
         if (reply.isError()) {
-            qWarning() << "X11GestureActionExecutor: window move end failed:"
+            qCWarning(logShortcut) << "X11GestureActionExecutor: window move end failed:"
                        << reply.error().message();
         }
         finishedWatcher->deleteLater();
@@ -327,7 +329,7 @@ void X11GestureActionExecutor::updateMultitaskVisible()
         const QDBusPendingReply<bool> reply = *finishedWatcher;
         finishedWatcher->deleteLater();
         if (reply.isError()) {
-            qWarning() << "X11GestureActionExecutor:" << m_multitaskActionId
+            qCWarning(logShortcut) << "X11GestureActionExecutor:" << m_multitaskActionId
                        << "failed to query multitask state:" << reply.error().message();
             m_multitaskUpdatePending = false;
             if (queryGeneration != m_multitaskTargetGeneration)
@@ -336,7 +338,7 @@ void X11GestureActionExecutor::updateMultitaskVisible()
         }
 
         if (reply.value() == m_multitaskTargetVisible) {
-            qDebug() << "X11GestureActionExecutor: action completed:" << m_multitaskActionId;
+            qCDebug(logShortcut) << "X11GestureActionExecutor: action completed:" << m_multitaskActionId;
             m_multitaskUpdatePending = false;
             return;
         }
@@ -356,10 +358,10 @@ void X11GestureActionExecutor::updateMultitaskVisible()
                         QDBusPendingCallWatcher *finishedToggle) {
             const QDBusPendingReply<> toggleReply = *finishedToggle;
             if (toggleReply.isError()) {
-                qWarning() << "X11GestureActionExecutor:" << actionId
+                qCWarning(logShortcut) << "X11GestureActionExecutor:" << actionId
                            << "failed to update multitask state:" << toggleReply.error().message();
             } else {
-                qDebug() << "X11GestureActionExecutor: action completed:" << actionId;
+                qCDebug(logShortcut) << "X11GestureActionExecutor: action completed:" << actionId;
             }
             finishedToggle->deleteLater();
             m_multitaskUpdatePending = false;
@@ -406,10 +408,10 @@ bool X11GestureActionExecutor::call(const QString &service, const QString &path,
             [context](QDBusPendingCallWatcher *finishedWatcher) {
         const QDBusPendingReply<> reply = *finishedWatcher;
         if (reply.isError()) {
-            qWarning() << "X11GestureActionExecutor: action failed:" << context
+            qCWarning(logShortcut) << "X11GestureActionExecutor: action failed:" << context
                        << reply.error().message();
         } else {
-            qDebug() << "X11GestureActionExecutor: action completed:" << context;
+            qCDebug(logShortcut) << "X11GestureActionExecutor: action completed:" << context;
         }
         finishedWatcher->deleteLater();
     });

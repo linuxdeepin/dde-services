@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "waylandgesturehandler.h"
 #include "core/shortcutconfig.h"
 #include "treelandshortcutwrapper.h"
@@ -14,7 +16,7 @@ WaylandGestureHandler::WaylandGestureHandler(TreelandShortcutWrapper *wrapper, Q
 {
     connect(m_wrapper, &TreelandShortcutWrapper::activated, this, &WaylandGestureHandler::onActivated);
     connect(m_wrapper, &TreelandShortcutWrapper::protocolInactive, this, [this]() {
-        qWarning() << "WaylandGestureHandler: Protocol inactive, clearing all bindings";
+        qCWarning(logShortcut) << "WaylandGestureHandler: Protocol inactive, clearing all bindings";
         m_bindings.clear();
     });
 }
@@ -52,7 +54,7 @@ bool WaylandGestureHandler::registerGesture(const GestureConfig &config)
     if (success) {
         m_bindings.append(name);
     } else {
-        qWarning() << "Failed to bind gesture for" << config.getId();
+        qCWarning(logShortcut) << "Failed to bind gesture for" << config.getId();
     }
 
     return success;
@@ -78,7 +80,7 @@ bool WaylandGestureHandler::commitSync()
 {
     bool success = m_wrapper->commitAndWait();
     if (!success) {
-        qWarning() << "WaylandGestureHandler::commitSync failed";
+        qCWarning(logShortcut) << "WaylandGestureHandler::commitSync failed";
     }
 
     return success;
@@ -90,6 +92,6 @@ void WaylandGestureHandler::onActivated(const QString &name, uint32_t flags)
     // Forward the activation signal to GestureHandler
     if (!m_bindings.contains(name)) return;
 
-    qDebug() << "WaylandGestureHandler::onActivated name:" << name << "flags:" << flags;
+    qCDebug(logShortcut) << "WaylandGestureHandler::onActivated name:" << name << "flags:" << flags;
     emit activated(name);
 }

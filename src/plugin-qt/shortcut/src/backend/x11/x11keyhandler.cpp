@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
+#include "shortcutlogging.h"
+
 #include "x11keyhandler.h"
 #include "modifierkeymonitor.h"
 #include "core/triggeractioncatalog.h"
@@ -122,13 +124,13 @@ X11KeyHandler::X11KeyHandler(QObject *parent)
 
     m_display = XOpenDisplay(nullptr);
     if (!m_display) {
-        qCritical() << "X11KeyHandler: Failed to connect to X11 server";
+        qCCritical(logShortcut) << "X11KeyHandler: Failed to connect to X11 server";
         return;
     }
     XSetEventQueueOwner(m_display, XCBOwnsEventQueue);
     m_connection = XGetXCBConnection(m_display);
     if (!m_connection || xcb_connection_has_error(m_connection)) {
-        qCritical() << "X11KeyHandler: Failed to obtain XCB connection";
+        qCCritical(logShortcut) << "X11KeyHandler: Failed to obtain XCB connection";
         return;
     }
 
@@ -139,13 +141,13 @@ X11KeyHandler::X11KeyHandler(QObject *parent)
         xcb_screen_next(&iter);
     }
     if (m_rootWindows.isEmpty()) {
-        qCritical() << "X11KeyHandler: X11 server has no screens";
+        qCCritical(logShortcut) << "X11KeyHandler: X11 server has no screens";
         return;
     }
 
     m_keySymbols = xcb_key_symbols_alloc(m_connection);
     if (!m_keySymbols) {
-        qCritical() << "X11KeyHandler: Failed to allocate keyboard symbols";
+        qCCritical(logShortcut) << "X11KeyHandler: Failed to allocate keyboard symbols";
         return;
     }
     refreshModifierMasks();
@@ -207,7 +209,7 @@ bool X11KeyHandler::beginCapture(uint timeoutMs, const QString &owner)
     xcb_grab_keyboard_reply_t *keyboardReply =
             xcb_grab_keyboard_reply(m_connection, keyboardCookie, nullptr);
     if (!keyboardReply || keyboardReply->status != XCB_GRAB_STATUS_SUCCESS) {
-        qWarning() << "X11KeyHandler: failed to grab keyboard for shortcut capture";
+        qCWarning(logShortcut) << "X11KeyHandler: failed to grab keyboard for shortcut capture";
         free(keyboardReply);
         return false;
     }
@@ -221,7 +223,7 @@ bool X11KeyHandler::beginCapture(uint timeoutMs, const QString &owner)
     xcb_grab_pointer_reply_t *pointerReply =
             xcb_grab_pointer_reply(m_connection, pointerCookie, nullptr);
     if (!pointerReply || pointerReply->status != XCB_GRAB_STATUS_SUCCESS) {
-        qWarning() << "X11KeyHandler: failed to grab pointer for shortcut capture";
+        qCWarning(logShortcut) << "X11KeyHandler: failed to grab pointer for shortcut capture";
         free(pointerReply);
         xcb_ungrab_keyboard(m_connection, XCB_CURRENT_TIME);
         xcb_flush(m_connection);
@@ -290,7 +292,7 @@ void X11KeyHandler::finishCapture(bool notify)
 bool X11KeyHandler::registerKey(const KeyConfig &config)
 {
     if (!isAvailable()) {
-        qCritical() << "X11KeyHandler: XCB connection not available, cannot register key:" << config.getId();
+        qCCritical(logShortcut) << "X11KeyHandler: XCB connection not available, cannot register key:" << config.getId();
         return false;
     }
 
@@ -304,7 +306,7 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
         if (!setWmShortcut(delegatedWmId, config.hotkeys))
             return false;
         m_wmShortcutIds.insert(config.getId(), delegatedWmId);
-        qInfo() << "X11KeyHandler: delegated shortcut to KWin:"
+        qCInfo(logShortcut) << "X11KeyHandler: delegated shortcut to KWin:"
                 << config.getId() << delegatedWmId << config.hotkeys;
         return true;
     }
@@ -334,12 +336,12 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
                     resolution == HotkeyResolution::UnavailableInKeymap
                     && candidate.requirement == PhysicalKeyAlias::X11CandidateRequirement::IfAvailable;
             if (unavailableAlias) {
-                qInfo() << "X11KeyHandler: Physical alias is unavailable in the current keymap:"
+                qCInfo(logShortcut) << "X11KeyHandler: Physical alias is unavailable in the current keymap:"
                         << xkbHotkey;
                 continue;
             }
 
-            qWarning() << "X11KeyHandler: Failed to resolve hotkey:" << xkbHotkey
+            qCWarning(logShortcut) << "X11KeyHandler: Failed to resolve hotkey:" << xkbHotkey
                        << (resolution == HotkeyResolution::InvalidSpecification
                                    ? "invalid specification"
                                    : "unavailable in current keymap");
@@ -352,7 +354,7 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
                 && isStandaloneModifierKey(hotkey.keysym, hotkey.modifierCombinations.constFirst());
         if (isStandaloneModifier
                 && (!m_modifierMonitor || !m_modifierMonitor->isAvailable())) {
-            qWarning() << "X11KeyHandler: Standalone modifier monitor is unavailable:" << xkbHotkey;
+            qCWarning(logShortcut) << "X11KeyHandler: Standalone modifier monitor is unavailable:" << xkbHotkey;
             allSuccess = false;
             break;
         }
@@ -366,7 +368,7 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
 
                 if (!isStandaloneModifier && !grabKey(keycode, modifiers)) {
                     candidateFailed = true;
-                    qWarning() << "X11KeyHandler: Failed to grab hotkey:" << xkbHotkey
+                    qCWarning(logShortcut) << "X11KeyHandler: Failed to grab hotkey:" << xkbHotkey
                                << "keycode:" << keycode << "modifiers:" << Qt::hex << modifiers;
                     break;
                 }
@@ -386,7 +388,7 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
     }
 
     if (!allSuccess && !grabbed.isEmpty()) {
-        qWarning() << "X11KeyHandler: Partial registration failure for" << config.getId()
+        qCWarning(logShortcut) << "X11KeyHandler: Partial registration failure for" << config.getId()
                    << "- rolling back" << grabbed.size() << "successful grabs";
         for (uint32_t key : std::as_const(grabbed)) {
             const xcb_keycode_t keycode = key & 0xFFFF;
@@ -478,7 +480,7 @@ bool X11KeyHandler::setWmShortcut(const QString &wmShortcutId, const QStringList
         m_wmSetAccelSignature = WmSetAccelSignature::DataOnly;
     }
     if (!reply.isValid() || !reply.value()) {
-        qWarning() << "X11KeyHandler: failed to set KWin shortcut:"
+        qCWarning(logShortcut) << "X11KeyHandler: failed to set KWin shortcut:"
                    << wmShortcutId << hotkeys << reply.error().message();
         return false;
     }
@@ -502,7 +504,7 @@ bool X11KeyHandler::grabKey(xcb_keycode_t keycode, uint16_t modifiers)
 
             xcb_generic_error_t *error = xcb_request_check(m_connection, cookie);
             if (error) {
-                qWarning() << "Failed to grab key" << keycode << "with modifiers" << Qt::hex << modifiers
+                qCWarning(logShortcut) << "Failed to grab key" << keycode << "with modifiers" << Qt::hex << modifiers
                           << "on root" << rootWindow << "Error code:" << error->error_code;
                 free(error);
                 hasError = true;
@@ -856,7 +858,7 @@ void X11KeyHandler::enableDetectableAutoRepeat()
             && XkbSetDetectableAutoRepeat(m_display, True, &supported)
             && supported;
     if (!m_detectableAutoRepeat)
-        qWarning() << "X11KeyHandler: falling back to Release/Press autorepeat detection";
+        qCWarning(logShortcut) << "X11KeyHandler: falling back to Release/Press autorepeat detection";
 }
 
 void X11KeyHandler::handleKeyPress(const xcb_key_press_event_t *event)
@@ -1002,7 +1004,7 @@ void X11KeyHandler::setCapsLockState(bool on)
     xcb_keycode_t *keycodes = xcb_key_symbols_get_keycode(m_keySymbols, XK_Caps_Lock);
     if (!keycodes || keycodes[0] == XCB_NO_SYMBOL) {
         if (keycodes) free(keycodes);
-        qWarning() << "Failed to get CapsLock keycode";
+        qCWarning(logShortcut) << "Failed to get CapsLock keycode";
         return;
     }
     
@@ -1027,7 +1029,7 @@ void X11KeyHandler::setNumLockState(bool on)
     xcb_keycode_t *keycodes = xcb_key_symbols_get_keycode(m_keySymbols, XK_Num_Lock);
     if (!keycodes || keycodes[0] == XCB_NO_SYMBOL) {
         if (keycodes) free(keycodes);
-        qWarning() << "Failed to get NumLock keycode";
+        qCWarning(logShortcut) << "Failed to get NumLock keycode";
         return;
     }
     
