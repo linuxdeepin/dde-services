@@ -63,7 +63,6 @@ DEF_SETTER_PERSIST(bool, LowPowerNotifyEnable, lowPowerNotifyEnable, lowPowerNot
 DEF_SETTER_PERSIST(int, LowPowerNotifyThreshold, lowPowerNotifyThreshold, lowPowerNotifyThresholdChanged, kLowPowerNotifyThreshold)
 DEF_SETTER_PERSIST(int, LowPowerAutoSleepThreshold, lowPowerAutoSleepThreshold, lowPowerAutoSleepThresholdChanged, kPercentageAction)
 DEF_SETTER_PERSIST(int, LowPowerAction, lowPowerAction, lowPowerActionChanged, kLowPowerAction)
-DEF_SETTER_PERSIST(bool, AmbientLightAdjustBrightness, ambientLightAdjustBrightness, ambientLightAdjustBrightnessChanged, kAmbientLightAdjustBrightness)
 DEF_SETTER_PERSIST(bool, ScheduledShutdownState, scheduledShutdownState, scheduledShutdownStateChanged, kScheduledShutdownState)
 DEF_SETTER_PERSIST(int, ShutdownRepetition, shutdownRepetition, shutdownRepetitionChanged, kShutdownRepetition)
 
@@ -615,8 +614,6 @@ void PowerManager::initDConfig()
           [this](const QVariant &v) { setLowPowerAutoSleepThreshold(v.toInt()); } },
         { PowerDConfig::kLowPowerAction,
           [this](const QVariant &v) { setLowPowerAction(v.toInt()); } },
-        { PowerDConfig::kAmbientLightAdjustBrightness,
-          [this](const QVariant &v) { setAmbientLightAdjustBrightness(v.toBool()); } },
 
         // ── Scheduled shutdown ──
         { PowerDConfig::kScheduledShutdownState,

@@ -74,7 +74,6 @@ constexpr const char *KEY_LINE_POWER_PRESS_POWER_BTN_ACTION = "linePowerPressPow
 constexpr const char *KEY_SCREEN_BLACK_LOCK = "screenBlackLock";
 constexpr const char *KEY_HIGH_PERFORMANCE_ENABLED = "highPerformanceEnabled";
 constexpr const char *KEY_SLEEP_LOCK = "sleepLock";
-constexpr const char *KEY_AMBIENT_LIGHT_ADJUST_BRIGHTNESS = "ambientLightAdjustBrightness";
 
 // Other keys
 constexpr const char *KEY_UPPER_LAYER_WLAN = "upperLayerWlan";
