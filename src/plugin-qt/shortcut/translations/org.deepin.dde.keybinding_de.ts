@@ -99,43 +99,43 @@
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Starter anzeigen/verstecken</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Zwischenablage anzeigen/verbergen</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Benachrichtigungszentrum anzeigen/verstecken</translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Deaktivieren</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"/>
+        <translation>Benutzerdefiniert</translation>
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Hilfsmittel</translation>
     </message>
     <message>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Text zu Sprache</translation>
     </message>
     <message>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Sprache zu Text</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"/>
+        <translation>Übersetzung</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Keine</translation>
     </message>
     <message>
         <source>System</source>
