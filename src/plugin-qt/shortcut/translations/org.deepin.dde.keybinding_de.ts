@@ -59,27 +59,27 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Fenster wiederherstellen</translation>
     </message>
     <message>
         <source>Current window left split</source>
-        <translation type="unfinished"/>
+        <translation>Aktuelles Fenster nach links aufteilen</translation>
     </message>
     <message>
         <source>Current window right split</source>
-        <translation type="unfinished"/>
+        <translation>Aktuelles Fenster nach rechts aufteilen</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Zeige Multitasking-Ansicht</translation>
     </message>
     <message>
         <source>Hide multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Verstecke Multitasking-Ansicht</translation>
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Zur vorherigen Arbeitsfläche wechseln</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
