@@ -199,11 +199,11 @@
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Beenden</translation>
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation type="unfinished"/>
+        <translation>Aufgabenumschalter öffnen</translation>
     </message>
     <message>
         <source>Select next task</source>
