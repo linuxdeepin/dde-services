@@ -207,15 +207,15 @@
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Nächste Aufgabe auswählen</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Vorherige Aufgabe auswählen</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Wähle das nächste Fenster des aktuellen Programmes aus</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
