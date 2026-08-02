@@ -139,27 +139,27 @@
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>System</translation>
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Benachrichtigen</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Zu Arbeitfläche 1 wechseln</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Zu Arbeitfläche 2 wechseln</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Zu Arbeitfläche 3 wechseln</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
-        <translation type="unfinished"/>
+        <translation>Zu Arbeitfläche 4 wechseln</translation>
     </message>
     <message>
         <source>Switch to workspace 5</source>
