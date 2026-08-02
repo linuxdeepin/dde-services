@@ -11,23 +11,23 @@
     </message>
     <message>
         <source>Swipe down with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Mit vier Fingern runterstreichen</translation>
     </message>
     <message>
         <source>Swipe down with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Mit drei Fingern runterstreichen</translation>
     </message>
     <message>
         <source>Swipe left with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Mit vier Fingern nach links streichen</translation>
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Mit drei Fingern nach links streichen</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Mit vier Fingern nach rechts streichen</translation>
     </message>
     <message>
         <source>Swipe right with three fingers</source>
