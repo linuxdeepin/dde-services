@@ -83,19 +83,19 @@
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Zur nächsten Arbeitfläche wechseln</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Schreibtisch zeigen</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Schreibtisch verbergen</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Große Suche anzeigen/verstecken</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
