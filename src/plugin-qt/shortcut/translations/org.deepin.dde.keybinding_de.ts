@@ -219,7 +219,7 @@
     </message>
     <message>
         <source>Select previous window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Wähle das vorherige Fenster des aktuellen Programmes aus</translation>
     </message>
 </context>
 </TS>
