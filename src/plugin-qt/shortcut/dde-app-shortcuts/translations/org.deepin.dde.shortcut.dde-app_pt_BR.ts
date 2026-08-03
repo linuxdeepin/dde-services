@@ -139,11 +139,11 @@
     </message>
     <message>
         <source>Switch Windows Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Alternar janelas na ordem inversa</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
-        <translation type="unfinished"/>
+        <translation>Alternar janelas do mesmo tipo</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type Reversely</source>
