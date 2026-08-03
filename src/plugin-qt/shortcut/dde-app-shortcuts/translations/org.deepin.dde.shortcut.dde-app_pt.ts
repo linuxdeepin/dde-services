@@ -123,15 +123,15 @@
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation type="unfinished"/>
+        <translation>Gravador de Ecrã</translation>
     </message>
     <message>
         <source>Scrollshot</source>
-        <translation type="unfinished"/>
+        <translation>Scrollshot</translation>
     </message>
     <message>
         <source>Switch Window Effects</source>
-        <translation type="unfinished"/>
+        <translation>Mudar Efeitos da Janela</translation>
     </message>
     <message>
         <source>Switch Windows</source>
