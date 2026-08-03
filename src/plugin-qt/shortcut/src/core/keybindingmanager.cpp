@@ -1125,6 +1125,8 @@ void KeybindingManager::Reset()
         toRestore.append(id);
     }
 
+    // Release every reset target first so restored defaults cannot conflict
+    // with another built-in's stale binding.
     if (!m_keyHandler->commitSync()) {
         qCWarning(logShortcut) << "Reset: failed to commit unregistering existing hotkeys";
         for (const QString &id : std::as_const(toRestore)) {
@@ -1136,7 +1138,30 @@ void KeybindingManager::Reset()
         return;
     }
 
-    m_loader->resetHotkeys(resetIds);
+    const QSet<QString> resetIdSet(resetIds.begin(), resetIds.end());
+    m_resetInProgressIds.unite(resetIdSet);
+
+    QSet<QString> restoredHotkeys;
+    QList<KeyConfig> resetConfigs = m_loader->resetHotkeys(resetIds);
+    for (KeyConfig &config : resetConfigs) {
+        config.hotkeys = normalizeHotkeys(config.hotkeys);
+        restoredHotkeys.unite(QSet<QString>(config.hotkeys.begin(), config.hotkeys.end()));
+    }
+
+    CustomShortcutTransaction::clearConflictingHotkeys(this, restoredHotkeys);
+
+    // Reuse the normal DConfig change path now that custom conflicts are gone.
+    // Removing one id at a time keeps the remaining delayed reset signals
+    // suppressed while commitSync() runs its nested event loop.
+    for (const KeyConfig &config : std::as_const(resetConfigs)) {
+        // onConfigRemoved() removes the id from this set. Do not resurrect a
+        // config deleted while commitSync() was running its nested event loop.
+        if (!m_resetInProgressIds.remove(config.getId()))
+            continue;
+        onKeyConfigChanged(config);
+    }
+
+    m_resetInProgressIds.subtract(resetIdSet);
 }
 
 void KeybindingManager::onKeyConfigAdded(const KeyConfig &loadedConfig)
@@ -1158,12 +1183,18 @@ void KeybindingManager::onKeyConfigAdded(const KeyConfig &loadedConfig)
 
 void KeybindingManager::onKeyConfigChanged(const KeyConfig &loadedConfig)
 {
-    if (!m_keyConfigsMap.contains(loadedConfig.getId())) {
-        onKeyConfigAdded(loadedConfig);
+    // Reset already read and applied these values synchronously. Ignore the
+    // delayed DConfig notification while the transaction is still running.
+    if (m_resetInProgressIds.contains(loadedConfig.getId()))
         return;
-    }
+
     KeyConfig config = loadedConfig;
     config.hotkeys = normalizeHotkeys(config.hotkeys);
+    if (!m_keyConfigsMap.contains(config.getId())) {
+        onKeyConfigAdded(config);
+        return;
+    }
+
     const KeyConfig oldConfig = m_keyConfigsMap.value(config.getId());
     if (oldConfig == config) {
         if (config.canRegister() && !m_activeShortcutIds.contains(config.getId())) {
@@ -1206,6 +1237,7 @@ void KeybindingManager::onKeyConfigChanged(const KeyConfig &loadedConfig)
 
 void KeybindingManager::onConfigRemoved(const QString &id)
 {
+    m_resetInProgressIds.remove(id);
     if (m_keyConfigsMap.contains(id)) {
         m_keyConfigsMap.remove(id);
         const bool wasActive = m_activeShortcutIds.contains(id);

@@ -22,11 +22,51 @@ void appendUniqueId(QStringList &ids, const QString &id)
 } // namespace
 
 // Creates a transaction for one prepared custom shortcut change.
-KeybindingManager::CustomShortcutTransaction::CustomShortcutTransaction(
-        KeybindingManager *manager, const CustomShortcutChange &change)
+KeybindingManager::CustomShortcutTransaction::CustomShortcutTransaction(KeybindingManager *manager, const CustomShortcutChange &change)
     : m_manager(manager)
     , m_change(change)
 {
+}
+
+// Each transaction restores its own state on failure. Reset only reports the
+// failure and does not add cross-component recovery.
+void KeybindingManager::CustomShortcutTransaction::clearConflictingHotkeys(KeybindingManager *manager, const QSet<QString> &reservedHotkeys)
+{
+    const QList<KeyConfig> configs = manager->m_keyConfigsMap.values();
+    for (const KeyConfig &oldConfig : configs) {
+        if (!manager->isRuntimeCustomShortcut(oldConfig))
+            continue;
+
+        KeyConfig newConfig = oldConfig;
+        newConfig.hotkeys.removeIf([&reservedHotkeys](const QString &hotkey) {
+            return reservedHotkeys.contains(hotkey);
+        });
+        if (newConfig.hotkeys == oldConfig.hotkeys)
+            continue;
+
+        CustomShortcutChange change;
+        change.hasOldTarget = true;
+        change.oldTarget = oldConfig;
+        change.newTarget = newConfig;
+
+        CustomShortcutTransaction transaction(manager, change);
+        if (!transaction.applyRuntime()) {
+            qCWarning(logShortcut) << "Reset: failed to clear custom shortcut conflict at runtime:"
+                                   << "id:" << oldConfig.getId()
+                                   << "old hotkeys:" << oldConfig.hotkeys
+                                   << "target hotkeys:" << newConfig.hotkeys;
+            return;
+        }
+        if (!transaction.persistModify()) {
+            qCWarning(logShortcut) << "Reset: failed to persist custom shortcut conflict cleanup:"
+                                   << "id:" << oldConfig.getId()
+                                   << "old hotkeys:" << oldConfig.hotkeys
+                                   << "target hotkeys:" << newConfig.hotkeys;
+            return;
+        }
+
+        transaction.publish();
+    }
 }
 
 // Applies runtime bindings and rolls back if registration or commit fails.

@@ -6,13 +6,16 @@
 
 #include "keybindingmanager.h"
 
+#include <QSet>
 #include <QStringList>
 
-// Handles apply, persist, publish, and rollback for one custom shortcut change.
+// Handles transactional runtime and persistence changes for custom shortcuts.
 class KeybindingManager::CustomShortcutTransaction
 {
 public:
     CustomShortcutTransaction(KeybindingManager *manager, const CustomShortcutChange &change);
+
+    static void clearConflictingHotkeys(KeybindingManager *manager, const QSet<QString> &reservedHotkeys);
 
     bool applyRuntime();
     bool persistAdd();

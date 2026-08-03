@@ -180,6 +180,7 @@ private:
     // id(shortcutId) -> KeyConfig
     QMap<QString, KeyConfig> m_keyConfigsMap;
     QSet<QString> m_activeShortcutIds;
+    QSet<QString> m_resetInProgressIds;
     bool m_isWayland = false;
 };
 
