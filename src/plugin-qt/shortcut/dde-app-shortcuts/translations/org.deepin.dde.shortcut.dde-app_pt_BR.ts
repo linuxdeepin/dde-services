@@ -159,19 +159,19 @@
     </message>
     <message>
         <source>Window Quick Tile Left</source>
-        <translation type="unfinished"/>
+        <translation>Ajustar rapidamente a janela à esquerda</translation>
     </message>
     <message>
         <source>Window Quick Tile Right</source>
-        <translation type="unfinished"/>
+        <translation>Ajustar rapidamente a janela à direita</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"/>
+        <translation>Ampliar</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"/>
+        <translation>Reduzir</translation>
     </message>
     <message>
         <source>Zoom to Actual Size</source>
