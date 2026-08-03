@@ -95,31 +95,31 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Ferramentas Assistivas</translation>
     </message>
     <message>
         <source>Minimize Window</source>
-        <translation type="unfinished"/>
+        <translation>Minimizar Janela</translation>
     </message>
     <message>
         <source>Move Window</source>
-        <translation type="unfinished"/>
+        <translation>Mover Janela</translation>
     </message>
     <message>
         <source>Move to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mover para a Área de trabalho Esquerda</translation>
     </message>
     <message>
         <source>Move to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mover para a Área de trabalho Direita</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum</translation>
     </message>
     <message>
         <source>Resize Window</source>
-        <translation type="unfinished"/>
+        <translation>Redimensionar Janela</translation>
     </message>
     <message>
         <source>Screen Recorder</source>
