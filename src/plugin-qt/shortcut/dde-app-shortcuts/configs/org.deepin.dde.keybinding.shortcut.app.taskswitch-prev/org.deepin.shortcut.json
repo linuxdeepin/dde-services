@@ -34,8 +34,7 @@
         },
         "hotkeys": {
             "value": [
-                "Shift+Meta+Tab",
-                "Shift+Alt+Tab"
+                "Alt+Shift+Tab"
             ],
             "serial": 1,
             "flags": [],

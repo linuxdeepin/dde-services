@@ -34,10 +34,9 @@
         },
         "hotkeys": {
             "value": [
-                "Meta+`",
                 "Alt+`"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "hotkeys",
             "name[zh_CN]": "快捷键组合",
