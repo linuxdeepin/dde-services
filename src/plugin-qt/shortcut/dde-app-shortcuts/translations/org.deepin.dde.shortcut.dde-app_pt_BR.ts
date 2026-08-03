@@ -127,7 +127,7 @@
     </message>
     <message>
         <source>Scrollshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de tela por rolagem</translation>
     </message>
     <message>
         <source>Switch Window Effects</source>
