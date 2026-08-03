@@ -95,11 +95,11 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Ferramentas de acessibilidade</translation>
     </message>
     <message>
         <source>Minimize Window</source>
-        <translation type="unfinished"/>
+        <translation>Minimizar janela</translation>
     </message>
     <message>
         <source>Move Window</source>
