@@ -38,30 +38,6 @@
         <translation>Maximizar janela</translation>
     </message>
     <message>
-        <source>Next Window</source>
-        <translation>Próxima janela</translation>
-    </message>
-    <message>
-        <source>Next Window of Same App</source>
-        <translation>Próxima janela do mesmo aplicativo</translation>
-    </message>
-    <message>
-        <source>Next Workspace</source>
-        <translation>Próxima área de trabalho</translation>
-    </message>
-    <message>
-        <source>Previous Window</source>
-        <translation>Janela anterior</translation>
-    </message>
-    <message>
-        <source>Previous Window of Same App</source>
-        <translation>Janela anterior do mesmo aplicativo</translation>
-    </message>
-    <message>
-        <source>Previous Workspace</source>
-        <translation>Área de trabalho anterior</translation>
-    </message>
-    <message>
         <source>Show Desktop</source>
         <translation>Exibir área de trabalho</translation>
     </message>
@@ -119,7 +95,87 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation>Ferramentas assistivas</translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Minimize Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Move Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Move to Left Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Move to Right Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Resize Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Screen Recorder</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Scrollshot</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Window Effects</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows Reversely</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type Reversely</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch to Left Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch to Right Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window Quick Tile Left</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window Quick Tile Right</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Zoom to Actual Size</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
