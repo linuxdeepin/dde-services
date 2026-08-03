@@ -147,15 +147,15 @@
     </message>
     <message>
         <source>Switch Windows of the Same Type Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Alternar janelas do mesmo tipo na ordem inversa</translation>
     </message>
     <message>
         <source>Switch to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o espaço de trabalho à esquerda</translation>
     </message>
     <message>
         <source>Switch to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para o espaço de trabalho à direita</translation>
     </message>
     <message>
         <source>Window Quick Tile Left</source>
