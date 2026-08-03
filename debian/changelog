@@ -1,3 +1,18 @@
+dde-services (1.0.37) unstable; urgency=medium
+
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#111)
+  * fix: clamp Treeland brightness at 10 percent
+  * refactor: move Treeland brightness policy into color control
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#114)
+  * feat: categorize shortcut plugin logs
+  * fix: resolve custom shortcut conflicts during reset
+  * fix: align default window switching shortcuts
+  * fix: update shortcut translation entries
+
+ -- zhangkun <zhangkun2@uniontech.com>  Mon, 03 Aug 2026 17:21:24 +0800
+
 dde-services (1.0.36) unstable; urgency=medium
 
   * fix(build): add libx11-xcb-dev to Build-Depends
