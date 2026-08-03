@@ -103,19 +103,19 @@
     </message>
     <message>
         <source>Move Window</source>
-        <translation type="unfinished"/>
+        <translation>Mover janela</translation>
     </message>
     <message>
         <source>Move to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mover para o espaço de trabalho à esquerda</translation>
     </message>
     <message>
         <source>Move to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mover para o espaço de trabalho à direita</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum</translation>
     </message>
     <message>
         <source>Resize Window</source>
