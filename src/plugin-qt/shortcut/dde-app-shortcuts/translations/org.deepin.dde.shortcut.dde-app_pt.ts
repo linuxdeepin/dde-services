@@ -63,15 +63,15 @@
     </message>
     <message>
         <source>Global Search</source>
-        <translation type="unfinished"/>
+        <translation>Pesquisa Global</translation>
     </message>
     <message>
         <source>Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de Ecrã</translation>
     </message>
     <message>
         <source>System Monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor do Sistema</translation>
     </message>
     <message>
         <source>Window Screenshot</source>
