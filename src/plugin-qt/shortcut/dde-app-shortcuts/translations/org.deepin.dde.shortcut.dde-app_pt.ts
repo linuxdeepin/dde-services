@@ -3,7 +3,7 @@
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
         <source>Clipboard</source>
-        <translation>Área de Tranferência</translation>
+        <translation>Área de Transferência</translation>
     </message>
     <message>
         <source>Lock screen</source>
@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Zoom to Actual Size</source>
-        <translation type="unfinished"/>
+        <translation>Aumentar para o Tamanho Atual</translation>
     </message>
 </context>
 </TS>
