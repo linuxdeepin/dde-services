@@ -131,11 +131,11 @@
     </message>
     <message>
         <source>Switch Window Effects</source>
-        <translation type="unfinished"/>
+        <translation>Alternar efeitos visuais</translation>
     </message>
     <message>
         <source>Switch Windows</source>
-        <translation type="unfinished"/>
+        <translation>Alternar janelas</translation>
     </message>
     <message>
         <source>Switch Windows Reversely</source>
