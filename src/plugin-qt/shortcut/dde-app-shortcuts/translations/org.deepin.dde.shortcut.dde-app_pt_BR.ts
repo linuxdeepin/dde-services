@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Zoom to Actual Size</source>
-        <translation type="unfinished"/>
+        <translation>Exibir no tamanho real</translation>
     </message>
 </context>
 </TS>
