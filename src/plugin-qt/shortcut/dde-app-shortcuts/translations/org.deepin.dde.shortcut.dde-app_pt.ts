@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation type="unfinished"/>
+        <translation>Janela do Terminal Quake</translation>
     </message>
     <message>
         <source>launcher</source>
-        <translation type="unfinished"/>
+        <translation>lançador</translation>
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar Maximização da Janela</translation>
     </message>
     <message>
         <source>Close Window</source>
-        <translation type="unfinished"/>
+        <translation>Fechar Janela</translation>
     </message>
     <message>
         <source>Maximize Window</source>
-        <translation type="unfinished"/>
+        <translation>Maximizar Janela</translation>
     </message>
     <message>
         <source>Show Desktop</source>
