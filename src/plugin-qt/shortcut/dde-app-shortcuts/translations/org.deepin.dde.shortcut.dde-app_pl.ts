@@ -38,30 +38,6 @@
         <translation>Maksymalizuj okno</translation>
     </message>
     <message>
-        <source>Next Window</source>
-        <translation>Następne okno</translation>
-    </message>
-    <message>
-        <source>Next Window of Same App</source>
-        <translation>Następne okno tej samej aplikacji</translation>
-    </message>
-    <message>
-        <source>Next Workspace</source>
-        <translation>Następny obszar roboczy</translation>
-    </message>
-    <message>
-        <source>Previous Window</source>
-        <translation>Poprzednie okno</translation>
-    </message>
-    <message>
-        <source>Previous Window of Same App</source>
-        <translation>Poprzednie okno tej samej aplikacji</translation>
-    </message>
-    <message>
-        <source>Previous Workspace</source>
-        <translation>Poprzedni obszar roboczy</translation>
-    </message>
-    <message>
         <source>Show Desktop</source>
         <translation>Pokaż pulpit</translation>
     </message>
@@ -119,7 +95,87 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation>Narzędzia pomocnicze</translation>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Minimize Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Move Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Move to Left Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Move to Right Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Resize Window</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Screen Recorder</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Scrollshot</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Window Effects</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows Reversely</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type Reversely</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch to Left Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Switch to Right Workspace</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window Quick Tile Left</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Window Quick Tile Right</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Zoom to Actual Size</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
