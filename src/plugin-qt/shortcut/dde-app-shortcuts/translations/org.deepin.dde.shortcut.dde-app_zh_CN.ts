@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -36,30 +38,6 @@
     <message>
         <source>Maximize Window</source>
         <translation>最大化窗口</translation>
-    </message>
-    <message>
-        <source>Next Window</source>
-        <translation>下一个窗口</translation>
-    </message>
-    <message>
-        <source>Next Window of Same App</source>
-        <translation>同一应用下一个窗口</translation>
-    </message>
-    <message>
-        <source>Next Workspace</source>
-        <translation>下一个工作区</translation>
-    </message>
-    <message>
-        <source>Previous Window</source>
-        <translation>上一个窗口</translation>
-    </message>
-    <message>
-        <source>Previous Window of Same App</source>
-        <translation>同一应用上一个窗口</translation>
-    </message>
-    <message>
-        <source>Previous Workspace</source>
-        <translation>上一个工作区</translation>
     </message>
     <message>
         <source>Show Desktop</source>
@@ -119,7 +97,87 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>辅助工具</translation>
+    </message>
+    <message>
+        <source>Minimize Window</source>
+        <translation>最小化窗口</translation>
+    </message>
+    <message>
+        <source>Move Window</source>
+        <translation>移动窗口</translation>
+    </message>
+    <message>
+        <source>Move to Left Workspace</source>
+        <translation>移动到左边工作区</translation>
+    </message>
+    <message>
+        <source>Move to Right Workspace</source>
+        <translation>移动到右边工作区</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <source>Resize Window</source>
+        <translation>改变窗口大小</translation>
+    </message>
+    <message>
+        <source>Screen Recorder</source>
+        <translation>录屏</translation>
+    </message>
+    <message>
+        <source>Scrollshot</source>
+        <translation>滚动截图</translation>
+    </message>
+    <message>
+        <source>Switch Window Effects</source>
+        <translation>切换窗口效果</translation>
+    </message>
+    <message>
+        <source>Switch Windows</source>
+        <translation>切换窗口</translation>
+    </message>
+    <message>
+        <source>Switch Windows Reversely</source>
+        <translation>反向切换窗口</translation>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type</source>
+        <translation>切换同类型窗口</translation>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type Reversely</source>
+        <translation>反向切换同类型窗口</translation>
+    </message>
+    <message>
+        <source>Switch to Left Workspace</source>
+        <translation>切换到左边工作区</translation>
+    </message>
+    <message>
+        <source>Switch to Right Workspace</source>
+        <translation>切换到右边工作区</translation>
+    </message>
+    <message>
+        <source>Window Quick Tile Left</source>
+        <translation>窗口快速铺至左侧</translation>
+    </message>
+    <message>
+        <source>Window Quick Tile Right</source>
+        <translation>窗口快速铺至右侧</translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation>屏幕放大</translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation>屏幕缩小</translation>
+    </message>
+    <message>
+        <source>Zoom to Actual Size</source>
+        <translation>重置屏幕缩放</translation>
     </message>
 </context>
 </TS>
