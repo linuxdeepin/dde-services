@@ -123,7 +123,8 @@ QStringList ConfigLoader::resettableHotkeyIds() const
     for (const KeyConfig &key : m_keys) {
         // Runtime custom shortcuts are created from an empty DConfig template.
         // Resetting their hotkeys would therefore clear the user-defined binding
-        // instead of restoring a meaningful default.
+        // instead of restoring a meaningful default. KeybindingManager clears
+        // only custom hotkeys that conflict with a restored built-in default.
         if (!key.modifiable || key.category == QLatin1String(CategoryKey::Custom))
             continue;
         DConfig *config = m_configs.value(key.subPath);
@@ -137,17 +138,29 @@ QStringList ConfigLoader::resettableHotkeyIds() const
     return ids;
 }
 
-void ConfigLoader::resetHotkeys(const QStringList &ids)
+QList<KeyConfig> ConfigLoader::resetHotkeys(const QStringList &ids)
 {
-    // DConfig emits valueChanged after reset; do not reload or emit keyConfigChanged here.
+    QList<KeyConfig> resetConfigs;
+
+    // reset() is synchronous. Read the restored value immediately so Reset
+    // can resolve conflicts in the same call instead of waiting for the later
+    // DConfig valueChanged signal.
     for (const QString &id : ids) {
         DConfig *config = m_configs.value(id);
         if (config && config->isValid() && !config->isReadOnly(QStringLiteral("hotkeys"))) {
             config->reset("hotkeys");
+            if (!config->isDefaultValue(QStringLiteral("hotkeys")))
+                qCWarning(logShortcut) << "ConfigLoader: hotkeys did not reset to default:" << id;
+
+            KeyConfig resetConfig;
+            if (reloadKeyConfig(id, &resetConfig))
+                resetConfigs.append(resetConfig);
         } else {
             qCWarning(logShortcut) << "ConfigLoader: hotkeys can not be reset:" << id;
         }
     }
+
+    return resetConfigs;
 }
 
 bool ConfigLoader::reloadKeyConfig(const QString &id, KeyConfig *result)

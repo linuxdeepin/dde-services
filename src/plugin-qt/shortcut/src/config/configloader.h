@@ -30,7 +30,7 @@ public:
     void scanForConfigs();
     void reload();
     QStringList resettableHotkeyIds() const;
-    void resetHotkeys(const QStringList &ids);
+    QList<KeyConfig> resetHotkeys(const QStringList &ids);
     bool reloadKeyConfig(const QString &id, KeyConfig *result = nullptr);
     bool updateValue(const QString &id, const QString &key, const QVariant &value);
     bool canUpdateValue(const QString &id) const;
