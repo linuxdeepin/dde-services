@@ -39,15 +39,15 @@
     </message>
     <message>
         <source>Show Desktop</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar Ambiente de Trabalho</translation>
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar Menu da Janela</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation type="unfinished"/>
+        <translation>Alternar Vista de Multi-tarefa</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
