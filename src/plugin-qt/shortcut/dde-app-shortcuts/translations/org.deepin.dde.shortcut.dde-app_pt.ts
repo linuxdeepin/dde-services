@@ -135,23 +135,23 @@
     </message>
     <message>
         <source>Switch Windows</source>
-        <translation type="unfinished"/>
+        <translation>Mudar Janelas</translation>
     </message>
     <message>
         <source>Switch Windows Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Mudar Janelas Reversivamente</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
-        <translation type="unfinished"/>
+        <translation>Mudar Janelas do Mesmo Tipo</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Mudar Janelas do Mesmo Tipo Reversivamente</translation>
     </message>
     <message>
         <source>Switch to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mudar para a Área de trabalho Esquerda</translation>
     </message>
     <message>
         <source>Switch to Right Workspace</source>
