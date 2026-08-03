@@ -51,15 +51,15 @@
     </message>
     <message>
         <source>Delay Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Atrasar Captura de Ecrã</translation>
     </message>
     <message>
         <source>File Manager</source>
-        <translation type="unfinished"/>
+        <translation>Gestor de Ficheiros</translation>
     </message>
     <message>
         <source>Fullscreen Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de Ecrã Completo</translation>
     </message>
     <message>
         <source>Global Search</source>
