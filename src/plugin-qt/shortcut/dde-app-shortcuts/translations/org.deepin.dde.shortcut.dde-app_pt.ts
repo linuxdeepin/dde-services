@@ -155,15 +155,15 @@
     </message>
     <message>
         <source>Switch to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mudar para a Área de trabalho Direita</translation>
     </message>
     <message>
         <source>Window Quick Tile Left</source>
-        <translation type="unfinished"/>
+        <translation>Janela Quick Tile Esquerda</translation>
     </message>
     <message>
         <source>Window Quick Tile Right</source>
-        <translation type="unfinished"/>
+        <translation>Janela Quick Tile Direita</translation>
     </message>
     <message>
         <source>Zoom In</source>
