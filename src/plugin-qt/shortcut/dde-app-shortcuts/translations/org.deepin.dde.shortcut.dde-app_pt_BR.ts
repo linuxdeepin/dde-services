@@ -119,11 +119,11 @@
     </message>
     <message>
         <source>Resize Window</source>
-        <translation type="unfinished"/>
+        <translation>Redimensionar janela</translation>
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation type="unfinished"/>
+        <translation>Gravador de tela</translation>
     </message>
     <message>
         <source>Scrollshot</source>
