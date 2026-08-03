@@ -75,23 +75,23 @@
     </message>
     <message>
         <source>Window Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de imagem da Janela</translation>
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de imagem OCR</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"/>
+        <translation>Sistema</translation>
     </message>
     <message>
         <source>Window</source>
-        <translation type="unfinished"/>
+        <translation>Janela</translation>
     </message>
     <message>
         <source>Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Área de trabalho</translation>
     </message>
     <message>
         <source>AssistiveTools</source>
