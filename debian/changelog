@@ -1,3 +1,9 @@
+dde-services (1.0.30.1) unstable; urgency=medium
+
+  * fix: support ambient light automatic brightness
+
+ -- fuleyi <fuleyi@uniontech.com>  Tue, 04 Aug 2026 17:53:55 +0800
+
 dde-services (1.0.30) unstable; urgency=medium
 
   * fix: add Wayland screen-off in systemTurnOffScreen
