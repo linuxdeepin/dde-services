@@ -143,39 +143,39 @@
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna tego samego typu</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna tego samego typu w odwrotnej kolejności</translation>
     </message>
     <message>
         <source>Switch to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na lewy obszar roboczy</translation>
     </message>
     <message>
         <source>Switch to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na prawy obszar roboczy</translation>
     </message>
     <message>
         <source>Window Quick Tile Left</source>
-        <translation type="unfinished"/>
+        <translation>Kafelkuj okno do lewej</translation>
     </message>
     <message>
         <source>Window Quick Tile Right</source>
-        <translation type="unfinished"/>
+        <translation>Kafelkuj okno do prawej</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"/>
+        <translation>Powiększ</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"/>
+        <translation>Pomniejsz</translation>
     </message>
     <message>
         <source>Zoom to Actual Size</source>
-        <translation type="unfinished"/>
+        <translation>Przybliż do rozmiaru rzeczywistego</translation>
     </message>
 </context>
 </TS>
