@@ -95,23 +95,23 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Narzędzia pomocnicze</translation>
     </message>
     <message>
         <source>Minimize Window</source>
-        <translation type="unfinished"/>
+        <translation>Minimalizuj okno</translation>
     </message>
     <message>
         <source>Move Window</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś okno</translation>
     </message>
     <message>
         <source>Move to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś na lewy obszar roboczy</translation>
     </message>
     <message>
         <source>Move to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś na prawy obszar roboczy</translation>
     </message>
     <message>
         <source>None</source>
