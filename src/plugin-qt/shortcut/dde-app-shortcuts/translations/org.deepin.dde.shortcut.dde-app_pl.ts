@@ -115,27 +115,27 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Brak</translation>
     </message>
     <message>
         <source>Resize Window</source>
-        <translation type="unfinished"/>
+        <translation>Zmień rozmiar okna</translation>
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation type="unfinished"/>
+        <translation>Nagrywanie ekranu</translation>
     </message>
     <message>
         <source>Scrollshot</source>
-        <translation type="unfinished"/>
+        <translation>Pionowy zrzut ekranu</translation>
     </message>
     <message>
         <source>Switch Window Effects</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz efekty okna</translation>
     </message>
     <message>
         <source>Switch Windows</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okno</translation>
     </message>
     <message>
         <source>Switch Windows Reversely</source>
