@@ -139,7 +139,7 @@
     </message>
     <message>
         <source>Switch Windows Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna w odwrotnej kolejności</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
