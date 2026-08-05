@@ -95,35 +95,35 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Eines d&apos;assistència</translation>
     </message>
     <message>
         <source>Minimize Window</source>
-        <translation type="unfinished"/>
+        <translation>Minimitza la finestra</translation>
     </message>
     <message>
         <source>Move Window</source>
-        <translation type="unfinished"/>
+        <translation>Mou la finestra</translation>
     </message>
     <message>
         <source>Move to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mou a l&apos;espai de treball de l&apos;esquerra</translation>
     </message>
     <message>
         <source>Move to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mou a l&apos;espai de treball de la dreta</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Cap</translation>
     </message>
     <message>
         <source>Resize Window</source>
-        <translation type="unfinished"/>
+        <translation>Canvia la mida de la finestra</translation>
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation type="unfinished"/>
+        <translation>Gravador de pantalla</translation>
     </message>
     <message>
         <source>Scrollshot</source>
