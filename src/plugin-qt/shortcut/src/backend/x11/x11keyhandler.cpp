@@ -26,10 +26,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>
 #include <X11/XKBlib.h>
+#include <X11/extensions/XKBproto.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
 
 #include <algorithm>
+#include <cstring>
 
 // Need to define XK_MISCELLANY before including keysymdef.h to get Caps_Lock, Num_Lock etc.
 #define XK_MISCELLANY
@@ -164,6 +166,7 @@ X11KeyHandler::X11KeyHandler(QObject *parent)
     }
     refreshModifierMasks();
     enableDetectableAutoRepeat();
+    enableLockStateMonitoring();
 
     m_releaseTimer->setSingleShot(true);
     m_releaseTimer->setInterval(0);
@@ -647,6 +650,11 @@ void X11KeyHandler::handleXcbEvents()
     while ((event = xcb_poll_for_event(m_connection))) {
         uint8_t responseType = event->response_type & ~0x80;
 
+        if (m_xkbEventBase >= 0
+                && responseType == static_cast<uint8_t>(m_xkbEventBase)) {
+            notifyLockStateChange(event);
+        }
+
         if (m_capture.active && responseType == XCB_KEY_PRESS) {
             const CapturedKey captured = captureKey(
                     reinterpret_cast<xcb_key_press_event_t *>(event));
@@ -896,6 +904,29 @@ void X11KeyHandler::enableDetectableAutoRepeat()
         qCWarning(logShortcut) << "X11KeyHandler: falling back to Release/Press autorepeat detection";
 }
 
+void X11KeyHandler::enableLockStateMonitoring()
+{
+    int opcode = 0;
+    int errorBase = 0;
+    int major = XkbMajorVersion;
+    int minor = XkbMinorVersion;
+    if (!m_display || !XkbQueryExtension(m_display, &opcode, &m_xkbEventBase,
+                                         &errorBase, &major, &minor)) {
+        m_xkbEventBase = -1;
+        qCWarning(logShortcut) << "X11KeyHandler: XKB extension is unavailable;"
+                                  " lock state changes cannot be monitored";
+        return;
+    }
+
+    if (!XkbSelectEventDetails(m_display, XkbUseCoreKbd, XkbStateNotify,
+                               XkbModifierLockMask, XkbModifierLockMask)) {
+        m_xkbEventBase = -1;
+        qCWarning(logShortcut) << "X11KeyHandler: Failed to subscribe to XKB lock state changes";
+        return;
+    }
+    XFlush(m_display);
+}
+
 void X11KeyHandler::handleKeyPress(const xcb_key_press_event_t *event)
 {
     const auto pending = m_pendingReleases.constFind(event->detail);
@@ -935,6 +966,23 @@ void X11KeyHandler::handleKeyPress(const xcb_key_press_event_t *event)
     }
     m_pressedBindings.insert(event->detail, shortcutId);
     activate(shortcutId, KeyEventFlag::Press);
+}
+
+void X11KeyHandler::notifyLockStateChange(const xcb_generic_event_t *event)
+{
+    if (!event)
+        return;
+
+    static_assert(sizeof(xkbStateNotify) == sz_xkbStateNotify);
+    xkbStateNotify stateEvent{};
+    std::memcpy(&stateEvent, event, sizeof(stateEvent));
+    if (stateEvent.xkbType != XkbStateNotify
+            || !(stateEvent.changed & XkbModifierLockMask)) {
+        return;
+    }
+
+    emit numLockStateChanged(stateEvent.lockedMods & m_numLockMask);
+    emit capsLockStateChanged(stateEvent.lockedMods & m_capsLockMask);
 }
 
 void X11KeyHandler::handleKeyRelease(const xcb_key_release_event_t *event)

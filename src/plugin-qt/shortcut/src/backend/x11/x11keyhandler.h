@@ -87,8 +87,10 @@ private:
     QList<uint16_t> ignoredModifierCombinations() const;
     void refreshModifierMasks();
     void enableDetectableAutoRepeat();
+    void enableLockStateMonitoring();
     void handleKeyPress(const xcb_key_press_event_t *event);
     void handleKeyRelease(const xcb_key_release_event_t *event);
+    void notifyLockStateChange(const xcb_generic_event_t *event);
     CapturedKey captureKey(const xcb_key_press_event_t *event) const;
     bool isCapturedKeyValid(const CapturedKey &key) const;
     bool hasAnyMask(uint16_t state, const QList<uint16_t> &masks) const;
@@ -107,6 +109,7 @@ private:
     QList<xcb_window_t> m_rootWindows;
     xcb_key_symbols_t *m_keySymbols = nullptr;
     QSocketNotifier *m_notifier = nullptr;
+    int m_xkbEventBase = -1;
 
     // Standalone modifier shortcut monitoring.
     ModifierKeyMonitor *m_modifierMonitor = nullptr;
