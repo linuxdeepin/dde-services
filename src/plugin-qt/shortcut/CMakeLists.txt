@@ -21,6 +21,7 @@ pkg_check_modules(XCB_XINPUT REQUIRED xcb-xinput)
 pkg_check_modules(XCB_XTEST REQUIRED xcb-xtest)
 pkg_check_modules(X11 REQUIRED x11)
 pkg_check_modules(X11_XCB REQUIRED x11-xcb)
+pkg_check_modules(XTST REQUIRED xtst)
 pkg_check_modules(WAYLAND_CLIENT REQUIRED wayland-client)
 
 # Set source file path (using sources from plugin directory)
@@ -52,6 +53,7 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/backend/x11/x11helper.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeystate.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeymonitor.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/x11shortcutpolicy.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/systemgestureproxy.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11gestureactionexecutor.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11gesturehandler.cpp
@@ -95,6 +97,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     ${XCB_XTEST_LIBRARIES}
     ${X11_LIBRARIES}
     ${X11_XCB_LIBRARIES}
+    ${XTST_LIBRARIES}
     ${WAYLAND_CLIENT_LIBRARIES}
 )
 
@@ -106,6 +109,7 @@ target_include_directories(${PLUGIN_NAME} PRIVATE
     ${XCB_XTEST_INCLUDE_DIRS}
     ${X11_INCLUDE_DIRS}
     ${X11_XCB_INCLUDE_DIRS}
+    ${XTST_INCLUDE_DIRS}
     ${WAYLAND_CLIENT_INCLUDE_DIRS}
 )
 
@@ -225,6 +229,7 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         ${XCB_XTEST_LIBRARIES}
         ${X11_LIBRARIES}
         ${X11_XCB_LIBRARIES}
+        ${XTST_LIBRARIES}
         ${WAYLAND_CLIENT_LIBRARIES}
     )
     
@@ -237,6 +242,7 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         ${XCB_XTEST_INCLUDE_DIRS}
         ${X11_INCLUDE_DIRS}
         ${X11_XCB_INCLUDE_DIRS}
+        ${XTST_INCLUDE_DIRS}
         ${WAYLAND_CLIENT_INCLUDE_DIRS}
     )
 endif()
