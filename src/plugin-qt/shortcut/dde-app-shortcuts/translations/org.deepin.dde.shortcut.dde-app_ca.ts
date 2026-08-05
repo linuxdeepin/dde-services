@@ -127,19 +127,19 @@
     </message>
     <message>
         <source>Scrollshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de desplaçament</translation>
     </message>
     <message>
         <source>Switch Window Effects</source>
-        <translation type="unfinished"/>
+        <translation>Commuta els efectes de les finestres</translation>
     </message>
     <message>
         <source>Switch Windows</source>
-        <translation type="unfinished"/>
+        <translation>Commuta finestres</translation>
     </message>
     <message>
         <source>Switch Windows Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Commuta finestres a la inversa</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
