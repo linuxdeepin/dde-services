@@ -167,15 +167,15 @@
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"/>
+        <translation>Apropa</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"/>
+        <translation>Allunya</translation>
     </message>
     <message>
         <source>Zoom to Actual Size</source>
-        <translation type="unfinished"/>
+        <translation>Mida real</translation>
     </message>
 </context>
 </TS>
