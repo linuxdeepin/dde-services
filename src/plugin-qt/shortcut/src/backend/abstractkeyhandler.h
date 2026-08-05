@@ -46,6 +46,8 @@ public:
 
 signals:
     void keyActivated(const QString &shortcutId);
+    void numLockStateChanged(bool on);
+    void capsLockStateChanged(bool on);
     void captureStarted();
     void captureKeyEvent(bool pressed, const QString &keystroke);
     void captureFinished();

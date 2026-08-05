@@ -302,6 +302,12 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
 
     // Connect signals from key handler
     connect(m_keyHandler, &AbstractKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
+    connect(m_keyHandler, &AbstractKeyHandler::numLockStateChanged,
+            this, &KeybindingManager::updateNumLockState);
+    connect(m_keyHandler, &AbstractKeyHandler::capsLockStateChanged,
+            this, &KeybindingManager::updateCapsLockState);
+    m_lastNumLockState = GetNumLockState();
+    m_lastCapsLockState = GetCapsLockState();
     if (!m_isWayland) {
         connect(m_keyHandler, &AbstractKeyHandler::captureStarted,
                 this, [this] { m_specialKeyHandler->setEnabled(false); });
@@ -1279,6 +1285,26 @@ void KeybindingManager::onCaptureKeyEvent(bool pressed, const QString &keystroke
     emit KeyEvent(pressed, keystroke);
 }
 
+void KeybindingManager::updateNumLockState(bool on)
+{
+    const uint state = on ? 1U : 0U;
+    if (m_lastNumLockState == state)
+        return;
+
+    m_lastNumLockState = state;
+    emit NumLockStateChanged(state);
+}
+
+void KeybindingManager::updateCapsLockState(bool on)
+{
+    const uint state = on ? 1U : 0U;
+    if (m_lastCapsLockState == state)
+        return;
+
+    m_lastCapsLockState = state;
+    emit CapsLockStateChanged(state);
+}
+
 bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringList &excludeIds)
 {
     if (!config.canRegister()) {
@@ -1515,7 +1541,7 @@ void KeybindingManager::SetNumLockState(uint state)
         uint oldState = GetNumLockState();
         m_keyHandler->setNumLockState(state != 0);
         if (oldState != state) {
-            emit NumLockStateChanged(state);
+            updateNumLockState(state != 0);
         }
     }
 }
@@ -1526,7 +1552,7 @@ void KeybindingManager::SetCapsLockState(uint state)
         uint oldState = GetCapsLockState();
         m_keyHandler->setCapsLockState(state != 0);
         if (oldState != state) {
-            emit CapsLockStateChanged(state);
+            updateCapsLockState(state != 0);
         }
     }
 }

@@ -124,6 +124,8 @@ private slots:
     void onConfigRemoved(const QString &id);
     void onKeyActivated(const QString &shortcutId);
     void onCaptureKeyEvent(bool pressed, const QString &keystroke);
+    void updateNumLockState(bool on);
+    void updateCapsLockState(bool on);
     void onBackendKeymapAboutToChange();
     void onBackendKeymapChanged();
     ShortcutInfo toShortcutInfo(const KeyConfig &config);
@@ -181,6 +183,8 @@ private:
     QMap<QString, KeyConfig> m_keyConfigsMap;
     QSet<QString> m_activeShortcutIds;
     QSet<QString> m_resetInProgressIds;
+    uint m_lastNumLockState = 0;
+    uint m_lastCapsLockState = 0;
     bool m_isWayland = false;
 };
 
