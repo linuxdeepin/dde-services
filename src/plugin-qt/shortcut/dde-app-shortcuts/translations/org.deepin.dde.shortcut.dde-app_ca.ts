@@ -151,7 +151,7 @@
     </message>
     <message>
         <source>Switch to Left Workspace</source>
-        <translation>Canvia a l&apos;espai de treball esquerre</translation>
+        <translation>Canvia a l&apos;espai de treball de l&apos;esquerra</translation>
     </message>
     <message>
         <source>Switch to Right Workspace</source>
@@ -159,11 +159,11 @@
     </message>
     <message>
         <source>Window Quick Tile Left</source>
-        <translation type="unfinished"/>
+        <translation>Mosaic ràpid de finestres a l&apos;esquerra</translation>
     </message>
     <message>
         <source>Window Quick Tile Right</source>
-        <translation type="unfinished"/>
+        <translation>Mosaic ràpid de finestres a la dreta</translation>
     </message>
     <message>
         <source>Zoom In</source>
