@@ -105,3 +105,76 @@ target_link_libraries(tst-modifierkeystate PRIVATE
 )
 
 add_test(NAME shortcut-modifierkeystate COMMAND tst-modifierkeystate)
+
+add_executable(tst-x11shortcutpolicy
+    tst_x11shortcutpolicy.cpp
+    ../src/backend/x11/x11shortcutpolicy.cpp
+)
+
+target_include_directories(tst-x11shortcutpolicy PRIVATE
+    ../src
+)
+
+target_link_libraries(tst-x11shortcutpolicy PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+add_test(NAME shortcut-x11shortcutpolicy COMMAND tst-x11shortcutpolicy)
+
+add_executable(tst-x11recordmonitor
+    tst_x11recordmonitor.cpp
+    ../shortcutlogging.cpp
+    ../src/backend/x11/modifierkeystate.cpp
+    ../src/backend/x11/modifierkeymonitor.cpp
+)
+
+target_include_directories(tst-x11recordmonitor PRIVATE
+    ..
+    ../src
+    ${XCB_INCLUDE_DIRS}
+    ${XCB_XINPUT_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIRS}
+    ${X11_XCB_INCLUDE_DIRS}
+    ${XTST_INCLUDE_DIRS}
+)
+
+target_link_libraries(tst-x11recordmonitor PRIVATE
+    Qt6::Core
+    Qt6::Test
+    ${XCB_LIBRARIES}
+    ${XCB_XINPUT_LIBRARIES}
+    ${X11_LIBRARIES}
+    ${X11_XCB_LIBRARIES}
+    ${XTST_LIBRARIES}
+)
+
+add_test(NAME shortcut-x11recordmonitor COMMAND tst-x11recordmonitor)
+
+add_executable(tst-x11grabresilientshortcuts
+    tst_x11grabresilientshortcuts.cpp
+)
+
+target_include_directories(tst-x11grabresilientshortcuts PRIVATE
+    ../src
+    ${X11_INCLUDE_DIRS}
+    ${XTST_INCLUDE_DIRS}
+)
+
+target_link_libraries(tst-x11grabresilientshortcuts PRIVATE
+    Qt6::Core
+    Qt6::Test
+    plugin-dde-shortcut
+    ${X11_LIBRARIES}
+    ${XTST_LIBRARIES}
+)
+
+add_test(NAME shortcut-x11grabresilientshortcuts COMMAND tst-x11grabresilientshortcuts)
+
+# Both integration tests take an active X11 keyboard grab. Keep them mutually
+# exclusive when dh_auto_test runs CTest in parallel.
+set_tests_properties(
+    shortcut-x11recordmonitor
+    shortcut-x11grabresilientshortcuts
+    PROPERTIES RESOURCE_LOCK x11_keyboard_grab
+)

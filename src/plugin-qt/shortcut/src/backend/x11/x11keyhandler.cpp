@@ -6,6 +6,7 @@
 
 #include "x11keyhandler.h"
 #include "modifierkeymonitor.h"
+#include "x11shortcutpolicy.h"
 #include "core/triggeractioncatalog.h"
 #include "core/qkeysequenceconverter.h"
 #include "core/physicalkeyalias.h"
@@ -40,7 +41,9 @@ enum class LogicalModifier {
     Shift,
     Control,
     Alt,
-    Meta
+    Meta,
+    CapsLock,
+    NumLock
 };
 
 LogicalModifier logicalModifier(xcb_keysym_t keysym)
@@ -55,6 +58,10 @@ LogicalModifier logicalModifier(xcb_keysym_t keysym)
             || keysym == XK_Meta_L || keysym == XK_Meta_R) {
         return LogicalModifier::Meta;
     }
+    if (keysym == XK_Caps_Lock)
+        return LogicalModifier::CapsLock;
+    if (keysym == XK_Num_Lock)
+        return LogicalModifier::NumLock;
     return LogicalModifier::Unknown;
 }
 
@@ -69,6 +76,10 @@ QList<xcb_keysym_t> modifierKeysyms(LogicalModifier modifier)
         return {XK_Alt_L, XK_Alt_R};
     case LogicalModifier::Meta:
         return {XK_Super_L, XK_Super_R, XK_Meta_L, XK_Meta_R};
+    case LogicalModifier::CapsLock:
+        return {XK_Caps_Lock};
+    case LogicalModifier::NumLock:
+        return {XK_Num_Lock};
     case LogicalModifier::Unknown:
         return {};
     }
@@ -161,7 +172,15 @@ X11KeyHandler::X11KeyHandler(QObject *parent)
     m_modifierMonitor = new ModifierKeyMonitor(this);
     connect(m_modifierMonitor, &ModifierKeyMonitor::modifierKeyReleased,
             this, &X11KeyHandler::onModifierKeyReleased);
+    connect(m_modifierMonitor, &ModifierKeyMonitor::keyEventRecorded,
+            this, &X11KeyHandler::onRecordedKeyEvent);
     m_modifierMonitor->start();
+
+    m_recordReleaseTimer = new QTimer(this);
+    m_recordReleaseTimer->setSingleShot(true);
+    m_recordReleaseTimer->setInterval(0);
+    connect(m_recordReleaseTimer, &QTimer::timeout,
+            this, &X11KeyHandler::flushRecordedPendingReleases);
 
     // Setup XCB event monitoring
     int fd = xcb_get_file_descriptor(m_connection);
@@ -233,6 +252,10 @@ bool X11KeyHandler::beginCapture(uint timeoutMs, const QString &owner)
 
     m_pendingReleases.clear();
     m_pressedBindings.clear();
+    m_xcbObservedPresses.clear();
+    m_recordPendingReleases.clear();
+    m_recordPressedBindings.clear();
+    m_recordObservedPresses.clear();
     m_capture.keystroke.clear();
     m_capture.owner = owner;
     m_capture.active = true;
@@ -403,6 +426,11 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
     if (!grabbed.isEmpty()) {
         m_shortcutKeys.insert(config.getId(), grabbed);
         m_shortcutFlags.insert(config.getId(), config.keyEventFlags);
+        if (X11ShortcutPolicy::isLegacyGrabResilientShortcut(config.getId())
+                && m_modifierMonitor
+                && m_modifierMonitor->supportsGrabResilientEvents()) {
+            m_recordShortcutIds.insert(config.getId());
+        }
     }
 
     return allSuccess;
@@ -423,6 +451,7 @@ bool X11KeyHandler::unregisterKey(const QString &shortcutId)
 
     QList<uint32_t> keys = m_shortcutKeys.take(shortcutId);
     m_shortcutFlags.remove(shortcutId);
+    m_recordShortcutIds.remove(shortcutId);
 
     for (uint32_t key : keys) {
         const xcb_keycode_t keycode = key & 0xFFFF;
@@ -430,8 +459,11 @@ bool X11KeyHandler::unregisterKey(const QString &shortcutId)
         if (!m_standaloneModifierKeys.remove(key))
             ungrabKey(keycode, mods);
         m_grabbedKeys.remove(key);
+        m_xcbObservedPresses.remove(keycode);
+        m_recordObservedPresses.remove(keycode);
     }
     clearPressedState(shortcutId);
+    clearRecordedPressedState(shortcutId);
 
     return true;
 }
@@ -644,6 +676,8 @@ void X11KeyHandler::handleXcbEvents()
                     emit keymapAboutToChange();
                 if (mappingEvent->request == XCB_MAPPING_KEYBOARD)
                     xcb_refresh_keyboard_mapping(m_keySymbols, mappingEvent);
+                if (m_modifierMonitor)
+                    m_modifierMonitor->refreshKeyboardMapping();
                 refreshModifierMasks();
                 if (!m_capture.active)
                     scheduleKeymapChanged();
@@ -887,6 +921,17 @@ void X11KeyHandler::handleKeyPress(const xcb_key_press_event_t *event)
         return;
 
     const QString shortcutId = bindingIt.value();
+    if (m_recordShortcutIds.contains(shortcutId)) {
+        // Both streams can report the same event when no active grab exists.
+        // Whichever stream observes the press first owns the whole sequence.
+        // Do not infer ownership from isRunning(): the RECORD state may have
+        // changed after this XCB event was generated.
+        if (m_recordPressedBindings.contains(event->detail)
+                || m_recordObservedPresses.value(event->detail) == event->time) {
+            return;
+        }
+        m_xcbObservedPresses.insert(event->detail, event->time);
+    }
     m_pressedBindings.insert(event->detail, shortcutId);
     activate(shortcutId, KeyEventFlag::Press);
 }
@@ -937,6 +982,18 @@ void X11KeyHandler::clearPressedState(const QString &shortcutId)
         if (it.value() == shortcutId) {
             m_pendingReleases.remove(it.key());
             it = m_pressedBindings.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void X11KeyHandler::clearRecordedPressedState(const QString &shortcutId)
+{
+    for (auto it = m_recordPressedBindings.begin(); it != m_recordPressedBindings.end();) {
+        if (it.value() == shortcutId) {
+            m_recordPendingReleases.remove(it.key());
+            it = m_recordPressedBindings.erase(it);
         } else {
             ++it;
         }
@@ -1060,6 +1117,73 @@ void X11KeyHandler::onModifierKeyReleased(unsigned long keysym)
     }
     for (const QString &shortcutId : std::as_const(shortcutIds))
         activate(shortcutId, KeyEventFlag::Release);
+}
+
+void X11KeyHandler::onRecordedKeyEvent(bool pressed, quint8 keycode,
+                                      quint16 state, quint32 time)
+{
+    const xcb_keycode_t code = xcb_keycode_t(keycode);
+    if (pressed) {
+        // XCB may have claimed this sequence while RECORD was restarting.
+        // Keep press/repeat/release on that channel to prevent duplicates.
+        if (m_pressedBindings.contains(code)
+                || m_xcbObservedPresses.value(code) == time) {
+            return;
+        }
+
+        const auto pending = m_recordPendingReleases.constFind(code);
+        if (pending != m_recordPendingReleases.constEnd()
+                && pending.value() == time
+                && m_recordPressedBindings.contains(code)) {
+            m_recordPendingReleases.erase(pending);
+            activate(m_recordPressedBindings.value(code), KeyEventFlag::Repeat);
+            return;
+        }
+
+        flushRecordedPendingReleases();
+        if (m_recordPressedBindings.contains(code)) {
+            activate(m_recordPressedBindings.value(code), KeyEventFlag::Repeat);
+            return;
+        }
+
+        const uint16_t modifiers = getConcernedMods(state);
+        const uint32_t bindingKey = code | (uint32_t(modifiers) << 16);
+        const auto bindingIt = m_grabbedKeys.constFind(bindingKey);
+        if (bindingIt == m_grabbedKeys.constEnd()
+                || !m_recordShortcutIds.contains(bindingIt.value())) {
+            return;
+        }
+
+        const QString shortcutId = bindingIt.value();
+        m_recordObservedPresses.insert(code, time);
+        m_recordPressedBindings.insert(code, shortcutId);
+        activate(shortcutId, KeyEventFlag::Press);
+        return;
+    }
+
+    if (!m_recordPressedBindings.contains(code))
+        return;
+    if (m_recordPendingReleases.contains(code))
+        flushRecordedPendingReleases();
+    m_recordPendingReleases.insert(code, time);
+    m_recordReleaseTimer->start();
+}
+
+void X11KeyHandler::flushRecordedPendingReleases()
+{
+    if (m_recordPendingReleases.isEmpty())
+        return;
+
+    const QList<xcb_keycode_t> keycodes = m_recordPendingReleases.keys();
+    m_recordPendingReleases.clear();
+    for (xcb_keycode_t keycode : keycodes) {
+        const auto bindingIt = m_recordPressedBindings.find(keycode);
+        if (bindingIt == m_recordPressedBindings.end())
+            continue;
+        const QString shortcutId = bindingIt.value();
+        m_recordPressedBindings.erase(bindingIt);
+        activate(shortcutId, KeyEventFlag::Release);
+    }
 }
 
 // ==================== Helper Functions ====================

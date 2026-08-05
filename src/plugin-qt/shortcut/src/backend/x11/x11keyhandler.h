@@ -41,7 +41,9 @@ public:
 private slots:
     void handleXcbEvents();
     void onModifierKeyReleased(unsigned long keysym);
+    void onRecordedKeyEvent(bool pressed, quint8 keycode, quint16 state, quint32 time);
     void flushPendingReleases();
+    void flushRecordedPendingReleases();
     void notifyKeymapChanged();
 
 private:
@@ -92,6 +94,7 @@ private:
     bool hasAnyMask(uint16_t state, const QList<uint16_t> &masks) const;
     void activate(const QString &shortcutId, int eventFlag);
     void clearPressedState(const QString &shortcutId);
+    void clearRecordedPressedState(const QString &shortcutId);
     void finishCapture(bool notify = true);
     void scheduleKeymapChanged();
     
@@ -119,8 +122,17 @@ private:
     // Press, release, and autorepeat tracking.
     QMap<xcb_keycode_t, QString> m_pressedBindings;
     QMap<xcb_keycode_t, xcb_timestamp_t> m_pendingReleases;
+    QMap<xcb_keycode_t, xcb_timestamp_t> m_xcbObservedPresses;
     QTimer *m_releaseTimer = nullptr;
     bool m_detectableAutoRepeat = false;
+
+    // X RECORD is the compatibility path for shortcuts that historically
+    // remained active while another client held an active keyboard grab.
+    QSet<QString> m_recordShortcutIds;
+    QMap<xcb_keycode_t, QString> m_recordPressedBindings;
+    QMap<xcb_keycode_t, xcb_timestamp_t> m_recordPendingReleases;
+    QMap<xcb_keycode_t, xcb_timestamp_t> m_recordObservedPresses;
+    QTimer *m_recordReleaseTimer = nullptr;
 
     // Interactive shortcut capture session.
     struct CaptureState {
