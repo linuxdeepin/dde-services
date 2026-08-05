@@ -95,87 +95,87 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>辅助工具</translation>
     </message>
     <message>
         <source>Minimize Window</source>
-        <translation type="unfinished"/>
+        <translation>最小化窗口</translation>
     </message>
     <message>
         <source>Move Window</source>
-        <translation type="unfinished"/>
+        <translation>移动窗口</translation>
     </message>
     <message>
         <source>Move to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>移动到左边工作区</translation>
     </message>
     <message>
         <source>Move to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>移动到右边工作区</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>无</translation>
     </message>
     <message>
         <source>Resize Window</source>
-        <translation type="unfinished"/>
+        <translation>改变窗口大小</translation>
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation type="unfinished"/>
+        <translation>录屏</translation>
     </message>
     <message>
         <source>Scrollshot</source>
-        <translation type="unfinished"/>
+        <translation>滚动截图</translation>
     </message>
     <message>
         <source>Switch Window Effects</source>
-        <translation type="unfinished"/>
+        <translation>切换窗口效果</translation>
     </message>
     <message>
         <source>Switch Windows</source>
-        <translation type="unfinished"/>
+        <translation>切换窗口</translation>
     </message>
     <message>
         <source>Switch Windows Reversely</source>
-        <translation type="unfinished"/>
+        <translation>反向切换窗口</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
-        <translation type="unfinished"/>
+        <translation>切换同类型窗口</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type Reversely</source>
-        <translation type="unfinished"/>
+        <translation>反向切换同类型窗口</translation>
     </message>
     <message>
         <source>Switch to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>切换到左边工作区</translation>
     </message>
     <message>
         <source>Switch to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>切换到右边工作区</translation>
     </message>
     <message>
         <source>Window Quick Tile Left</source>
-        <translation type="unfinished"/>
+        <translation>窗口快速铺至左侧</translation>
     </message>
     <message>
         <source>Window Quick Tile Right</source>
-        <translation type="unfinished"/>
+        <translation>窗口快速铺至右侧</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"/>
+        <translation>屏幕放大</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"/>
+        <translation>屏幕缩小</translation>
     </message>
     <message>
         <source>Zoom to Actual Size</source>
-        <translation type="unfinished"/>
+        <translation>重置屏幕缩放</translation>
     </message>
 </context>
 </TS>
