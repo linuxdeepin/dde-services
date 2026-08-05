@@ -38,30 +38,6 @@
         <translation>Maximizar janela</translation>
     </message>
     <message>
-        <source>Next Window</source>
-        <translation>Próxima janela</translation>
-    </message>
-    <message>
-        <source>Next Window of Same App</source>
-        <translation>Próxima janela do mesmo aplicativo</translation>
-    </message>
-    <message>
-        <source>Next Workspace</source>
-        <translation>Próxima área de trabalho</translation>
-    </message>
-    <message>
-        <source>Previous Window</source>
-        <translation>Janela anterior</translation>
-    </message>
-    <message>
-        <source>Previous Window of Same App</source>
-        <translation>Janela anterior do mesmo aplicativo</translation>
-    </message>
-    <message>
-        <source>Previous Workspace</source>
-        <translation>Área de trabalho anterior</translation>
-    </message>
-    <message>
         <source>Show Desktop</source>
         <translation>Exibir área de trabalho</translation>
     </message>
@@ -119,7 +95,87 @@
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation>Ferramentas assistivas</translation>
+        <translation>Ferramentas de acessibilidade</translation>
+    </message>
+    <message>
+        <source>Minimize Window</source>
+        <translation>Minimizar janela</translation>
+    </message>
+    <message>
+        <source>Move Window</source>
+        <translation>Mover janela</translation>
+    </message>
+    <message>
+        <source>Move to Left Workspace</source>
+        <translation>Mover para o espaço de trabalho à esquerda</translation>
+    </message>
+    <message>
+        <source>Move to Right Workspace</source>
+        <translation>Mover para o espaço de trabalho à direita</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Nenhum</translation>
+    </message>
+    <message>
+        <source>Resize Window</source>
+        <translation>Redimensionar janela</translation>
+    </message>
+    <message>
+        <source>Screen Recorder</source>
+        <translation>Gravador de tela</translation>
+    </message>
+    <message>
+        <source>Scrollshot</source>
+        <translation>Captura de tela por rolagem</translation>
+    </message>
+    <message>
+        <source>Switch Window Effects</source>
+        <translation>Alternar efeitos visuais</translation>
+    </message>
+    <message>
+        <source>Switch Windows</source>
+        <translation>Alternar janelas</translation>
+    </message>
+    <message>
+        <source>Switch Windows Reversely</source>
+        <translation>Alternar janelas na ordem inversa</translation>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type</source>
+        <translation>Alternar janelas do mesmo tipo</translation>
+    </message>
+    <message>
+        <source>Switch Windows of the Same Type Reversely</source>
+        <translation>Alternar janelas do mesmo tipo na ordem inversa</translation>
+    </message>
+    <message>
+        <source>Switch to Left Workspace</source>
+        <translation>Alternar para o espaço de trabalho à esquerda</translation>
+    </message>
+    <message>
+        <source>Switch to Right Workspace</source>
+        <translation>Alternar para o espaço de trabalho à direita</translation>
+    </message>
+    <message>
+        <source>Window Quick Tile Left</source>
+        <translation>Ajustar rapidamente a janela à esquerda</translation>
+    </message>
+    <message>
+        <source>Window Quick Tile Right</source>
+        <translation>Ajustar rapidamente a janela à direita</translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation>Ampliar</translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation>Reduzir</translation>
+    </message>
+    <message>
+        <source>Zoom to Actual Size</source>
+        <translation>Exibir no tamanho real</translation>
     </message>
 </context>
 </TS>
