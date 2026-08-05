@@ -135,27 +135,27 @@
     </message>
     <message>
         <source>Switch Windows</source>
-        <translation>Commuta finestres</translation>
+        <translation>Canvia finestres</translation>
     </message>
     <message>
         <source>Switch Windows Reversely</source>
-        <translation>Commuta finestres a la inversa</translation>
+        <translation>Canvia finestres a la inversa</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type</source>
-        <translation type="unfinished"/>
+        <translation>Canvia entre finestres del mateix tipus</translation>
     </message>
     <message>
         <source>Switch Windows of the Same Type Reversely</source>
-        <translation type="unfinished"/>
+        <translation>Canvia finestres del mateix tipus en ordre invers</translation>
     </message>
     <message>
         <source>Switch to Left Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball esquerre</translation>
     </message>
     <message>
         <source>Switch to Right Workspace</source>
-        <translation type="unfinished"/>
+        <translation>Canvia a l&apos;espai de treball de la dreta</translation>
     </message>
     <message>
         <source>Window Quick Tile Left</source>
