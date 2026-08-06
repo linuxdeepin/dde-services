@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation>鎖定螢幕</translation>
+        <translation>鎖屏介面</translation>
     </message>
     <message>
         <source>Notification Center</source>
@@ -19,7 +19,7 @@
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation>雷神終端機</translation>
+        <translation>終端雷神模式</translation>
     </message>
     <message>
         <source>launcher</source>
@@ -43,11 +43,11 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>開啟視窗選單</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation>切換多工檢視</translation>
+        <translation>顯示工作區</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
@@ -63,7 +63,7 @@
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation>全域搜尋</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>OCR (Image to Text)</source>
-        <translation type="unfinished"/>
+        <translation>圖文識別</translation>
     </message>
     <message>
         <source>System</source>
