@@ -1,0 +1,105 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "ambientLightAdjustBrightness": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "Ambient light auto brightness",
+            "name[zh_CN]": "环境光自动调节亮度",
+            "description": "Boolean. Enable or disable ambient light auto brightness. When enabled, the service claims the sensor, reads lux, and publishes recommended brightness. When disabled, the service releases the sensor claim and stops recommendation.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "布尔值。启用或禁用环境光自动亮度。启用时，服务声明传感器、读取 lux 并发布推荐亮度。禁用时，服务释放传感器声明并停止推荐。"
+        },
+        "continuousMappingMode": {
+            "value": "steps",
+            "serial": 0,
+            "flags": [],
+            "name": "Mapping mode",
+            "name[zh_CN]": "映射模式",
+            "description": "Mapping mode enum. steps: lux falls into a step band and outputs the fixed brightness of that band (default). curve: interpolate continuously between control points in log1p(lux) space.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "映射模式。steps：lux 落入某个档位区间时输出该区间固定亮度（默认）。curve：在 log1p(lux) 空间对控制点做连续插值。"
+        },
+        "useWeightedWindows": {
+            "value": false,
+            "serial": 0,
+            "flags": [],
+            "name": "Use weighted windows",
+            "name[zh_CN]": "启用双窗口加权",
+            "description": "Boolean. true: smooth sensor data with fast/slow time-weighted windows. false: use the latest raw lux and rely on debounce plus hysteresis; recommended for low-frequency sensors such as an 800 ms reporting interval.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "布尔值。true：使用 fast/slow 时间加权窗口平滑传感器数据，此时 ambientLightHorizonMs 和 fastLightHorizonMs 生效。false：直接使用最新 rawLux，依靠 debounce 和滞回防抖，适合约 800ms 上报一次的低频传感器。"
+        },
+        "ambientLightHorizonMs": {
+            "value": 10000,
+            "serial": 0,
+            "flags": [],
+            "name": "Slow window horizon",
+            "name[zh_CN]": "慢窗口时长",
+            "description": "Slow weighted-window duration in milliseconds. Effective only when useWeightedWindows=true. Valid range: (0, 10000], and the value must be greater than or equal to fastLightHorizonMs. A larger value is steadier but responds more slowly.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "慢加权窗口时长，单位毫秒。仅 useWeightedWindows=true 时生效。有效范围：(0, 10000]，且必须大于或等于 fastLightHorizonMs。值越大越稳定，但响应越慢。"
+        },
+        "fastLightHorizonMs": {
+            "value": 1000,
+            "serial": 0,
+            "flags": [],
+            "name": "Fast window horizon",
+            "name[zh_CN]": "快窗口时长",
+            "description": "Fast weighted-window duration in milliseconds. Effective only when useWeightedWindows=true. Valid range: (0, ambientLightHorizonMs]. A smaller value responds faster but provides less smoothing.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "快加权窗口时长，单位毫秒。仅 useWeightedWindows=true 时生效。有效范围：(0, ambientLightHorizonMs]。值越小响应越快，但平滑能力越弱。"
+        },
+        "continuousLuxCurve": {
+            "value": [{"lux":20,"brightness":0.2},{"lux":120,"brightness":0.4},{"lux":220,"brightness":0.6},{"lux":320,"brightness":0.8},{"lux":650,"brightness":0.9},{"lux":2000,"brightness":1.0}],
+            "serial": 0,
+            "flags": [],
+            "name": "Lux-brightness curve",
+            "name[zh_CN]": "lux-亮度曲线",
+            "description": "JSON array of {lux, brightness} control points. At least two points are required; lux must be finite, non-negative, and strictly increasing; brightness must be within [0,1] and non-decreasing. In steps mode, adjacent lux midpoints define initial neutral boundaries and each point supplies a fixed brightness; directional thresholds then apply stepHysteresisRatio. In curve mode, interpolation is linear in log1p(lux) space. Invalid data falls back to the built-in default.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "由 {lux, brightness} 控制点组成的 JSON 数组。至少需要两个点；lux 必须是有限、非负且严格递增的数值；brightness 必须位于 [0,1] 且单调不降。steps 模式下相邻 lux 的中点作为初始中性边界，每个控制点提供固定亮度，运行时再应用 stepHysteresisRatio 双向阈值。curve 模式下在 log1p(lux) 空间线性插值。配置无效时回退到内置默认值。"
+        },
+        "stepHysteresisRatio": {
+            "value": 0.6,
+            "serial": 0,
+            "flags": [],
+            "name": "Step hysteresis ratio",
+            "name[zh_CN]": "档位滞回比例",
+            "description": "Effective only in steps mode. Valid range: [0.5, 1.0]. For adjacent lux points a<b, the brighten threshold is a+ratio*(b-a) and the darken threshold is b-ratio*(b-a). 0.5 gives no hysteresis band; larger values widen the band.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "仅 steps 模式下生效。有效范围：[0.5, 1.0]。对于相邻 lux 点 a<b，变亮阈值为 a+ratio*(b-a)，变暗阈值为 b-ratio*(b-a)。0.5 不产生滞回带；值越大滞回带越宽。"
+        },
+        "brightenDebounceMs": {
+            "value": 2000,
+            "serial": 0,
+            "flags": [],
+            "name": "Brightening debounce",
+            "name[zh_CN]": "变亮防抖时间",
+            "description": "Milliseconds that lux must remain continuously above the brightening threshold before publishing a brighter recommendation. Valid range: >= 0. Larger values reject short flashes but respond more slowly.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "变亮防抖时间，单位毫秒。lux 必须连续高于变亮阈值达到该时长，才发布更亮的推荐值。有效范围：>= 0。值越大越能过滤短暂闪光，但响应越慢。"
+        },
+        "darkenDebounceMs": {
+            "value": 2000,
+            "serial": 0,
+            "flags": [],
+            "name": "Darkening debounce",
+            "name[zh_CN]": "变暗防抖时间",
+            "description": "Milliseconds that lux must remain continuously below the darkening threshold before publishing a darker recommendation. Valid range: >= 0. Larger values reject brief sensor occlusion but respond more slowly.",
+            "permissions": "readwrite",
+            "visibility": "public",
+            "description[zh_CN]": "变暗防抖时间，单位毫秒。lux 必须连续低于变暗阈值达到该时长，才发布更暗的推荐值。有效范围：>= 0。值越大越能过滤短暂遮挡，但响应越慢。"
+        }
+    }
+}
