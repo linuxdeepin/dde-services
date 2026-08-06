@@ -2,7 +2,7 @@
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
-        <source>Display switch</source>
+        <source>Toggle multiple displays</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -178,7 +178,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show window menu</source>
+        <source>Open window menu</source>
         <translation type="unfinished"/>
     </message>
     <message>
