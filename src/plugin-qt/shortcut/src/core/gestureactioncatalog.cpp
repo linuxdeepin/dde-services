@@ -134,7 +134,7 @@ const QList<GestureActionMetadata> &GestureActionCatalog::metadata()
         {GestureActionId::RestoreWindow, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Restore window")},
         {GestureActionId::MoveWindow, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Move window")},
         {GestureActionId::CloseWindow, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Close window")},
-        {GestureActionId::ShowWindowMenu, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Show window menu")},
+        {GestureActionId::ShowWindowMenu, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Open window menu")},
         {GestureActionId::ShowMultitask, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Show multitasking view")},
         {GestureActionId::HideMultitask, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Hide multitasking view")},
         {GestureActionId::ToggleMultitask, QT_TRANSLATE_NOOP("org.deepin.dde.keybinding", "Toggle multitasking view")},

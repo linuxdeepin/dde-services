@@ -44,7 +44,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
+        <source>Open window menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -64,7 +64,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Global Search</source>
+        <source>Grand search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -80,7 +80,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
+        <source>OCR (Image to Text)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
