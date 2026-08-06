@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Abrir menu da janela</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>OCR (Image to Text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (imagem para texto)</translation>
     </message>
     <message>
         <source>System</source>
