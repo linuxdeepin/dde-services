@@ -42,8 +42,8 @@
         <translation>Näytä työpöytä</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>Näytä ikkunan valikot</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>Kokonäytön kaappaus</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>Haku</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>Ikkunan kaappaus</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>OCR-tekstintunnistus</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
