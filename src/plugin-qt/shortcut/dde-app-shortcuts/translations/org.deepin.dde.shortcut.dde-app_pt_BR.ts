@@ -42,8 +42,8 @@
         <translation>Exibir área de trabalho</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>Exibir menu da janela</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>Capturar tela inteira</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>Pesquisa global</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>Capturar janela</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>Capturar texto por OCR</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
