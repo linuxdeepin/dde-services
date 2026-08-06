@@ -1,3 +1,18 @@
+dde-services (1.0.38) unstable; urgency=medium
+
+  * fix: restore grab-resilient X11 shortcuts
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#119)
+  * fix: restore reverse same-application window switching
+  * test: isolate X11 input-injection tests
+  * fix: update shortcut display labels
+  * fix: sync shortcut translation catalogs
+  * fix: monitor X11 lock state changes through XKB
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#134)
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 06 Aug 2026 15:52:56 +0800
+
 dde-services (1.0.37) unstable; urgency=medium
 
   * i18n: [Transifex] Updates for project Deepin Desktop Environment
