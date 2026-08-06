@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_TW">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_TW">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -9,7 +7,7 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation>鎖定螢幕</translation>
+        <translation>鎖屏介面</translation>
     </message>
     <message>
         <source>Notification Center</source>
@@ -21,7 +19,7 @@
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation>雷神終端機</translation>
+        <translation>終端雷神模式</translation>
     </message>
     <message>
         <source>launcher</source>
@@ -44,12 +42,12 @@
         <translation>顯示桌面</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation type="vanished">顯示視窗選單</translation>
+        <source>Open window menu</source>
+        <translation>開啟視窗選單</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation>切換多工檢視</translation>
+        <translation>顯示工作區</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
@@ -64,8 +62,8 @@
         <translation>全螢幕截圖</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation type="vanished">全域搜尋</translation>
+        <source>Grand search</source>
+        <translation>全域搜尋</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -80,8 +78,8 @@
         <translation>視窗截圖</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation type="vanished">OCR 截圖</translation>
+        <source>OCR (Image to Text)</source>
+        <translation>圖文識別</translation>
     </message>
     <message>
         <source>System</source>
@@ -178,18 +176,6 @@
     <message>
         <source>Zoom to Actual Size</source>
         <translation>重設螢幕縮放</translation>
-    </message>
-    <message>
-        <source>Grand search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OCR (Image to Text)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open window menu</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
