@@ -54,6 +54,7 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeystate.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeymonitor.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11shortcutpolicy.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/x11wmaccelconverter.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/systemgestureproxy.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11gestureactionexecutor.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11gesturehandler.cpp
