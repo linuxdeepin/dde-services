@@ -2,8 +2,8 @@
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
-        <source>Display switch</source>
-        <translation>切换多屏模式</translation>
+        <source>Toggle multiple displays</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Default terminal</source>
@@ -178,8 +178,8 @@
         <translation>关闭窗口</translation>
     </message>
     <message>
-        <source>Show window menu</source>
-        <translation>打开窗口菜单</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle multitasking view</source>
