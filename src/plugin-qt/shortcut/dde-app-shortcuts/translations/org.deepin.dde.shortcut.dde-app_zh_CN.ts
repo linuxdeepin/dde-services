@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -44,8 +42,8 @@
         <translation>显示桌面</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>显示窗口菜单</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -64,8 +62,8 @@
         <translation>全屏截图</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>全局搜索</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -80,8 +78,8 @@
         <translation>窗口截图</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>OCR截图</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
