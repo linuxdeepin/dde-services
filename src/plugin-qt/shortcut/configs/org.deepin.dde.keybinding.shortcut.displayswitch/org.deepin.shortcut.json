@@ -13,12 +13,12 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Display switch",
-            "serial": 0,
+            "value": "Toggle multiple displays",
+            "serial": 1,
             "flags": [],
             "name": "displayName",
-            "name[zh_CN]": "切换显示模式",
-            "description": "切换显示模式快捷键",
+            "name[zh_CN]": "切换多屏模式",
+            "description": "切换多屏模式快捷键",
             "permissions": "",
             "visibility": "private"
         },
@@ -40,7 +40,7 @@
             "flags": [],
             "name": "hotkeys",
             "name[zh_CN]": "快捷键组合",
-            "description": "切换显示模式快捷键组合",
+            "description": "切换多屏模式快捷键组合",
             "permissions": "readwrite",
             "visibility": "private"
         },
@@ -64,7 +64,7 @@
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
-            "description": "切换显示模式快捷键触发动作",
+            "description": "切换多屏模式快捷键触发动作",
             "permissions": "",
             "visibility": "private"
         },
