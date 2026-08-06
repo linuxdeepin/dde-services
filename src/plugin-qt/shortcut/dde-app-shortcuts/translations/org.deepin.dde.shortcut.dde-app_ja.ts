@@ -42,8 +42,8 @@
         <translation>デスクトップを表示</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>ウィンドウメニューの表示</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>画面全体のスクリーンショット</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>Global Search</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>ウィンドウのスクリーンショット</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>OCRスクリーンショット</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
