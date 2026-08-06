@@ -2,8 +2,8 @@
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
-        <source>Display switch</source>
-        <translation>Ndërrim ekrani</translation>
+        <source>Toggle multiple displays</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Default terminal</source>
@@ -178,7 +178,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show window menu</source>
+        <source>Open window menu</source>
         <translation type="unfinished"/>
     </message>
     <message>
