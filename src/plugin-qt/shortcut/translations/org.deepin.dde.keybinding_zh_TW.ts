@@ -3,7 +3,7 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Toggle multiple displays</source>
-        <translation type="unfinished"/>
+        <translation>切換多螢幕模式</translation>
     </message>
     <message>
         <source>Default terminal</source>
@@ -179,11 +179,11 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>開啟視窗選單</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
-        <translation>切換多工檢視</translation>
+        <translation>顯示工作區</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
@@ -191,7 +191,7 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation>鎖定螢幕</translation>
+        <translation>鎖屏介面</translation>
     </message>
     <message>
         <source>Show shutdown menu</source>
