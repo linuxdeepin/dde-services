@@ -34,9 +34,9 @@
         },
         "hotkeys": {
             "value": [
-                "Alt+Shift+~"
+                "Alt+Shift+`"
             ],
-            "serial": 1,
+            "serial": 2,
             "flags": [],
             "name": "hotkeys",
             "name[zh_CN]": "快捷键组合",

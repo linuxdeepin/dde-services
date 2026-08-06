@@ -122,6 +122,24 @@ target_link_libraries(tst-x11shortcutpolicy PRIVATE
 
 add_test(NAME shortcut-x11shortcutpolicy COMMAND tst-x11shortcutpolicy)
 
+add_executable(tst-x11wmaccelconverter
+    tst_x11wmaccelconverter.cpp
+    ../src/backend/x11/x11wmaccelconverter.cpp
+    ../src/core/qkeysequenceconverter.cpp
+)
+
+target_include_directories(tst-x11wmaccelconverter PRIVATE
+    ../src
+)
+
+target_link_libraries(tst-x11wmaccelconverter PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Test
+)
+
+add_test(NAME shortcut-x11wmaccelconverter COMMAND tst-x11wmaccelconverter)
+
 add_executable(tst-x11recordmonitor
     tst_x11recordmonitor.cpp
     ../shortcutlogging.cpp

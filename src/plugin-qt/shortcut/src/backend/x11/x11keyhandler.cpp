@@ -7,6 +7,7 @@
 #include "x11keyhandler.h"
 #include "modifierkeymonitor.h"
 #include "x11shortcutpolicy.h"
+#include "x11wmaccelconverter.h"
 #include "core/triggeractioncatalog.h"
 #include "core/qkeysequenceconverter.h"
 #include "core/physicalkeyalias.h"
@@ -472,7 +473,7 @@ bool X11KeyHandler::setWmShortcut(const QString &wmShortcutId, const QStringList
 {
     QJsonArray accels;
     for (const QString &hotkey : hotkeys)
-        accels.append(QKeySequenceConverter::qKeySequenceToXkb(hotkey));
+        accels.append(X11WmAccelConverter::toDaemonAccel(wmShortcutId, hotkey));
 
     const QString data = QString::fromUtf8(QJsonDocument(QJsonObject{
         {QStringLiteral("Id"), wmShortcutId},
