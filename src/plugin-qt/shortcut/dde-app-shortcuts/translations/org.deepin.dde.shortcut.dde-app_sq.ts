@@ -42,8 +42,8 @@
         <translation>Shfaqe Desktopin</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>Shfaq Menu Dritaresh</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>Foto Ekrani Sa Krejt Ekrani</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>Kërkim Global</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>Foto Ekrani Dritareje</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>Foto Ekrani OCR</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
