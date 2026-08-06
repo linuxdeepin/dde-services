@@ -3,7 +3,7 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Toggle multiple displays</source>
-        <translation type="unfinished"/>
+        <translation>Alternar entre vários monitores</translation>
     </message>
     <message>
         <source>Default terminal</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Abrir menu da janela</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
