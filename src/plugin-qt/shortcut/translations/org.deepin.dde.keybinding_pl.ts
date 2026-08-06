@@ -1,8 +1,10 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pl">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl">
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
-        <source>Display switch</source>
+        <source>Toggle multiple displays</source>
         <translation>Przełącz ekran</translation>
     </message>
     <message>
@@ -178,7 +180,7 @@
         <translation>Zamknij okno</translation>
     </message>
     <message>
-        <source>Show window menu</source>
+        <source>Open window menu</source>
         <translation>Pokaż menu okna</translation>
     </message>
     <message>

@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pt">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -42,7 +44,7 @@
         <translation>Mostrar Ambiente de Trabalho</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
+        <source>Open window menu</source>
         <translation>Mostrar Menu da Janela</translation>
     </message>
     <message>
@@ -62,7 +64,7 @@
         <translation>Captura de Ecrã Completo</translation>
     </message>
     <message>
-        <source>Global Search</source>
+        <source>Grand search</source>
         <translation>Pesquisa Global</translation>
     </message>
     <message>
@@ -78,7 +80,7 @@
         <translation>Captura de imagem da Janela</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
+        <source>OCR (Image to Text)</source>
         <translation>Captura de imagem OCR</translation>
     </message>
     <message>

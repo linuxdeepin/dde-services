@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Show Window Menu</source>
-        <translation>显示窗口菜单</translation>
+        <translation type="vanished">显示窗口菜单</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
         <source>Global Search</source>
-        <translation>全局搜索</translation>
+        <translation type="vanished">全局搜索</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>OCR Screenshot</source>
-        <translation>OCR截图</translation>
+        <translation type="vanished">OCR截图</translation>
     </message>
     <message>
         <source>System</source>
@@ -178,6 +178,18 @@
     <message>
         <source>Zoom to Actual Size</source>
         <translation>重置屏幕缩放</translation>
+    </message>
+    <message>
+        <source>Grand search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open window menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

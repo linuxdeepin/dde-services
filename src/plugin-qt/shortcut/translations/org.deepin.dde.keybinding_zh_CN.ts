@@ -1,9 +1,11 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Display switch</source>
-        <translation>切换多屏模式</translation>
+        <translation type="vanished">切换多屏模式</translation>
     </message>
     <message>
         <source>Default terminal</source>
@@ -179,7 +181,7 @@
     </message>
     <message>
         <source>Show window menu</source>
-        <translation>打开窗口菜单</translation>
+        <translation type="vanished">打开窗口菜单</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
@@ -220,6 +222,14 @@
     <message>
         <source>Select previous window of current application</source>
         <translation>选择当前应用的上一个窗口</translation>
+    </message>
+    <message>
+        <source>Toggle multiple displays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open window menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
