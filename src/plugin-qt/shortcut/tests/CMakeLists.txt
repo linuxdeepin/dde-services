@@ -167,8 +167,6 @@ target_link_libraries(tst-x11recordmonitor PRIVATE
     ${XTST_LIBRARIES}
 )
 
-add_test(NAME shortcut-x11recordmonitor COMMAND tst-x11recordmonitor)
-
 add_executable(tst-x11grabresilientshortcuts
     tst_x11grabresilientshortcuts.cpp
 )
@@ -187,12 +185,22 @@ target_link_libraries(tst-x11grabresilientshortcuts PRIVATE
     ${XTST_LIBRARIES}
 )
 
-add_test(NAME shortcut-x11grabresilientshortcuts COMMAND tst-x11grabresilientshortcuts)
-
-# Both integration tests take an active X11 keyboard grab. Keep them mutually
-# exclusive when dh_auto_test runs CTest in parallel.
-set_tests_properties(
-    shortcut-x11recordmonitor
-    shortcut-x11grabresilientshortcuts
-    PROPERTIES RESOURCE_LOCK x11_keyboard_grab
-)
+# XTestFakeKeyEvent injects into the whole X server. Never run these tests on
+# the developer's active display, where desktop shortcuts would also fire.
+find_program(XVFB_RUN_EXECUTABLE NAMES xvfb-run)
+if (XVFB_RUN_EXECUTABLE)
+    add_test(
+        NAME shortcut-x11recordmonitor
+        COMMAND ${XVFB_RUN_EXECUTABLE} -a
+                -s "-screen 0 1280x1024x24 +extension RECORD"
+                $<TARGET_FILE:tst-x11recordmonitor>
+    )
+    add_test(
+        NAME shortcut-x11grabresilientshortcuts
+        COMMAND ${XVFB_RUN_EXECUTABLE} -a
+                -s "-screen 0 1280x1024x24 +extension RECORD"
+                $<TARGET_FILE:tst-x11grabresilientshortcuts>
+    )
+else()
+    message(WARNING "xvfb-run was not found; unsafe X11 input-injection tests are disabled")
+endif()
