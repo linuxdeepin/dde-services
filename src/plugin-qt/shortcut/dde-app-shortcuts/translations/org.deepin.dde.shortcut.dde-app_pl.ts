@@ -42,8 +42,8 @@
         <translation>Pokaż pulpit</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>Pokaż menu okna</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>Zrzut pełnego ekranu</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>Wyszukiwanie globalne</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>Zrzut okna</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>Zrzut OCR (Tekst z obrazu)</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
