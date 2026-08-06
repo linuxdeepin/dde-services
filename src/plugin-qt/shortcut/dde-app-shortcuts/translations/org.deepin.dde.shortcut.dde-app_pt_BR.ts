@@ -63,7 +63,7 @@
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation>Pesquisa global</translation>
     </message>
     <message>
         <source>Screenshot</source>
