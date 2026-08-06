@@ -42,8 +42,8 @@
         <translation>顯示桌面</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>顯示視窗選單</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>全屏截圖</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>全域搜尋</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>視窗截圖</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>OCR 截圖</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
