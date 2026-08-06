@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -9,7 +7,7 @@
     </message>
     <message>
         <source>Lock screen</source>
-        <translation>锁屏</translation>
+        <translation>锁屏界面</translation>
     </message>
     <message>
         <source>Notification Center</source>
@@ -21,7 +19,7 @@
     </message>
     <message>
         <source>Terminal Quake Window</source>
-        <translation>雷神终端</translation>
+        <translation>终端雷神模式</translation>
     </message>
     <message>
         <source>launcher</source>
@@ -44,12 +42,12 @@
         <translation>显示桌面</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation type="vanished">显示窗口菜单</translation>
+        <source>Open window menu</source>
+        <translation>打开窗口菜单</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
-        <translation>切换多任务视图</translation>
+        <translation>显示工作区</translation>
     </message>
     <message>
         <source>Delay Screenshot</source>
@@ -64,8 +62,8 @@
         <translation>全屏截图</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation type="vanished">全局搜索</translation>
+        <source>Grand search</source>
+        <translation>全局搜索</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -80,8 +78,8 @@
         <translation>窗口截图</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation type="vanished">OCR截图</translation>
+        <source>OCR (Image to Text)</source>
+        <translation>图文识别</translation>
     </message>
     <message>
         <source>System</source>
@@ -178,18 +176,6 @@
     <message>
         <source>Zoom to Actual Size</source>
         <translation>重置屏幕缩放</translation>
-    </message>
-    <message>
-        <source>Grand search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OCR (Image to Text)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open window menu</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
