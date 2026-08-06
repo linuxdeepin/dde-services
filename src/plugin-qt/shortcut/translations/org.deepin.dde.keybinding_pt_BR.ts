@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt_BR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt_BR">
 <context>
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Toggle multiple displays</source>
-        <translation>Alternar tela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Default terminal</source>
@@ -181,7 +179,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation>Exibir menu da janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle multitasking view</source>
