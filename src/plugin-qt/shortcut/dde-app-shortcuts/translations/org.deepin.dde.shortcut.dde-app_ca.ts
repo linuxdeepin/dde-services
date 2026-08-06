@@ -42,8 +42,8 @@
         <translation>Mostra l&apos;escriptori</translation>
     </message>
     <message>
-        <source>Show Window Menu</source>
-        <translation>Mostra el menú de la finestra</translation>
+        <source>Open window menu</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -62,8 +62,8 @@
         <translation>Captura de la pantalla completa</translation>
     </message>
     <message>
-        <source>Global Search</source>
-        <translation>Cerca global</translation>
+        <source>Grand search</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screenshot</source>
@@ -78,8 +78,8 @@
         <translation>Captura de la finestra</translation>
     </message>
     <message>
-        <source>OCR Screenshot</source>
-        <translation>Captura de reconeixement òptic de caràcters</translation>
+        <source>OCR (Image to Text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
