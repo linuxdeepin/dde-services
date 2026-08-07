@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Abrir menu da janela</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -63,7 +63,7 @@
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation>Grande pesquisa</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>OCR (Image to Text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (Imagem para Texto)</translation>
     </message>
     <message>
         <source>System</source>
