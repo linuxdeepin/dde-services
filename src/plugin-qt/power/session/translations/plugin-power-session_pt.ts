@@ -3,7 +3,7 @@
     <name>LowPowerManager</name>
     <message>
         <source>Battery critically low</source>
-        <translation>Bateria criticamente baixa</translation>
+        <translation>Bateria criticamente fraca</translation>
     </message>
     <message>
         <source>Battery low, please plug in</source>
