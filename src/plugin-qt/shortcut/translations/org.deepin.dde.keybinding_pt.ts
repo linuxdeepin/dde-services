@@ -79,47 +79,47 @@
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho anterior</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho seguinte</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar ambiente de trabalho</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Esconder ambiente de trabalho</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar/esconder grande pesquisa</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar/esconder lançador</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar/esconder área de transferência</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar/esconder centro de notificação</translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Desativar</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"/>
+        <translation>Personalizado</translation>
     </message>
     <message>
         <source>AssistiveTools</source>
-        <translation type="unfinished"/>
+        <translation>Ferramentas Assistivas</translation>
     </message>
     <message>
         <source>Text to Speech</source>
