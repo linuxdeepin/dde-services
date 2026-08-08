@@ -147,39 +147,39 @@
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho 1</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho 2</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho 3</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho 4</translation>
     </message>
     <message>
         <source>Switch to workspace 5</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho 5</translation>
     </message>
     <message>
         <source>Switch to workspace 6</source>
-        <translation type="unfinished"/>
+        <translation>Trocar para área de trabalho 6</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Mover janela</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Fechar janela</translation>
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Abrir menu da janela</translation>
     </message>
     <message>
         <source>Toggle multitasking view</source>
