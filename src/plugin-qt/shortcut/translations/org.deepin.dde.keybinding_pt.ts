@@ -215,11 +215,11 @@
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar janela seguinte da aplicação atual</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar janela anterior da aplicação atual</translation>
     </message>
 </context>
 </TS>
