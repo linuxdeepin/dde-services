@@ -199,19 +199,19 @@
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Sair</translation>
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation type="unfinished"/>
+        <translation>Entrar no alternador de tarefas</translation>
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar tarefa seguinte</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Selecionar tarefa anterior</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
