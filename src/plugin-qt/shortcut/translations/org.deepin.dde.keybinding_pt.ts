@@ -183,19 +183,19 @@
     </message>
     <message>
         <source>Toggle multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Alternar vista de multi-tarefa</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
-        <translation type="unfinished"/>
+        <translation>Alternar mostra de FPS</translation>
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"/>
+        <translation>Trancar ecrã</translation>
     </message>
     <message>
         <source>Show shutdown menu</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar menu de encerramento</translation>
     </message>
     <message>
         <source>Quit</source>
