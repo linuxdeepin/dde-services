@@ -1,0 +1,36 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "capslockToggle": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "capslockToggle",
+            "name[zh_CN]": "大写锁定切换通知",
+            "description": "Control whether to show the CapsLock OSD",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "saveNumlockState": {
+            "value": true,
+            "serial": 0,
+            "flags": [],
+            "name": "saveNumlockState",
+            "name[zh_CN]": "保存数字锁定状态",
+            "description": "Save NumLock state on X11",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "numlockState": {
+            "value": 2,
+            "serial": 0,
+            "flags": [],
+            "name": "numlockState",
+            "name[zh_CN]": "数字锁定状态",
+            "description": "NumLock state on X11. Enum values: 0=off, 1=on, 2=unknown; unknown defaults to off on laptops and on on desktops",
+            "permissions": "readwrite",
+            "visibility": "private"
+        }
+    }
+}

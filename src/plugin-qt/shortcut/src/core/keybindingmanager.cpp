@@ -16,6 +16,7 @@
 #include "qkeysequenceconverter.h"
 #include "physicalkeyalias.h"
 #include "backend/x11/x11gestureactionexecutor.h"
+#include "backend/x11/x11numlockstatecontroller.h"
 
 #include <DGuiApplicationHelper>
 
@@ -302,13 +303,13 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
 
     // Connect signals from key handler
     connect(m_keyHandler, &AbstractKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
-    connect(m_keyHandler, &AbstractKeyHandler::numLockStateChanged,
-            this, &KeybindingManager::updateNumLockState);
     connect(m_keyHandler, &AbstractKeyHandler::capsLockStateChanged,
             this, &KeybindingManager::updateCapsLockState);
-    m_lastNumLockState = GetNumLockState();
     m_lastCapsLockState = GetCapsLockState();
     if (!m_isWayland) {
+        m_numLockStateController = new X11NumLockStateController(m_keyHandler, this);
+        connect(m_numLockStateController, &X11NumLockStateController::stateChanged,
+                this, &KeybindingManager::updateNumLockState);
         connect(m_keyHandler, &AbstractKeyHandler::captureStarted,
                 this, [this] { m_specialKeyHandler->setEnabled(false); });
         connect(m_keyHandler, &AbstractKeyHandler::captureKeyEvent,
@@ -320,6 +321,7 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
         connect(m_keyHandler, &AbstractKeyHandler::keymapChanged,
                 this, &KeybindingManager::onBackendKeymapChanged);
     }
+    m_lastNumLockState = GetNumLockState();
     
     // Connect signals from special key handler
     connect(m_specialKeyHandler, &SpecialKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
@@ -1521,6 +1523,8 @@ QString KeybindingManager::localizedNoHotkeyText() const
 
 uint KeybindingManager::GetNumLockState() const
 {
+    if (m_numLockStateController)
+        return m_numLockStateController->state();
     if (m_keyHandler) {
         return m_keyHandler->getNumLockState() ? 1 : 0;
     }
@@ -1537,6 +1541,22 @@ uint KeybindingManager::GetCapsLockState() const
 
 void KeybindingManager::SetNumLockState(uint state)
 {
+    if (m_numLockStateController) {
+        const uint oldState = GetNumLockState();
+        m_numLockStateController->setState(state);
+
+        const uint newState = GetNumLockState();
+        if (oldState != newState && m_executor
+                && !m_executor->executeCommand({
+                        QStringLiteral("/usr/bin/dde-shortcut-tool"),
+                        QStringLiteral("lockkey"),
+                        QStringLiteral("numlock"),
+                })) {
+            qCWarning(logShortcut) << "KeybindingManager: failed to launch NumLock OSD tool";
+        }
+        return;
+    }
+
     if (m_keyHandler) {
         uint oldState = GetNumLockState();
         m_keyHandler->setNumLockState(state != 0);

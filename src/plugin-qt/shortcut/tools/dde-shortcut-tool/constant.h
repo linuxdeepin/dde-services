@@ -57,18 +57,14 @@ constexpr const char *DSETTINGS_KEYBINDING_MEDIAKEY = "org.deepin.dde.daemon.key
 constexpr const char *DSETTINGS_KEYBINDING_WRAP_GNOME_WM = "org.deepin.dde.daemon.keybinding.wrap.gnome.wm";
 constexpr const char *DSETTINGS_KEYBINDING_ENABLE = "org.deepin.dde.daemon.keybinding.enable";
 constexpr const char *DSETTINGS_POWER = "org.deepin.dde.daemon.power";
-constexpr const char *DSETTINGS_KEYBOARD = "org.deepin.dde.daemon.keyboard";
 
 // Config Keys
 constexpr const char *KEY_WIRELESS_CONTROL_ENABLE = "wirelessControlEnable";
 constexpr const char *KEY_NEED_XRANDR_Q_DEVICES = "needXrandrQDevices";
 constexpr const char *KEY_DEVICE_MANAGER_CONTROL_ENABLE = "deviceManagerControlEnable";
-constexpr const char *KEY_NUM_LOCK_STATE = "numlockState";
-constexpr const char *KEY_SAVE_NUM_LOCK_STATE = "saveNumlockState";
 constexpr const char *KEY_SHORTCUT_SWITCH_LAYOUT = "shortcutSwitchLayout";
 
 // OSD related keys
-constexpr const char *KEY_SHOW_CAPS_LOCK_OSD = "capslockToggle";
 constexpr const char *KEY_OSD_ADJUST_VOLUME_STATE = "osdAdjustVolumeEnabled";
 constexpr const char *KEY_OSD_ADJUST_BRIGHTNESS_STATE = "osdAdjustBrightnessEnabled";
 
