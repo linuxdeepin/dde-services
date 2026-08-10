@@ -49,6 +49,7 @@ private:
     
     // NumLock handling
     void handleNumLockOSD();
+    void saveNumLockStateForUpgradeCompatibility(int state);
     
     // Query lock state (returns -1 on failure, 0 for off, 1 for on)
     int queryCapsLockState();

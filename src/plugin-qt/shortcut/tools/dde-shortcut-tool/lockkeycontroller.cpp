@@ -24,6 +24,17 @@
 DCORE_USE_NAMESPACE
 DGUI_USE_NAMESPACE
 
+namespace {
+constexpr const char *kKeyboardConfigAppId = "org.deepin.dde.keybinding";
+constexpr const char *kKeyboardConfigName = "org.deepin.dde.keybinding.keyboard";
+constexpr const char *kLegacyKeyboardConfigAppId = "org.deepin.dde.daemon";
+constexpr const char *kLegacyKeyboardConfigName = "org.deepin.dde.daemon.keyboard";
+constexpr const char *kCapsLockToggleKey = "capslockToggle";
+constexpr const char *kSaveNumLockStateKey = "saveNumlockState";
+constexpr const char *kNumLockStateKey = "numlockState";
+constexpr uint kNumLockUnknown = 2;
+}
+
 LockKeyController::LockKeyController(QObject *parent) 
     : BaseController(parent)
     , m_keyboardConfig(nullptr)
@@ -35,9 +46,11 @@ LockKeyController::LockKeyController(QObject *parent)
     // Detect session type
     m_isWayland = isWayland();
     
-    // Initialize keyboard configuration
-    m_keyboardConfig = DConfig::create("org.deepin.dde.daemon", 
-                                        "org.deepin.dde.daemon.keyboard", 
+    // Lock-key settings are owned and installed by the shortcut service.
+    // X11NumLockStateController normally owns NumLock persistence; this tool
+    // retains a compatibility write for mixed-version live upgrades.
+    m_keyboardConfig = DConfig::create(kKeyboardConfigAppId,
+                                        kKeyboardConfigName,
                                         "", this);
     if (!m_keyboardConfig || !m_keyboardConfig->isValid()) {
         qWarning() << "Keyboard config not available";
@@ -156,25 +169,52 @@ void LockKeyController::handleNumLockOSD()
         qWarning() << "Failed to query NumLock state";
         return;
     }
-    
-    // Check if we should save the state
-    bool shouldSave = false;
-    if (m_keyboardConfig && m_keyboardConfig->isValid()) {
-        QVariant saveValue = m_keyboardConfig->value("saveNumlockState");
-        shouldSave = saveValue.toBool();
-    }
-    
+
+    saveNumLockStateForUpgradeCompatibility(state);
+
     if (state == 1) { // NumLock On
-        if (shouldSave && m_keyboardConfig) {
-            m_keyboardConfig->setValue("numlockState", 1);
-        }
         showOSD("NumLockOn");
     } else { // NumLock Off
-        if (shouldSave && m_keyboardConfig) {
-            m_keyboardConfig->setValue("numlockState", 0);
-        }
         showOSD("NumLockOff");
     }
+}
+
+void LockKeyController::saveNumLockStateForUpgradeCompatibility(int state)
+{
+    if (m_isWayland || !m_keyboardConfig || !m_keyboardConfig->isValid())
+        return;
+
+    bool ok = false;
+    const uint configuredState = m_keyboardConfig->value(kNumLockStateKey).toUInt(&ok);
+    if (ok && configuredState == kNumLockUnknown) {
+        // During a live upgrade the old plugin can remain loaded while this
+        // helper has already been replaced. Preserve the legacy save switch
+        // before the new controller gets a chance to run its full migration.
+        auto *legacyConfig = DConfig::create(kLegacyKeyboardConfigAppId,
+                                             kLegacyKeyboardConfigName,
+                                             "", this);
+        if (legacyConfig && legacyConfig->isValid()) {
+            const QVariant legacySaveState = legacyConfig->value(kSaveNumLockStateKey);
+            if (legacySaveState.isValid())
+                m_keyboardConfig->setValue(kSaveNumLockStateKey,
+                                           legacySaveState.toBool());
+
+            bool legacyStateOk = false;
+            const uint legacyState = legacyConfig->value(kNumLockStateKey)
+                                             .toUInt(&legacyStateOk);
+            if (legacyStateOk && legacyState <= 1)
+                m_keyboardConfig->setValue(kNumLockStateKey,
+                                           static_cast<int>(legacyState));
+        }
+        if (legacyConfig)
+            legacyConfig->deleteLater();
+    }
+
+    if (!m_keyboardConfig->value(kSaveNumLockStateKey).toBool())
+        return;
+
+    if (!ok || configuredState != static_cast<uint>(state))
+        m_keyboardConfig->setValue(kNumLockStateKey, state);
 }
 
 int LockKeyController::queryCapsLockState()
@@ -201,7 +241,7 @@ bool LockKeyController::shouldShowCapsLockOSD()
         return true; // Show by default
     }
     
-    QVariant showValue = m_keyboardConfig->value("capslockToggle");
+    QVariant showValue = m_keyboardConfig->value(kCapsLockToggleKey);
     return showValue.toBool();
 }
 

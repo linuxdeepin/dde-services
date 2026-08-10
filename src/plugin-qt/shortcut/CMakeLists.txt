@@ -53,6 +53,8 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/backend/x11/x11helper.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeystate.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/modifierkeymonitor.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/x11numlockstatecontroller.cpp
+    ${SHORTCUT_SRC_DIR}/backend/x11/x11numlockstatecontroller.h
     ${SHORTCUT_SRC_DIR}/backend/x11/x11shortcutpolicy.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/x11wmaccelconverter.cpp
     ${SHORTCUT_SRC_DIR}/backend/x11/systemgestureproxy.cpp
@@ -146,6 +148,12 @@ endforeach()
 dtk_add_config_meta_files(
     APPID "org.deepin.dde.keybinding"
     FILES "${CMAKE_CURRENT_SOURCE_DIR}/configs/org.deepin.shortcut.json"
+)
+
+# X11 NumLock state persistence owned by the shortcut service.
+dtk_add_config_meta_files(
+    APPID "org.deepin.dde.keybinding"
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/configs/org.deepin.dde.keybinding.keyboard.json"
 )
 
 foreach(SUBDIR_PATH ${GESTURE_CONFIG_SUBDIRS})

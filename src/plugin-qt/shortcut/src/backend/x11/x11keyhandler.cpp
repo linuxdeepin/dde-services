@@ -1126,27 +1126,24 @@ void X11KeyHandler::setCapsLockState(bool on)
 
 void X11KeyHandler::setNumLockState(bool on)
 {
-    if (!isAvailable()) return;
+    if (!isAvailable() || !m_display)
+        return;
     
-    bool currentState = getNumLockState();
-    if (currentState == on) return;
-    
-    // Get NumLock keycode
-    xcb_keycode_t *keycodes = xcb_key_symbols_get_keycode(m_keySymbols, XK_Num_Lock);
-    if (!keycodes || keycodes[0] == XCB_NO_SYMBOL) {
-        if (keycodes) free(keycodes);
-        qCWarning(logShortcut) << "Failed to get NumLock keycode";
+    if (getNumLockState() == on)
+        return;
+
+    if (!m_numLockMask) {
+        qCWarning(logShortcut) << "X11KeyHandler: NumLock modifier mask is unavailable";
         return;
     }
-    
-    xcb_keycode_t keycode = keycodes[0];
-    free(keycodes);
-    
-    // Simulate key press and release
-    const xcb_window_t rootWindow = m_rootWindows.constFirst();
-    xcb_test_fake_input(m_connection, XCB_KEY_PRESS, keycode, XCB_CURRENT_TIME, rootWindow, 0, 0, 0);
-    xcb_test_fake_input(m_connection, XCB_KEY_RELEASE, keycode, XCB_CURRENT_TIME, rootWindow, 0, 0, 0);
-    xcb_flush(m_connection);
+
+    const unsigned int lockedModifiers = on ? m_numLockMask : 0;
+    if (!XkbLockModifiers(m_display, XkbUseCoreKbd,
+                          m_numLockMask, lockedModifiers)) {
+        qCWarning(logShortcut) << "X11KeyHandler: failed to set NumLock state through XKB";
+        return;
+    }
+    XFlush(m_display);
 }
 
 // ==================== Modifier Key Handler ====================

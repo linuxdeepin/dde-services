@@ -20,6 +20,8 @@ class AbstractKeyHandler;
 class SpecialKeyHandler;
 class TranslationManager;
 class X11GestureActionExecutor;
+class X11NumLockStateController;
+
 struct ShortcutInfo {
     QString id;
     QString displayName;
@@ -186,6 +188,7 @@ private:
     uint m_lastNumLockState = 0;
     uint m_lastCapsLockState = 0;
     bool m_isWayland = false;
+    X11NumLockStateController *m_numLockStateController = nullptr;
 };
 
 Q_DECLARE_METATYPE(QList<ShortcutInfo>)
