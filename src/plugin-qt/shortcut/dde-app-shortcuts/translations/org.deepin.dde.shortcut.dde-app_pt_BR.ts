@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt_BR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt_BR">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -26,10 +24,6 @@
     <message>
         <source>launcher</source>
         <translation>Launcher</translation>
-    </message>
-    <message>
-        <source>Cancel Maximize Window</source>
-        <translation type="vanished">Cancelar maximização da janela</translation>
     </message>
     <message>
         <source>Close Window</source>
@@ -181,7 +175,7 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
