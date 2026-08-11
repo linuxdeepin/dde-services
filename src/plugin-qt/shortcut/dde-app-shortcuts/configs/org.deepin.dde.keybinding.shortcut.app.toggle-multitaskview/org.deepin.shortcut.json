@@ -23,8 +23,8 @@
             "visibility": "private"
         },
         "displayOrder": {
-            "value": 130,
-            "serial": 1,
+            "value": 0,
+            "serial": 2,
             "flags": [],
             "name": "displayOrder",
             "name[zh_CN]": "显示顺序",
@@ -77,12 +77,12 @@
             "visibility": "private"
         },
         "category": {
-            "value": "System",
-            "serial": 1,
+            "value": "Workspace",
+            "serial": 2,
             "flags": [],
             "name": "category",
-            "name[zh_CN]": "快捷键类别（System）",
-            "description": "System shortcut category",
+            "name[zh_CN]": "快捷键类别（Workspace）",
+            "description": "Workspace shortcut category",
             "permissions": "",
             "visibility": "private"
         },
