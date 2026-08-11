@@ -1,3 +1,15 @@
+dde-services (1.0.39) unstable; urgency=medium
+
+  * fix: persist NumLock state on X11
+  * fix: support legacy hardware shortcut events
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#136)
+  * fix: update default shortcut settings
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#140)
+
+ -- Kun Zhang <zhangkun2@uniontech.com>  Tue, 11 Aug 2026 20:57:12 +0800
+
 dde-services (1.0.38) unstable; urgency=medium
 
   * fix: restore grab-resilient X11 shortcuts
