@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>Workspace</source>
-        <translation>工作空间</translation>
+        <translation>工作区</translation>
     </message>
     <message>
         <source>AssistiveTools</source>
@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>恢复窗口</translation>
     </message>
 </context>
 </TS>
