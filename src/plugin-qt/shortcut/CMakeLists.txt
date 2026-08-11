@@ -37,6 +37,10 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/core/triggeractioncatalog.cpp
     ${SHORTCUT_SRC_DIR}/core/gestureactioncatalog.cpp
     ${SHORTCUT_SRC_DIR}/core/gesturemanager.cpp
+    ${SHORTCUT_SRC_DIR}/core/crosschannelactivationguard.cpp
+    ${SHORTCUT_SRC_DIR}/core/crosschannelactivationguard.h
+    ${SHORTCUT_SRC_DIR}/core/sessionactivemonitor.cpp
+    ${SHORTCUT_SRC_DIR}/core/sessionactivemonitor.h
     ${SHORTCUT_SRC_DIR}/core/sessiongestureguard.cpp
     ${SHORTCUT_SRC_DIR}/core/qkeysequenceconverter.cpp
     ${SHORTCUT_SRC_DIR}/core/physicalkeyalias.cpp

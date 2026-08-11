@@ -10,6 +10,7 @@
 #include "actionexecutor.h"
 #include "serviceactionexecutor.h"
 #include "translationmanager.h"
+#include "sessionactivemonitor.h"
 #include "config/configloader.h"
 #include "backend/x11/x11keyhandler.h"
 #include "backend/x11/x11gesturehandler.h"
@@ -32,6 +33,7 @@ ShortcutManager::ShortcutManager(QObject *parent)
     , m_executor(new ActionExecutor(this))
     , m_translationManager(new TranslationManager(this))
     , m_serviceActionExecutor(new ServiceActionExecutor(m_executor, this))
+    , m_sessionMonitor(new SessionActiveMonitor(this))
 {
     m_isWayland = DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform);
 }
@@ -53,7 +55,8 @@ bool ShortcutManager::init()
     } else {
         m_keyHandler = new X11KeyHandler(this);
         m_x11GestureActionExecutor = new X11GestureActionExecutor(this);
-        m_gestureHandler = new X11GestureHandler(m_x11GestureActionExecutor, this);
+        m_gestureHandler = new X11GestureHandler(m_x11GestureActionExecutor,
+                                                 m_sessionMonitor, this);
     }
 
     if (!m_keyHandler || !m_keyHandler->isAvailable()) {
@@ -62,7 +65,8 @@ bool ShortcutManager::init()
     }
 
     m_keybindingManager = new KeybindingManager(m_loader, m_executor, m_translationManager,
-                                                m_keyHandler, m_x11GestureActionExecutor, this);
+                                                m_keyHandler, m_sessionMonitor,
+                                                m_x11GestureActionExecutor, this);
 
     m_gestureManager = new GestureManager(m_loader, m_executor, m_translationManager, m_gestureHandler,
                                           m_x11GestureActionExecutor, m_serviceActionExecutor, this);

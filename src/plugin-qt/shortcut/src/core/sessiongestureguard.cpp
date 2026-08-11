@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "sessiongestureguard.h"
+#include "sessionactivemonitor.h"
 
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDBusMessage>
-#include <QDBusObjectPath>
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 #include <QDBusServiceWatcher>
@@ -19,17 +19,9 @@
 
 #include <xcb/xcb.h>
 
-#include <functional>
-#include <utility>
-
 namespace {
 
 constexpr auto PropertiesInterface = "org.freedesktop.DBus.Properties";
-constexpr auto SessionManagerService = "org.deepin.dde.SessionManager1";
-constexpr auto SessionManagerPath = "/org/deepin/dde/SessionManager1";
-constexpr auto SessionManagerInterface = "org.deepin.dde.SessionManager1";
-constexpr auto LoginService = "org.freedesktop.login1";
-constexpr auto LoginSessionInterface = "org.freedesktop.login1.Session";
 constexpr auto TouchpadService = "org.deepin.dde.InputDevices1";
 constexpr auto TouchpadPath = "/org/deepin/dde/InputDevice1/TouchPad";
 constexpr auto TouchpadInterface = "org.deepin.dde.InputDevice1.TouchPad";
@@ -44,46 +36,12 @@ QVariant unwrapDbusValue(const QVariant &value)
     return value;
 }
 
-class LoginSessionSignalRelay : public QObject
-{
-    Q_OBJECT
-public:
-    using Callback = std::function<void(const QString &, quint64, const QString &,
-                                        const QVariantMap &, const QStringList &)>;
-
-    LoginSessionSignalRelay(QString path, quint64 generation, Callback callback, QObject *parent)
-        : QObject(parent)
-        , m_path(std::move(path))
-        , m_generation(generation)
-        , m_callback(std::move(callback))
-    {
-    }
-
-private slots:
-    void onPropertiesChanged(const QString &interface, const QVariantMap &changed,
-                             const QStringList &invalidated)
-    {
-        m_callback(m_path, m_generation, interface, changed, invalidated);
-    }
-
-private:
-    QString m_path;
-    quint64 m_generation = 0;
-    Callback m_callback;
-};
-
-QString objectPathString(const QVariant &value)
-{
-    const QVariant unwrapped = unwrapDbusValue(value);
-    if (unwrapped.canConvert<QDBusObjectPath>())
-        return qvariant_cast<QDBusObjectPath>(unwrapped).path();
-    return unwrapped.toString();
 }
 
-}
-
-SessionGestureGuard::SessionGestureGuard(QObject *parent)
+SessionGestureGuard::SessionGestureGuard(SessionActiveMonitor *sessionMonitor,
+                                         QObject *parent)
     : QObject(parent)
+    , m_sessionMonitor(sessionMonitor)
     , m_multitaskRefreshTimer(new QTimer(this))
 {
     m_xConnection = xcb_connect(nullptr, nullptr);
@@ -93,30 +51,12 @@ SessionGestureGuard::SessionGestureGuard(QObject *parent)
             m_rootWindow = screen->root;
     }
 
-    QDBusConnection::sessionBus().connect(QLatin1String(SessionManagerService),
-                                          QLatin1String(SessionManagerPath),
-                                          QLatin1String(PropertiesInterface),
-                                          QStringLiteral("PropertiesChanged"),
-                                          this,
-                                          SLOT(onSessionManagerPropertiesChanged(QString,QVariantMap,QStringList)));
     QDBusConnection::sessionBus().connect(QLatin1String(TouchpadService),
                                           QLatin1String(TouchpadPath),
                                           QLatin1String(PropertiesInterface),
                                           QStringLiteral("PropertiesChanged"),
                                           this,
                                           SLOT(onTouchpadPropertiesChanged(QString,QVariantMap,QStringList)));
-
-    auto *sessionManagerWatcher = new QDBusServiceWatcher(
-            QLatin1String(SessionManagerService), QDBusConnection::sessionBus(),
-            QDBusServiceWatcher::WatchForRegistration
-                | QDBusServiceWatcher::WatchForUnregistration, this);
-    connect(sessionManagerWatcher, &QDBusServiceWatcher::serviceRegistered,
-            this, [this]() { refreshSessionManagerState(); });
-    connect(sessionManagerWatcher, &QDBusServiceWatcher::serviceUnregistered,
-            this, [this]() {
-        m_locked = true;
-        updateCurrentSession(QString());
-    });
 
     auto *touchpadWatcher = new QDBusServiceWatcher(
             QLatin1String(TouchpadService), QDBusConnection::sessionBus(),
@@ -127,15 +67,6 @@ SessionGestureGuard::SessionGestureGuard(QObject *parent)
     connect(touchpadWatcher, &QDBusServiceWatcher::serviceUnregistered,
             this, [this]() { m_touchpadEnabled = false; });
 
-    auto *loginWatcher = new QDBusServiceWatcher(
-            QLatin1String(LoginService), QDBusConnection::systemBus(),
-            QDBusServiceWatcher::WatchForRegistration
-                | QDBusServiceWatcher::WatchForUnregistration, this);
-    connect(loginWatcher, &QDBusServiceWatcher::serviceRegistered,
-            this, [this]() { refreshLoginSessionState(); });
-    connect(loginWatcher, &QDBusServiceWatcher::serviceUnregistered,
-            this, [this]() { m_sessionActive = false; });
-
     auto *wmWatcher = new QDBusServiceWatcher(
             QLatin1String(WmService), QDBusConnection::sessionBus(),
             QDBusServiceWatcher::WatchForRegistration
@@ -145,7 +76,6 @@ SessionGestureGuard::SessionGestureGuard(QObject *parent)
     connect(wmWatcher, &QDBusServiceWatcher::serviceUnregistered,
             this, [this]() { setWmOwner(QString()); });
 
-    refreshSessionManagerState();
     refreshTouchpadState();
     refreshWmOwner();
 
@@ -177,28 +107,13 @@ bool SessionGestureGuard::canHandleTouchpadGesture(const QString &gestureName) c
 
 bool SessionGestureGuard::canHandleTouchpadEvent() const
 {
-    return !m_locked && m_sessionActive && m_touchpadEnabled;
+    return m_sessionMonitor && !m_sessionMonitor->isLocked()
+            && m_sessionMonitor->isActive() && m_touchpadEnabled;
 }
 
 bool SessionGestureGuard::canBeginWindowMove() const
 {
     return canHandleTouchpadEvent() && !isKeyboardGrabbed();
-}
-
-void SessionGestureGuard::refreshSessionManagerState()
-{
-    QDBusInterface sessionManager(QLatin1String(SessionManagerService),
-                                  QLatin1String(SessionManagerPath),
-                                  QLatin1String(SessionManagerInterface),
-                                  QDBusConnection::sessionBus());
-    if (!sessionManager.isValid()) {
-        m_locked = true;
-        updateCurrentSession(QString());
-        return;
-    }
-
-    m_locked = sessionManager.property("Locked").toBool();
-    updateCurrentSession(objectPathString(sessionManager.property("CurrentSessionPath")));
 }
 
 void SessionGestureGuard::refreshTouchpadState()
@@ -208,93 +123,6 @@ void SessionGestureGuard::refreshTouchpadState()
                             QLatin1String(TouchpadInterface),
                             QDBusConnection::sessionBus());
     m_touchpadEnabled = touchpad.isValid() && touchpad.property("TPadEnable").toBool();
-}
-
-void SessionGestureGuard::updateCurrentSession(const QString &path)
-{
-    if (path == m_currentSessionPath && !path.isEmpty()) {
-        refreshLoginSessionState();
-        return;
-    }
-
-    if (!m_currentSessionPath.isEmpty() && m_loginSessionSignalRelay) {
-        QDBusConnection::systemBus().disconnect(QLatin1String(LoginService),
-                                                m_currentSessionPath,
-                                                QLatin1String(PropertiesInterface),
-                                                QStringLiteral("PropertiesChanged"),
-                                                m_loginSessionSignalRelay,
-                                                SLOT(onPropertiesChanged(QString,QVariantMap,QStringList)));
-    }
-    delete m_loginSessionSignalRelay;
-    m_loginSessionSignalRelay = nullptr;
-
-    m_currentSessionPath = path;
-    ++m_sessionGeneration;
-    m_sessionActive = false;
-    if (path.isEmpty())
-        return;
-
-    const quint64 generation = m_sessionGeneration;
-    m_loginSessionSignalRelay = new LoginSessionSignalRelay(
-            path, generation,
-            [this](const QString &signalPath, quint64 signalGeneration,
-                   const QString &interface, const QVariantMap &changed,
-                   const QStringList &invalidated) {
-        handleLoginSessionPropertiesChanged(signalPath, signalGeneration,
-                                            interface, changed, invalidated);
-    }, this);
-    QDBusConnection::systemBus().connect(QLatin1String(LoginService),
-                                         path,
-                                         QLatin1String(PropertiesInterface),
-                                         QStringLiteral("PropertiesChanged"),
-                                         m_loginSessionSignalRelay,
-                                         SLOT(onPropertiesChanged(QString,QVariantMap,QStringList)));
-    refreshLoginSessionState();
-}
-
-void SessionGestureGuard::refreshLoginSessionState()
-{
-    if (m_currentSessionPath.isEmpty()) {
-        m_sessionActive = false;
-        return;
-    }
-    QDBusInterface loginSession(QLatin1String(LoginService), m_currentSessionPath,
-                                QLatin1String(LoginSessionInterface),
-                                QDBusConnection::systemBus());
-    m_sessionActive = loginSession.isValid() && loginSession.property("Active").toBool();
-}
-
-void SessionGestureGuard::onSessionManagerPropertiesChanged(const QString &interface,
-                                                             const QVariantMap &changed,
-                                                             const QStringList &invalidated)
-{
-    if (interface != QLatin1String(SessionManagerInterface))
-        return;
-    if (changed.contains(QStringLiteral("Locked")))
-        m_locked = unwrapDbusValue(changed.value(QStringLiteral("Locked"))).toBool();
-    if (changed.contains(QStringLiteral("CurrentSessionPath")))
-        updateCurrentSession(objectPathString(changed.value(QStringLiteral("CurrentSessionPath"))));
-    if (invalidated.contains(QStringLiteral("Locked"))
-            || invalidated.contains(QStringLiteral("CurrentSessionPath"))) {
-        refreshSessionManagerState();
-    }
-}
-
-void SessionGestureGuard::handleLoginSessionPropertiesChanged(const QString &path,
-                                                               quint64 generation,
-                                                               const QString &interface,
-                                                               const QVariantMap &changed,
-                                                               const QStringList &invalidated)
-{
-    if (path != m_currentSessionPath || generation != m_sessionGeneration
-            || interface != QLatin1String(LoginSessionInterface)) {
-        return;
-    }
-    if (changed.contains(QStringLiteral("Active")))
-        m_sessionActive = unwrapDbusValue(changed.value(QStringLiteral("Active"))).toBool();
-    if (invalidated.contains(QStringLiteral("Active"))) {
-        refreshLoginSessionState();
-    }
 }
 
 void SessionGestureGuard::onTouchpadPropertiesChanged(const QString &interface,
@@ -392,5 +220,3 @@ bool SessionGestureGuard::isKeyboardGrabbed() const
     }
     return true;
 }
-
-#include "sessiongestureguard.moc"

@@ -12,12 +12,15 @@ class SessionGestureGuard;
 class SystemGestureProxy;
 class QTimer;
 class X11GestureActionExecutor;
+class SessionActiveMonitor;
 
 class X11GestureHandler : public AbstractGestureHandler
 {
     Q_OBJECT
 public:
-    explicit X11GestureHandler(X11GestureActionExecutor *executor, QObject *parent = nullptr);
+    explicit X11GestureHandler(X11GestureActionExecutor *executor,
+                               SessionActiveMonitor *sessionMonitor,
+                               QObject *parent = nullptr);
     ~X11GestureHandler() override;
 
     bool registerGesture(const GestureConfig &config) override;

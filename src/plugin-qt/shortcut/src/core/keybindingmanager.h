@@ -5,7 +5,9 @@
 #pragma once
 
 #include "shortcutconfig.h"
+#include "crosschannelactivationguard.h"
 
+#include <QElapsedTimer>
 #include <QObject>
 #include <QVariant>
 #include <QDBusContext>
@@ -17,6 +19,7 @@
 class ConfigLoader;
 class ActionExecutor;
 class AbstractKeyHandler;
+class SessionActiveMonitor;
 class SpecialKeyHandler;
 class TranslationManager;
 class X11GestureActionExecutor;
@@ -57,6 +60,7 @@ public:
     explicit KeybindingManager(ConfigLoader *loader, ActionExecutor *executor, 
                                TranslationManager *translationManager, 
                                AbstractKeyHandler *keyHandler,
+                               SessionActiveMonitor *sessionMonitor,
                                X11GestureActionExecutor *x11ActionExecutor = nullptr,
                                QObject *parent = nullptr);
     ~KeybindingManager() override;
@@ -125,6 +129,7 @@ private slots:
     void onKeyConfigChanged(const KeyConfig &config);
     void onConfigRemoved(const QString &id);
     void onKeyActivated(const QString &shortcutId);
+    void onSpecialKeyActivated(const QString &shortcutId);
     void onCaptureKeyEvent(bool pressed, const QString &keystroke);
     void updateNumLockState(bool on);
     void updateCapsLockState(bool on);
@@ -133,6 +138,11 @@ private slots:
     ShortcutInfo toShortcutInfo(const KeyConfig &config);
 
 private:
+    enum class ShortcutActivationSource {
+        Backend,
+        SpecialKey,
+    };
+
     enum class RollbackResult {
         Success,
         RebuildRequired,
@@ -158,6 +168,7 @@ private:
     void updateCustomShortcutConfigFields(KeyConfig &config, const QString &displayName,
                                           const QStringList &commandArguments,
                                           const QString &normalizedHotkey) const;
+    void activateShortcut(const QString &shortcutId, ShortcutActivationSource source);
 
     struct CustomShortcutChange {
         bool hasOldTarget = false;
@@ -177,6 +188,7 @@ private:
     ConfigLoader *m_loader;
     AbstractKeyHandler *m_keyHandler;
     SpecialKeyHandler *m_specialKeyHandler;
+    SessionActiveMonitor *m_sessionMonitor;
     ActionExecutor *m_executor;
     TranslationManager *m_translationManager;
     X11GestureActionExecutor *m_x11ActionExecutor;
@@ -185,6 +197,8 @@ private:
     QMap<QString, KeyConfig> m_keyConfigsMap;
     QSet<QString> m_activeShortcutIds;
     QSet<QString> m_resetInProgressIds;
+    CrossChannelActivationGuard m_crossChannelActivationGuard;
+    QElapsedTimer m_activationClock;
     uint m_lastNumLockState = 0;
     uint m_lastCapsLockState = 0;
     bool m_isWayland = false;

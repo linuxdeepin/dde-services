@@ -15,6 +15,8 @@
 #include "core/shortcutconfig.h"
 #include "qkeysequenceconverter.h"
 #include "physicalkeyalias.h"
+#include "sessionactivemonitor.h"
+#include "triggeractioncatalog.h"
 #include "backend/x11/x11gestureactionexecutor.h"
 #include "backend/x11/x11numlockstatecontroller.h"
 
@@ -35,6 +37,18 @@ DGUI_USE_NAMESPACE
 namespace {
 constexpr const char *kDefaultShortcutAppId = "org.deepin.dde.keybinding";
 constexpr const char *kNoHotkeyText = "None";
+
+bool isFixedCompatibilityAlias(const KeyConfig &config)
+{
+    if (config.modifiable)
+        return false;
+
+    static const QSet<QString> fixedCompatibilityAliases{
+        QStringLiteral("org.deepin.dde.keybinding.shortcut.micmute"),
+        QStringLiteral("org.deepin.dde.keybinding.shortcut.tools"),
+    };
+    return fixedCompatibilityAliases.contains(config.getId());
+}
 
 const QHash<QString, int> &reservedCategoryOrder()
 {
@@ -278,17 +292,20 @@ static bool areValidShortcutHotkeys(const QStringList &hotkeys)
 KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *executor,
                                      TranslationManager *translationManager,
                                      AbstractKeyHandler *keyHandler,
+                                     SessionActiveMonitor *sessionMonitor,
                                      X11GestureActionExecutor *x11ActionExecutor,
                                      QObject *parent)
     : QObject(parent)
     , m_loader(loader)
     , m_keyHandler(keyHandler)
     , m_specialKeyHandler(new SpecialKeyHandler(this))
+    , m_sessionMonitor(sessionMonitor)
     , m_executor(executor)
     , m_translationManager(translationManager)
     , m_x11ActionExecutor(x11ActionExecutor)
     , m_isWayland(DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform))
 {
+    m_activationClock.start();
     qRegisterMetaType<ShortcutInfo>("ShortcutInfo");
     qRegisterMetaType<QList<ShortcutInfo>>("QList<ShortcutInfo>");
     qRegisterMetaType<KeyConfig>("KeyConfig");
@@ -300,6 +317,12 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
     qRegisterMetaType<QList<CategoryInfo>>("QList<CategoryInfo>");
     qDBusRegisterMetaType<CategoryInfo>();
     qDBusRegisterMetaType<QList<CategoryInfo>>();
+
+    connect(m_sessionMonitor, &SessionActiveMonitor::activeChanged,
+            this, [this](bool active) {
+        m_specialKeyHandler->setSessionActive(active);
+    });
+    m_specialKeyHandler->setSessionActive(m_sessionMonitor->isActive());
 
     // Connect signals from key handler
     connect(m_keyHandler, &AbstractKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
@@ -324,7 +347,8 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
     m_lastNumLockState = GetNumLockState();
     
     // Connect signals from special key handler
-    connect(m_specialKeyHandler, &SpecialKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
+    connect(m_specialKeyHandler, &SpecialKeyHandler::keyActivated,
+            this, &KeybindingManager::onSpecialKeyActivated);
     
     connect(m_loader, &ConfigLoader::keyConfigChanged, this, &KeybindingManager::onKeyConfigChanged);
     connect(m_loader, &ConfigLoader::keyConfigAdded,
@@ -380,6 +404,7 @@ void KeybindingManager::clearState()
 {
     qCWarning(logShortcut) << "KeybindingManager: Marking runtime bindings inactive due to protocol disconnection";
     m_specialKeyHandler->clear();
+    m_crossChannelActivationGuard.clear();
     m_activeShortcutIds.clear();
 }
 
@@ -1268,18 +1293,65 @@ void KeybindingManager::onConfigRemoved(const QString &id)
 
 void KeybindingManager::onKeyActivated(const QString &shortcutId)
 {
-    qCDebug(logShortcut) << "Key activated:" << shortcutId;
-    
-    if (m_keyConfigsMap.contains(shortcutId) && m_activeShortcutIds.contains(shortcutId)) {
-        const auto &config = m_keyConfigsMap[shortcutId];
-        if (!m_isWayland && config.triggerType == static_cast<int>(TriggerType::Action)
-                && m_x11ActionExecutor) {
-            m_x11ActionExecutor->execute(config);
-        } else {
-            m_executor->execute(config);
-        }
-        emit ShortcutActivated(shortcutId, config.triggerValue);
+    activateShortcut(shortcutId, ShortcutActivationSource::Backend);
+}
+
+void KeybindingManager::onSpecialKeyActivated(const QString &shortcutId)
+{
+    activateShortcut(shortcutId, ShortcutActivationSource::SpecialKey);
+}
+
+void KeybindingManager::activateShortcut(const QString &shortcutId,
+                                         ShortcutActivationSource source)
+{
+    qCDebug(logShortcut) << "Key activated:" << shortcutId
+                         << "source:" << static_cast<int>(source);
+
+    const auto configIt = m_keyConfigsMap.constFind(shortcutId);
+    if (configIt == m_keyConfigsMap.constEnd() || !m_activeShortcutIds.contains(shortcutId))
+        return;
+
+    const bool isRawToggleMultitask = source == ShortcutActivationSource::SpecialKey
+            && configIt->triggerType == static_cast<int>(TriggerType::Action)
+            && !configIt->triggerValue.isEmpty()
+            && TriggerActionCatalog::resolve(configIt->triggerValue.constFirst())
+                    == TriggerActionId::ToggleMultitask;
+    if (isRawToggleMultitask && m_sessionMonitor->isLocked()) {
+        qCInfo(logShortcut) << "Ignoring raw multitask shortcut while session is locked:"
+                            << shortcutId;
+        return;
     }
+
+    if (source == ShortcutActivationSource::SpecialKey && m_isWayland
+            && configIt->triggerType == static_cast<int>(TriggerType::Action)) {
+        // TODO(wayland): Raw Linux keycodes arrive through KeyEvent1 instead of
+        // Treeland's shortcut protocol, so the compositor has not executed the
+        // configured action. Add an explicit Treeland action bridge before
+        // enabling or reporting keycode-only compositor actions on Wayland.
+        qCWarning(logShortcut) << "Special key compositor action is not supported on Wayland:"
+                               << shortcutId << configIt->triggerValue;
+        return;
+    }
+
+    if (!m_isWayland && isFixedCompatibilityAlias(*configIt)) {
+        const auto channel = source == ShortcutActivationSource::Backend
+                ? CrossChannelActivationGuard::Channel::Symbolic
+                : CrossChannelActivationGuard::Channel::Raw;
+        if (!m_crossChannelActivationGuard.shouldAccept(shortcutId, channel,
+                                                        m_activationClock.elapsed())) {
+            qCInfo(logShortcut) << "Ignoring correlated cross-channel shortcut activation:"
+                                << shortcutId << "source:" << static_cast<int>(source);
+            return;
+        }
+    }
+
+    if (!m_isWayland && configIt->triggerType == static_cast<int>(TriggerType::Action)
+            && m_x11ActionExecutor) {
+        m_x11ActionExecutor->execute(*configIt);
+    } else {
+        m_executor->execute(*configIt);
+    }
+    emit ShortcutActivated(shortcutId, configIt->triggerValue);
 }
 
 void KeybindingManager::onCaptureKeyEvent(bool pressed, const QString &keystroke)
@@ -1348,11 +1420,10 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringL
     if (normalHotkeys.isEmpty() && keycodeHotkeys.isEmpty())
         return false;
 
-    bool normalRegistered = normalHotkeys.isEmpty();
-    bool specialRegistered = keycodeHotkeys.isEmpty();
+    const auto registerNormalHotkeys = [&]() {
+        if (normalHotkeys.isEmpty())
+            return false;
 
-    // Register normal hotkeys via AbstractKeyHandler (X11/Wayland)
-    if (!normalHotkeys.isEmpty()) {
         // Check for conflicts before registering
         for (const QString &hotkey : normalHotkeys) {
             const QString conflictId = lookupRuntimeConflict(hotkey, excludeIds);
@@ -1362,37 +1433,72 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringL
                             << "Config displayName:" << config.displayName
                             << "Config hotkeys:" << config.hotkeys
                             << "Conflicts with:" << conflictId
-                            << "- Skipping registration";
+                            << "- Skipping symbolic registration";
                 return false;
             }
         }
 
-        // Create a config with only normal hotkeys
         KeyConfig normalConfig = config;
         normalConfig.hotkeys = normalHotkeys;
-        
-        normalRegistered = m_keyHandler->registerKey(normalConfig);
-        if (!normalRegistered)
-            return false;
-    }
+        if (m_keyHandler->registerKey(normalConfig))
+            return true;
 
-    // Register keycode hotkeys via SpecialKeyHandler
-    if (!keycodeHotkeys.isEmpty()) {
+        qCWarning(logShortcut) << "Failed to register symbolic hotkeys:"
+                               << config.getId() << normalHotkeys;
+        // Wayland may retain successful bindings from a partially failed batch.
+        m_keyHandler->unregisterKey(config.getId());
+        return false;
+    };
+
+    const auto registerSpecialHotkeys = [&]() {
+        if (keycodeHotkeys.isEmpty())
+            return false;
+
         KeyConfig keycodeConfig = config;
         keycodeConfig.hotkeys = keycodeHotkeys;
-        
-        specialRegistered = m_specialKeyHandler->registerKey(keycodeConfig);
-        if (!specialRegistered) {
-            if (normalRegistered && !normalHotkeys.isEmpty())
-                m_keyHandler->unregisterKey(config.getId());
-            return false;
+        if (m_specialKeyHandler->registerKey(keycodeConfig))
+            return true;
+
+        qCWarning(logShortcut) << "Failed to register raw keycode aliases:"
+                               << config.getId() << keycodeHotkeys;
+        m_specialKeyHandler->unregisterKey(config.getId());
+        return false;
+    };
+
+    if (isFixedCompatibilityAlias(config)
+            && !normalHotkeys.isEmpty() && !keycodeHotkeys.isEmpty()) {
+        // X11 hardware may expose either an XF86 symbol, a Linux keycode, or
+        // both. Register both channels and correlate duplicate activations at
+        // dispatch. Wayland keeps raw events as a registration fallback.
+        const bool symbolicRegistered = registerNormalHotkeys();
+        const bool rawRegistered = (!m_isWayland || !symbolicRegistered)
+                && registerSpecialHotkeys();
+        const bool registered = symbolicRegistered || rawRegistered;
+        if (registered) {
+            qCInfo(logShortcut) << "Registered fixed compatibility shortcut:"
+                                << config.getId()
+                                << "symbolic:" << symbolicRegistered
+                                << "raw:" << rawRegistered;
+            m_activeShortcutIds.insert(config.getId());
         }
+        return registered;
     }
 
-    if (normalRegistered && specialRegistered) {
+    const bool normalRegistered = normalHotkeys.isEmpty() || registerNormalHotkeys();
+    const bool specialRegistered = keycodeHotkeys.isEmpty() || registerSpecialHotkeys();
+    const bool allRequestedChannelsRegistered =
+            normalRegistered && specialRegistered;
+    if (allRequestedChannelsRegistered) {
         m_activeShortcutIds.insert(config.getId());
         return true;
     }
+
+    // Editable and ordinary configurations are transactional: never report a
+    // complete hotkey list as active when only one requested channel works.
+    if (!normalHotkeys.isEmpty())
+        m_keyHandler->unregisterKey(config.getId());
+    if (!keycodeHotkeys.isEmpty())
+        m_specialKeyHandler->unregisterKey(config.getId());
     return false;
 }
 
@@ -1400,6 +1506,7 @@ void KeybindingManager::unregisterShortcut(const QString &id)
 {
     m_keyHandler->unregisterKey(id);
     m_specialKeyHandler->unregisterKey(id);
+    m_crossChannelActivationGuard.clear(id);
     m_activeShortcutIds.remove(id);
 }
 

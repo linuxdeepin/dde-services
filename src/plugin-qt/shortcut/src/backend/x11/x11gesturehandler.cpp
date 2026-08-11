@@ -17,10 +17,12 @@ constexpr int WindowMoveTimeoutMs = 5000;
 
 }
 
-X11GestureHandler::X11GestureHandler(X11GestureActionExecutor *executor, QObject *parent)
+X11GestureHandler::X11GestureHandler(X11GestureActionExecutor *executor,
+                                     SessionActiveMonitor *sessionMonitor,
+                                     QObject *parent)
     : AbstractGestureHandler(parent)
     , m_proxy(new SystemGestureProxy(this))
-    , m_guard(new SessionGestureGuard(this))
+    , m_guard(new SessionGestureGuard(sessionMonitor, this))
     , m_executor(executor)
     , m_windowMoveTimeout(new QTimer(this))
 {

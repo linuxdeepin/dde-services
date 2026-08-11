@@ -40,6 +40,7 @@ public:
     bool unregisterKey(const QString &shortcutId);
     void clear();
     void setEnabled(bool enabled);
+    void setSessionActive(bool active);
 
     /**
      * @brief Check if a keycode is already registered
@@ -77,6 +78,8 @@ private slots:
                     bool shiftPressed, bool altPressed, bool superPressed);
 
 private:
+    void updateDispatchEnabled();
+
     struct KeyBinding {
         QString shortcutId;
         int keyEventFlags;  // KeyEventFlag bitfield
@@ -93,5 +96,7 @@ private:
     QSet<uint32_t> m_suppressedKeys;
 
     bool m_connected;
-    bool m_enabled = true;
+    bool m_inputEnabled = true;
+    bool m_sessionActive = false;
+    bool m_dispatchEnabled = false;
 };

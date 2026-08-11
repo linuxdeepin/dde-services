@@ -1279,7 +1279,7 @@ sudo evtest
 
 ```bash
 # 监听按键事件
-dbus-monitor --session "interface='org.deepin.dde.KeyEvent1'"
+dbus-monitor --system "interface='org.deepin.dde.KeyEvent1'"
 ```
 
 #### 问题 5：`modifiable=true` 但用户改键不持久化
