@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_CN">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -26,10 +24,6 @@
     <message>
         <source>launcher</source>
         <translation>启动器</translation>
-    </message>
-    <message>
-        <source>Cancel Maximize Window</source>
-        <translation type="vanished">取消最大化窗口</translation>
     </message>
     <message>
         <source>Close Window</source>
@@ -93,7 +87,7 @@
     </message>
     <message>
         <source>Workspace</source>
-        <translation>工作空间</translation>
+        <translation>工作区</translation>
     </message>
     <message>
         <source>AssistiveTools</source>
@@ -181,7 +175,7 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复窗口</translation>
     </message>
 </context>
 </TS>
