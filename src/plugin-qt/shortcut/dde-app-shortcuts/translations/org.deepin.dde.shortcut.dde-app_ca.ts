@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="ca">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="ca">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -27,7 +29,7 @@
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation>Cancel·la la maximització de la finestra</translation>
+        <translation type="vanished">Cancel·la la maximització de la finestra</translation>
     </message>
     <message>
         <source>Close Window</source>
@@ -43,7 +45,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -63,7 +65,7 @@
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -79,7 +81,7 @@
     </message>
     <message>
         <source>OCR (Image to Text)</source>
-        <translation type="unfinished"/>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System</source>
@@ -176,6 +178,10 @@
     <message>
         <source>Zoom to Actual Size</source>
         <translation>Mida real</translation>
+    </message>
+    <message>
+        <source>Restore window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

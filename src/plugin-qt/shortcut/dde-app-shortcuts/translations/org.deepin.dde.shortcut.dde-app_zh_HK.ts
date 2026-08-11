@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh_HK">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="zh_HK">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -27,7 +29,7 @@
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation>取消最大化視窗</translation>
+        <translation type="vanished">取消最大化視窗</translation>
     </message>
     <message>
         <source>Close Window</source>
@@ -176,6 +178,10 @@
     <message>
         <source>Zoom to Actual Size</source>
         <translation>重設屏幕縮放</translation>
+    </message>
+    <message>
+        <source>Restore window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

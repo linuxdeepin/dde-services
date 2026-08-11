@@ -28,10 +28,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel Maximize Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Close Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -177,6 +173,10 @@
     </message>
     <message>
         <source>Zoom to Actual Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore window</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

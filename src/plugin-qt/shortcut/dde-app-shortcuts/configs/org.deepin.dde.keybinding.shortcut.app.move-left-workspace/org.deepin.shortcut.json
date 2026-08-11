@@ -34,10 +34,10 @@
     },
     "hotkeys": {
       "value": [
-        "Ctrl+Shift+Alt+Left"
+        "Shift+Meta+Left"
       ],
       "permissions": "readwrite",
-      "serial": 0,
+      "serial": 1,
       "flags": [],
       "name": "hotkeys",
       "name[zh_CN]": "快捷键组合",

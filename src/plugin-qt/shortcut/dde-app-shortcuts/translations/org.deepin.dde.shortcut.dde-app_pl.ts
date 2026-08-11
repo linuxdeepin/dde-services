@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pl">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl">
 <context>
     <name>org.deepin.dde.shortcut.dde-app</name>
     <message>
@@ -27,7 +29,7 @@
     </message>
     <message>
         <source>Cancel Maximize Window</source>
-        <translation>Przywróć okno</translation>
+        <translation type="vanished">Przywróć okno</translation>
     </message>
     <message>
         <source>Close Window</source>
@@ -176,6 +178,10 @@
     <message>
         <source>Zoom to Actual Size</source>
         <translation>Przybliż do rozmiaru rzeczywistego</translation>
+    </message>
+    <message>
+        <source>Restore window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

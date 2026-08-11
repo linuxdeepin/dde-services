@@ -23,8 +23,8 @@
             "visibility": "private"
         },
         "displayOrder": {
-            "value": 150,
-            "serial": 1,
+            "value": 100,
+            "serial": 2,
             "flags": [],
             "name": "displayOrder",
             "name[zh_CN]": "显示顺序",
@@ -77,12 +77,12 @@
             "visibility": "private"
         },
         "category": {
-            "value": "System",
-            "serial": 1,
+            "value": "Window",
+            "serial": 2,
             "flags": [],
             "name": "category",
-            "name[zh_CN]": "快捷键类别（System）",
-            "description": "System shortcut category",
+            "name[zh_CN]": "快捷键类别（Window）",
+            "description": "Window shortcut category",
             "permissions": "",
             "visibility": "private"
         },

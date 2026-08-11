@@ -23,8 +23,8 @@
       "visibility": "private"
     },
     "displayOrder": {
-      "value": 210,
-      "serial": 0,
+      "value": 140,
+      "serial": 1,
       "flags": [],
       "name": "displayOrder",
       "name[zh_CN]": "显示顺序",
@@ -79,8 +79,8 @@
       "visibility": "private"
     },
     "category": {
-      "value": "System",
-      "serial": 0,
+      "value": "Window",
+      "serial": 1,
       "flags": [],
       "name": "category",
       "name[zh_CN]": "快捷键类别",
