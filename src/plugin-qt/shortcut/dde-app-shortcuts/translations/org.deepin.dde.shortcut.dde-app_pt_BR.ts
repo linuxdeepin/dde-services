@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Restaurar janela</translation>
     </message>
 </context>
 </TS>
