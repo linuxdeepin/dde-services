@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>還原視窗</translation>
     </message>
 </context>
 </TS>
