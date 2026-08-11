@@ -90,6 +90,41 @@ target_link_libraries(tst-qkeysequenceconverter PRIVATE
 
 add_test(NAME shortcut-qkeysequenceconverter COMMAND tst-qkeysequenceconverter)
 
+add_executable(tst-specialkeyhandler
+    tst_specialkeyhandler.cpp
+    ../shortcutlogging.cpp
+    ../src/backend/specialkeyhandler.cpp
+)
+
+target_include_directories(tst-specialkeyhandler PRIVATE
+    ..
+    ../src
+)
+
+target_link_libraries(tst-specialkeyhandler PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Test
+)
+
+add_test(NAME shortcut-specialkeyhandler COMMAND tst-specialkeyhandler)
+
+add_executable(tst-crosschannelactivationguard
+    tst_crosschannelactivationguard.cpp
+    ../src/core/crosschannelactivationguard.cpp
+)
+
+target_include_directories(tst-crosschannelactivationguard PRIVATE
+    ../src
+)
+
+target_link_libraries(tst-crosschannelactivationguard PRIVATE
+    Qt6::Core
+    Qt6::Test
+)
+
+add_test(NAME shortcut-crosschannelactivationguard COMMAND tst-crosschannelactivationguard)
+
 add_executable(tst-modifierkeystate
     tst_modifierkeystate.cpp
     ../src/backend/x11/modifierkeystate.cpp

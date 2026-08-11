@@ -24,15 +24,16 @@
         },
         "hotkeys": {
             "value": [
-                "Tools"
+                "Tools",
+                "141"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "hotkeys",
             "permissions": "",
             "visibility": "private",
             "name[zh_CN]": "快捷键组合",
-            "description": "快捷键组合"
+            "description": "XF86Tools and KEY_SETUP compatibility bindings"
         },
         "triggerType": {
             "value": 2,

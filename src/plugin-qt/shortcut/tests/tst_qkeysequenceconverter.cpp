@@ -26,6 +26,8 @@ void TestQKeySequenceConverter::symbolKeysUseXkbNames_data()
                                << QStringLiteral("<Super>minus");
     QTest::newRow("equal") << QStringLiteral("Meta+=")
                             << QStringLiteral("<Super>equal");
+    QTest::newRow("display") << QStringLiteral("Display")
+                              << QStringLiteral("XF86Display");
 }
 
 void TestQKeySequenceConverter::symbolKeysUseXkbNames()

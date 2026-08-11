@@ -71,6 +71,7 @@ static const QMap<QString, QString>& getQtToXkbMap() {
         map.insert("Keyboard Light On/Off", "XF86KbdLightOnOff");
         map.insert("Keyboard Brightness Up", "XF86KbdBrightnessUp");
         map.insert("Keyboard Brightness Down", "XF86KbdBrightnessDown");
+        map.insert("Display", "XF86Display");
         map.insert("Eject", "XF86Eject");
         map.insert("Touchpad Toggle", "XF86TouchpadToggle");
         map.insert("Touchpad On", "XF86TouchpadOn");

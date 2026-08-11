@@ -10,32 +10,42 @@
 #include <QDBusConnection>
 #include <QDBusServiceWatcher>
 
+namespace {
+
+constexpr auto KeyEventService = "org.deepin.dde.KeyEvent1";
+constexpr auto KeyEventPath = "/org/deepin/dde/KeyEvent1";
+constexpr auto KeyEventInterface = "org.deepin.dde.KeyEvent1";
+
+}
+
 SpecialKeyHandler::SpecialKeyHandler(QObject *parent)
     : QObject(parent)
     , m_connected(false)
 {
     // Connect to org.deepin.dde.KeyEvent1 signal
     m_connected = QDBusConnection::systemBus().connect(
-        "org.deepin.dde.KeyEvent1",           // service
-        "/org/deepin/dde/KeyEvent1",          // path
-        "org.deepin.dde.KeyEvent1",           // interface
-        "KeyEvent",                            // signal name
-        this,                                  // receiver
+        KeyEventService,    // service
+        KeyEventPath,       // path
+        KeyEventInterface,  // interface
+        "KeyEvent",         // signal name
+        this,               // receiver
         SLOT(onKeyEvent(uint,bool,bool,bool,bool,bool))
     );
 
     if (m_connected) {
-        qCInfo(logShortcut) << "SpecialKeyHandler: Connected to org.deepin.dde.KeyEvent1";
+        qCInfo(logShortcut) << "SpecialKeyHandler: Subscribed to org.deepin.dde.KeyEvent1";
     } else {
         qCWarning(logShortcut) << "SpecialKeyHandler: Failed to connect to org.deepin.dde.KeyEvent1";
     }
 
-    auto *serviceWatcher = new QDBusServiceWatcher(QStringLiteral("org.deepin.dde.KeyEvent1"),
+    auto *serviceWatcher = new QDBusServiceWatcher(QLatin1String(KeyEventService),
                                                    QDBusConnection::systemBus(),
                                                    QDBusServiceWatcher::WatchForUnregistration,
                                                    this);
     connect(serviceWatcher, &QDBusServiceWatcher::serviceUnregistered,
             this, [this]() {
+                qCCritical(logShortcut) << "SpecialKeyHandler: org.deepin.dde.KeyEvent1 stopped;"
+                                        << "raw hardware shortcuts are unavailable.";
                 m_keysHeld.clear();
                 m_suppressedKeys.clear();
             });
@@ -45,9 +55,9 @@ SpecialKeyHandler::~SpecialKeyHandler()
 {
     if (m_connected) {
         QDBusConnection::systemBus().disconnect(
-            "org.deepin.dde.KeyEvent1",
-            "/org/deepin/dde/KeyEvent1",
-            "org.deepin.dde.KeyEvent1",
+            KeyEventService,
+            KeyEventPath,
+            KeyEventInterface,
             "KeyEvent",
             this,
             SLOT(onKeyEvent(uint,bool,bool,bool,bool,bool))
@@ -61,6 +71,9 @@ bool SpecialKeyHandler::registerKey(const KeyConfig &config)
         qCWarning(logShortcut) << "SpecialKeyHandler: Not connected to KeyEvent1 service";
         return false;
     }
+
+    // Keep local registrations even when KeyEvent1 has no current owner. The
+    // D-Bus signal subscription survives service startup and restarts.
 
     if (m_shortcutKeycodes.contains(config.getId()))
         unregisterKey(config.getId());
@@ -137,14 +150,33 @@ void SpecialKeyHandler::clear()
 
 void SpecialKeyHandler::setEnabled(bool enabled)
 {
-    if (m_enabled == enabled)
+    if (m_inputEnabled == enabled)
+        return;
+
+    m_inputEnabled = enabled;
+    updateDispatchEnabled();
+}
+
+void SpecialKeyHandler::setSessionActive(bool active)
+{
+    if (m_sessionActive == active)
+        return;
+
+    m_sessionActive = active;
+    updateDispatchEnabled();
+}
+
+void SpecialKeyHandler::updateDispatchEnabled()
+{
+    const bool enabled = m_inputEnabled && m_sessionActive;
+    if (m_dispatchEnabled == enabled)
         return;
 
     if (!enabled) {
         m_suppressedKeys.unite(m_keysHeld);
         m_keysHeld.clear();
     }
-    m_enabled = enabled;
+    m_dispatchEnabled = enabled;
 }
 
 QString SpecialKeyHandler::lookupConflict(uint32_t keycode) const
@@ -193,12 +225,7 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
                                     bool ctrlPressed, bool shiftPressed, 
                                     bool altPressed, bool superPressed)
 {
-    Q_UNUSED(ctrlPressed)
-    Q_UNUSED(shiftPressed)
-    Q_UNUSED(altPressed)
-    Q_UNUSED(superPressed)
-
-    if (!m_enabled) {
+    if (!m_dispatchEnabled) {
         if (pressed)
             m_suppressedKeys.insert(keycode);
         else
@@ -213,6 +240,18 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
     }
     
     if (!m_keycodeBindings.contains(keycode)) {
+        return;
+    }
+
+    // Numeric hotkeys represent bare Linux keycodes.  Once any modifier is
+    // observed, suppress the sequence through release so a modified shortcut
+    // cannot also trigger its bare raw alias.
+    if (ctrlPressed || shiftPressed || altPressed || superPressed) {
+        m_keysHeld.remove(keycode);
+        if (pressed)
+            m_suppressedKeys.insert(keycode);
+        qCDebug(logShortcut) << "SpecialKeyHandler: Ignoring modified raw key sequence:"
+                             << keycode;
         return;
     }
     
