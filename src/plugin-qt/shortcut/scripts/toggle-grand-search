@@ -1,0 +1,34 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+service=com.deepin.dde.GrandSearch
+object_path=/com/deepin/dde/GrandSearch
+interface=com.deepin.dde.GrandSearch
+
+registered=$(/usr/bin/dbus-send --session --print-reply \
+    --dest=org.freedesktop.DBus \
+    /org/freedesktop/DBus \
+    org.freedesktop.DBus.NameHasOwner \
+    string:"$service")
+
+if printf '%s\n' "$registered" | /usr/bin/grep -q true; then
+    visible=$(/usr/bin/dbus-send --session --print-reply=literal \
+        --dest="$service" \
+        "$object_path" \
+        "$interface.IsVisible")
+
+    if printf '%s\n' "$visible" | /usr/bin/grep -q true; then
+        target=false
+    else
+        target=true
+    fi
+else
+    target=true
+fi
+
+exec /usr/bin/dbus-send --session --print-reply=literal \
+    --dest="$service" \
+    "$object_path" \
+    "$interface.SetVisible" \
+    boolean:"$target"

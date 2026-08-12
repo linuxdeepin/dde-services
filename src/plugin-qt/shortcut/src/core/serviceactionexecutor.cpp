@@ -34,8 +34,7 @@ bool ServiceActionExecutor::execute(TriggerActionId actionId, const QString &con
     case TriggerActionId::ToggleGrandSearch:
         success = m_actionExecutor
                 && m_actionExecutor->executeCommand({
-                        QStringLiteral(
-                                "/usr/libexec/dde-daemon/keybinding/shortcut-dde-grand-search.sh"),
+                        QStringLiteral("/usr/libexec/dde-services/keybinding/toggle-grand-search"),
                 });
         break;
     case TriggerActionId::ToggleLauncher:

@@ -28,6 +28,8 @@ void TestQKeySequenceConverter::symbolKeysUseXkbNames_data()
                             << QStringLiteral("<Super>equal");
     QTest::newRow("display") << QStringLiteral("Display")
                               << QStringLiteral("XF86Display");
+    QTest::newRow("webcam") << QStringLiteral("WebCam")
+                             << QStringLiteral("XF86WebCam");
 }
 
 void TestQKeySequenceConverter::symbolKeysUseXkbNames()
