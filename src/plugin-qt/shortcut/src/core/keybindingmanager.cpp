@@ -337,6 +337,8 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
                 this, [this] { m_specialKeyHandler->setEnabled(false); });
         connect(m_keyHandler, &AbstractKeyHandler::captureKeyEvent,
                 this, &KeybindingManager::onCaptureKeyEvent);
+        connect(m_keyHandler, &AbstractKeyHandler::captureResult,
+                this, &KeybindingManager::onCaptureResult);
         connect(m_keyHandler, &AbstractKeyHandler::captureFinished,
                 this, [this] { m_specialKeyHandler->setEnabled(true); });
         connect(m_keyHandler, &AbstractKeyHandler::keymapAboutToChange,
@@ -358,11 +360,16 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
 
 bool KeybindingManager::BeginCapture(uint timeoutMs)
 {
+    return BeginCapture(0, timeoutMs);
+}
+
+bool KeybindingManager::BeginCapture(quint64 captureId, uint timeoutMs)
+{
     if (m_isWayland)
         return true;
 
     const QString owner = calledFromDBus() ? message().service() : QString();
-    return m_keyHandler->beginCapture(timeoutMs, owner);
+    return m_keyHandler->beginCapture(captureId, timeoutMs, owner);
 }
 
 void KeybindingManager::EndCapture()
@@ -1357,6 +1364,11 @@ void KeybindingManager::activateShortcut(const QString &shortcutId,
 void KeybindingManager::onCaptureKeyEvent(bool pressed, const QString &keystroke)
 {
     emit KeyEvent(pressed, keystroke);
+}
+
+void KeybindingManager::onCaptureResult(quint64 captureId, uint result, const QString &keystroke)
+{
+    emit CaptureFinished(captureId, result, keystroke);
 }
 
 void KeybindingManager::updateNumLockState(bool on)

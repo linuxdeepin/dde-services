@@ -29,7 +29,7 @@ public:
     bool registerKey(const KeyConfig &config) override;
     bool unregisterKey(const QString &appId) override;
     bool isAvailable() const override;
-    bool beginCapture(uint timeoutMs, const QString &owner) override;
+    bool beginCapture(quint64 captureId, uint timeoutMs, const QString &owner) override;
     bool endCapture(const QString &owner) override;
 
     // Lock key state operations
@@ -141,8 +141,11 @@ private:
     struct CaptureState {
         QTimer *timer = nullptr;
         QDBusServiceWatcher *ownerWatcher = nullptr;
+        quint64 id = 0;
         QString owner;
         QString keystroke;
+        QString candidateKeystroke;
+        bool candidateValid = false;
         bool active = false;
     };
     CaptureState m_capture;

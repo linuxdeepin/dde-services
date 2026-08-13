@@ -31,6 +31,20 @@ void sendTestChord(Display *display)
     XFlush(display);
 }
 
+void sendKeyStroke(Display *display, KeySym keysym)
+{
+    sendKey(display, keysym, true);
+    sendKey(display, keysym, false);
+    XFlush(display);
+}
+
+void clickPointer(Display *display)
+{
+    XTestFakeButtonEvent(display, 1, True, CurrentTime);
+    XTestFakeButtonEvent(display, 1, False, CurrentTime);
+    XFlush(display);
+}
+
 KeyConfig shortcut(const QString &id, const QString &hotkey)
 {
     KeyConfig config;
@@ -54,6 +68,10 @@ class TestX11GrabResilientShortcuts : public QObject
 private slots:
     void legacyShortcutsActivateExactlyOnce();
     void xcbFallbackDuringRecordRestart();
+    void captureReportsExplicitResults();
+    void activeCaptureRejectsReplacement();
+    void captureReportsTimeout();
+    void explicitEndCaptureDoesNotReportResult();
 };
 
 void TestX11GrabResilientShortcuts::legacyShortcutsActivateExactlyOnce()
@@ -123,7 +141,7 @@ void TestX11GrabResilientShortcuts::xcbFallbackDuringRecordRestart()
 
     // Ending capture restarts RECORD asynchronously. A shortcut pressed in
     // that interval must fall back to XCB and still activate exactly once.
-    QVERIFY(handler.beginCapture(30000, QStringLiteral("test-owner")));
+    QVERIFY(handler.beginCapture(1, 30000, QStringLiteral("test-owner")));
     QVERIFY(handler.endCapture(QStringLiteral("test-owner")));
     sendTestChord(display);
     QTRY_COMPARE_WITH_TIMEOUT(activationSpy.size(), 1, 2000);
@@ -133,6 +151,111 @@ void TestX11GrabResilientShortcuts::xcbFallbackDuringRecordRestart()
 
     handler.unregisterKey(screenshotId);
     XCloseDisplay(display);
+}
+
+void TestX11GrabResilientShortcuts::captureReportsExplicitResults()
+{
+    Display *display = XOpenDisplay(nullptr);
+    if (!display)
+        QSKIP("No X server is available");
+
+    X11KeyHandler handler;
+    if (!handler.isAvailable()) {
+        XCloseDisplay(display);
+        QSKIP("X11 shortcut backend is unavailable");
+    }
+
+    QSignalSpy resultSpy(&handler, &X11KeyHandler::captureResult);
+    QVERIFY(resultSpy.isValid());
+
+    QVERIFY(handler.beginCapture(10, 30000, QStringLiteral("test-owner")));
+    sendKeyStroke(display, XK_Shift_L);
+    QTRY_COMPARE_WITH_TIMEOUT(resultSpy.size(), 1, 2000);
+    QList<QVariant> result = resultSpy.takeFirst();
+    QCOMPARE(result.at(0).toULongLong(), 10ULL);
+    QCOMPARE(result.at(1).toUInt(),
+             static_cast<uint>(AbstractKeyHandler::CaptureInvalid));
+
+    QVERIFY(handler.beginCapture(11, 30000, QStringLiteral("test-owner")));
+    sendKeyStroke(display, XK_Escape);
+    QTRY_COMPARE_WITH_TIMEOUT(resultSpy.size(), 1, 2000);
+    result = resultSpy.takeFirst();
+    QCOMPARE(result.at(0).toULongLong(), 11ULL);
+    QCOMPARE(result.at(1).toUInt(),
+             static_cast<uint>(AbstractKeyHandler::CaptureCanceled));
+
+    QVERIFY(handler.beginCapture(12, 30000, QStringLiteral("test-owner")));
+    sendTestChord(display);
+    QTRY_COMPARE_WITH_TIMEOUT(resultSpy.size(), 1, 2000);
+    result = resultSpy.takeFirst();
+    QCOMPARE(result.at(0).toULongLong(), 12ULL);
+    QCOMPARE(result.at(1).toUInt(), static_cast<uint>(AbstractKeyHandler::CaptureSuccess));
+    QCOMPARE(result.at(2).toString(), QStringLiteral("<Control><Alt>B"));
+
+    QVERIFY(handler.beginCapture(13, 30000, QStringLiteral("test-owner")));
+    clickPointer(display);
+    QTRY_COMPARE_WITH_TIMEOUT(resultSpy.size(), 1, 2000);
+    result = resultSpy.takeFirst();
+    QCOMPARE(result.at(0).toULongLong(), 13ULL);
+    QCOMPARE(result.at(1).toUInt(),
+             static_cast<uint>(AbstractKeyHandler::CaptureCanceled));
+
+    XCloseDisplay(display);
+}
+
+void TestX11GrabResilientShortcuts::activeCaptureRejectsReplacement()
+{
+    Display *display = XOpenDisplay(nullptr);
+    if (!display)
+        QSKIP("No X server is available");
+
+    X11KeyHandler handler;
+    if (!handler.isAvailable()) {
+        XCloseDisplay(display);
+        QSKIP("X11 shortcut backend is unavailable");
+    }
+
+    QSignalSpy resultSpy(&handler, &X11KeyHandler::captureResult);
+    QVERIFY(resultSpy.isValid());
+
+    const QString owner = QStringLiteral("test-owner");
+    QVERIFY(handler.beginCapture(14, 30000, owner));
+    QVERIFY(!handler.beginCapture(15, 30000, owner));
+    sendTestChord(display);
+    QTRY_COMPARE_WITH_TIMEOUT(resultSpy.size(), 1, 2000);
+    QCOMPARE(resultSpy.constFirst().at(0).toULongLong(), 14ULL);
+    QCOMPARE(resultSpy.constFirst().at(1).toUInt(),
+             static_cast<uint>(AbstractKeyHandler::CaptureSuccess));
+
+    XCloseDisplay(display);
+}
+
+void TestX11GrabResilientShortcuts::captureReportsTimeout()
+{
+    X11KeyHandler handler;
+    if (!handler.isAvailable())
+        QSKIP("X11 shortcut backend is unavailable");
+
+    QSignalSpy resultSpy(&handler, &X11KeyHandler::captureResult);
+    QVERIFY(handler.beginCapture(20, 1, QStringLiteral("test-owner")));
+    QTRY_COMPARE_WITH_TIMEOUT(resultSpy.size(), 1, 2000);
+    const QList<QVariant> result = resultSpy.takeFirst();
+    QCOMPARE(result.at(0).toULongLong(), 20ULL);
+    QCOMPARE(result.at(1).toUInt(),
+             static_cast<uint>(AbstractKeyHandler::CaptureTimedOut));
+}
+
+void TestX11GrabResilientShortcuts::explicitEndCaptureDoesNotReportResult()
+{
+    X11KeyHandler handler;
+    if (!handler.isAvailable())
+        QSKIP("X11 shortcut backend is unavailable");
+
+    QSignalSpy resultSpy(&handler, &X11KeyHandler::captureResult);
+    QVERIFY(handler.beginCapture(30, 30000, QStringLiteral("test-owner")));
+    QVERIFY(handler.endCapture(QStringLiteral("test-owner")));
+    QTest::qWait(50);
+    QCOMPARE(resultSpy.size(), 0);
 }
 
 QTEST_MAIN(TestX11GrabResilientShortcuts)
