@@ -98,6 +98,7 @@ public slots:
                                                        const QString &expectedConflictId);
     Q_SCRIPTABLE bool DeleteCustomShortcut(const QString &id);
     Q_SCRIPTABLE bool BeginCapture(uint timeoutMs = 30000);
+    Q_SCRIPTABLE bool BeginCapture(quint64 captureId, uint timeoutMs);
     Q_SCRIPTABLE void EndCapture();
 
     // Atomically swap the hotkeys of two shortcuts in a single compositor commit.
@@ -119,6 +120,7 @@ signals:
     Q_SCRIPTABLE void ShortcutActivated(const QString &id, const QStringList &triggerValue);
     Q_SCRIPTABLE void ShortcutRemoved(const QString &id);
     Q_SCRIPTABLE void KeyEvent(bool pressed, const QString &keystroke);
+    Q_SCRIPTABLE void CaptureFinished(quint64 captureId, uint result, const QString &keystroke);
     
     // Lock key state signals (0=off, 1=on)
     Q_SCRIPTABLE void NumLockStateChanged(uint state);
@@ -131,6 +133,7 @@ private slots:
     void onKeyActivated(const QString &shortcutId);
     void onSpecialKeyActivated(const QString &shortcutId);
     void onCaptureKeyEvent(bool pressed, const QString &keystroke);
+    void onCaptureResult(quint64 captureId, uint result, const QString &keystroke);
     void updateNumLockState(bool on);
     void updateCapsLockState(bool on);
     void onBackendKeymapAboutToChange();

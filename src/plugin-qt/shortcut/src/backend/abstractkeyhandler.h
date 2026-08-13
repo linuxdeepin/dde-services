@@ -12,6 +12,14 @@ class AbstractKeyHandler : public QObject
 {
     Q_OBJECT
 public:
+    enum CaptureResult : uint {
+        CaptureSuccess = 0,
+        CaptureInvalid = 1,
+        CaptureCanceled = 2,
+        CaptureTimedOut = 3,
+    };
+    Q_ENUM(CaptureResult)
+
     explicit AbstractKeyHandler(QObject *parent = nullptr) : QObject(parent) {}
     virtual ~AbstractKeyHandler() = default;
 
@@ -26,8 +34,9 @@ public:
     virtual bool commit() { return true; }
     virtual bool commitSync() { return commit(); }
 
-    virtual bool beginCapture(uint timeoutMs, const QString &owner)
+    virtual bool beginCapture(quint64 captureId, uint timeoutMs, const QString &owner)
     {
+        Q_UNUSED(captureId);
         Q_UNUSED(timeoutMs);
         Q_UNUSED(owner);
         return false;
@@ -50,6 +59,7 @@ signals:
     void capsLockStateChanged(bool on);
     void captureStarted();
     void captureKeyEvent(bool pressed, const QString &keystroke);
+    void captureResult(quint64 captureId, uint result, const QString &keystroke);
     void captureFinished();
     void keymapAboutToChange();
     void keymapChanged();

@@ -127,7 +127,10 @@ X11KeyHandler::X11KeyHandler(QObject *parent)
     m_capture.timer = new QTimer(this);
     m_capture.ownerWatcher = new QDBusServiceWatcher(this);
     m_capture.timer->setSingleShot(true);
-    connect(m_capture.timer, &QTimer::timeout, this, [this] { finishCapture(); });
+    connect(m_capture.timer, &QTimer::timeout, this, [this] {
+        emit captureResult(m_capture.id, CaptureTimedOut, QString());
+        finishCapture();
+    });
     m_capture.ownerWatcher->setConnection(QDBusConnection::sessionBus());
     m_capture.ownerWatcher->setWatchMode(QDBusServiceWatcher::WatchForUnregistration);
     connect(m_capture.ownerWatcher, &QDBusServiceWatcher::serviceUnregistered,
@@ -208,14 +211,10 @@ bool X11KeyHandler::isAvailable() const
             && !xcb_connection_has_error(m_connection);
 }
 
-bool X11KeyHandler::beginCapture(uint timeoutMs, const QString &owner)
+bool X11KeyHandler::beginCapture(quint64 captureId, uint timeoutMs, const QString &owner)
 {
-    if (m_capture.active) {
-        if (!owner.isEmpty() && owner != m_capture.owner)
-            return false;
-        m_capture.timer->start(qBound(1000u, timeoutMs, 60000u));
-        return true;
-    }
+    if (m_capture.active)
+        return false;
     if (!isAvailable())
         return false;
 
@@ -260,7 +259,10 @@ bool X11KeyHandler::beginCapture(uint timeoutMs, const QString &owner)
     m_recordPendingReleases.clear();
     m_recordPressedBindings.clear();
     m_recordObservedPresses.clear();
+    m_capture.id = captureId;
     m_capture.keystroke.clear();
+    m_capture.candidateKeystroke.clear();
+    m_capture.candidateValid = false;
     m_capture.owner = owner;
     m_capture.active = true;
     if (!m_capture.owner.isEmpty())
@@ -296,8 +298,11 @@ void X11KeyHandler::finishCapture(bool notify)
     m_capture.timer->stop();
     if (!m_capture.owner.isEmpty())
         m_capture.ownerWatcher->removeWatchedService(m_capture.owner);
+    m_capture.id = 0;
     m_capture.owner.clear();
     m_capture.keystroke.clear();
+    m_capture.candidateKeystroke.clear();
+    m_capture.candidateValid = false;
     m_capture.active = false;
     if (m_modifierMonitor)
         m_modifierMonitor->start();
@@ -658,17 +663,31 @@ void X11KeyHandler::handleXcbEvents()
         if (m_capture.active && responseType == XCB_KEY_PRESS) {
             const CapturedKey captured = captureKey(
                     reinterpret_cast<xcb_key_press_event_t *>(event));
-            m_capture.keystroke = isCapturedKeyValid(captured)
+            m_capture.candidateKeystroke = captured.keystroke;
+            m_capture.candidateValid = isCapturedKeyValid(captured);
+            m_capture.keystroke = m_capture.candidateValid
                     ? captured.keystroke : QString();
             emit captureKeyEvent(true, captured.keystroke);
         } else if (m_capture.active && responseType == XCB_KEY_RELEASE) {
             emit captureKeyEvent(false, m_capture.keystroke);
+            const bool canceled = m_capture.candidateKeystroke == QLatin1String("Escape")
+                    || m_capture.candidateKeystroke == QLatin1String("Esc");
+            if (canceled) {
+                emit captureResult(m_capture.id, CaptureCanceled, QString());
+            } else if (m_capture.candidateValid) {
+                emit captureResult(m_capture.id, CaptureSuccess, m_capture.keystroke);
+            } else {
+                emit captureResult(m_capture.id, CaptureInvalid, m_capture.candidateKeystroke);
+            }
             finishCapture();
         } else if (m_capture.active && responseType == XCB_BUTTON_PRESS) {
             m_capture.keystroke.clear();
+            m_capture.candidateKeystroke.clear();
+            m_capture.candidateValid = false;
             emit captureKeyEvent(true, QString());
         } else if (m_capture.active && responseType == XCB_BUTTON_RELEASE) {
             emit captureKeyEvent(false, QString());
+            emit captureResult(m_capture.id, CaptureCanceled, QString());
             finishCapture();
         } else if (responseType == XCB_KEY_PRESS) {
             handleKeyPress(reinterpret_cast<xcb_key_press_event_t *>(event));

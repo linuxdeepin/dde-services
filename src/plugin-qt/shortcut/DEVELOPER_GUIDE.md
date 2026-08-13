@@ -1117,12 +1117,16 @@ iface.call("Reset");
 | 分类元数据 | `ListCategories` |
 | 修改 | `ModifyHotkeys`、`Disable`、`SwapHotkeys`、`ReplaceHotkey`、`Reset` |
 | 自定义快捷键 | `AddCustomShortcut`、`ModifyCustomShortcut`、`DeleteCustomShortcut` |
-| 录入 | `BeginCapture`、`EndCapture` 和 `KeyEvent` 信号 |
+| 录入 | `BeginCapture`、`EndCapture`、`KeyEvent` 和 `CaptureFinished` 信号 |
 | 手势 | `ListAllGestures`、`ModifyGesture` |
 
 `category` 是提供方拥有的自由字符串，不是固定整数枚举。客户端通过
 `ListCategories` 获取分类的显示名、顺序和 `isCustom` 标记，不应硬编码分类键。
 `GestureInfo.availableActions` 是当前后端动作能力的来源。
+
+新版 `BeginCapture(captureId, timeoutMs)` 接收客户端生成的 `captureId`，
+`CaptureFinished` 会原样返回该标识，客户端只处理与当前录入请求匹配的结果。
+为兼容旧客户端，服务仍保留 `BeginCapture(timeoutMs)` 签名；旧接口使用标识 `0`。
 
 D-Bus 结构体必须在调用前注册 Qt 元类型。字段顺序和完整方法签名以
 `src/core/keybindingmanager.h`、`src/core/gesturemanager.h` 为准。
