@@ -39,7 +39,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Obre el menú de la finestra</translation>
     </message>
     <message>
         <source>Toggle Multitask View</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation>Cerca gran</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>OCR (Image to Text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (de imatge a text)</translation>
     </message>
     <message>
         <source>System</source>
@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Restore window</source>
-        <translation type="unfinished"/>
+        <translation>Restaura la finestra</translation>
     </message>
 </context>
 </TS>
