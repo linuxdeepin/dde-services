@@ -55,11 +55,11 @@
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Kokonäytön kaappaus</translation>
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation>Suuri haku</translation>
     </message>
     <message>
         <source>Screenshot</source>
