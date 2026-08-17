@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>Canvia la mida de la finestra</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>Gravador de pantalla</translation>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,43 +127,43 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>Commuta els efectes de les finestres</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>Commuta finestres</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Commuta finestres a la inversa</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation type="unfinished"/>
+        <translation>Commuta finestres semblants</translation>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Commuta finestres semblants a la inversa</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Ves a l&apos;espai de treball de l&apos;esquerra</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Ves a l&apos;espai de treball de la dreta</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation type="unfinished"/>
+        <translation>Disposa la finestra en mosaic a l&apos;esquerra</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation type="unfinished"/>
+        <translation>Disposa la finestra en mosaic a la dreta</translation>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation type="unfinished"/>
+        <translation>Amplia</translation>
     </message>
     <message>
         <source>Zoom out</source>
