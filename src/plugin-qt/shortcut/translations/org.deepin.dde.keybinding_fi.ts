@@ -203,11 +203,11 @@
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Seuraava tehtävä</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Edellinen tehtävä</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
