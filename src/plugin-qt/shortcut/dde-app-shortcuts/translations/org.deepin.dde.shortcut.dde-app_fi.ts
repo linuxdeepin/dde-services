@@ -175,7 +175,7 @@
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Palauta ikkuna</translation>
     </message>
 </context>
 </TS>
