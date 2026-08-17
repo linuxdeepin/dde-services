@@ -167,15 +167,15 @@
     </message>
     <message>
         <source>Zoom out</source>
-        <translation type="unfinished"/>
+        <translation>Redueix</translation>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>Restableix-ne la mida</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Desmaximitza la finestra</translation>
     </message>
 </context>
 </TS>
