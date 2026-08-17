@@ -12,6 +12,4 @@ public:
     explicit SystemDBusProxy(QObject *parent = nullptr);
 
     QString chassis() const;
-    bool lidIsPresent() const;
-    bool lidIsClosed() const;
 };
