@@ -151,7 +151,7 @@
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Siirry oikeaan työtilaan</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
