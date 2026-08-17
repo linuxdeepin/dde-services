@@ -13,8 +13,8 @@
       "visibility": "private"
     },
     "displayName": {
-      "value": "Switch Window Effects",
-      "serial": 0,
+      "value": "Switch window effects",
+      "serial": 1,
       "flags": [],
       "name": "displayName",
       "name[zh_CN]": "切换窗口效果",

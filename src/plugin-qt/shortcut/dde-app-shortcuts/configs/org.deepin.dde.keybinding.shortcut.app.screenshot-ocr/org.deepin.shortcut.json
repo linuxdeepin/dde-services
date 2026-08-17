@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "OCR (Image to Text)",
-            "serial": 1,
+            "value": "OCR (image to text)",
+            "serial": 2,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "图文识别",

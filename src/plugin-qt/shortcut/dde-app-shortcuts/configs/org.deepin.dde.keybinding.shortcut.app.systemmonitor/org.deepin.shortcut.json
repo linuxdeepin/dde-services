@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "System Monitor",
-            "serial": 0,
+            "value": "System monitor",
+            "serial": 1,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "系统监视器",

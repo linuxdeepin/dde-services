@@ -26,7 +26,7 @@ namespace CategoryKey {
     inline constexpr const char *System = "System";
     inline constexpr const char *Window = "Window";
     inline constexpr const char *Workspace = "Workspace";
-    inline constexpr const char *AssistiveTools = "AssistiveTools";
+    inline constexpr const char *Accessibility = "Accessibility";
     inline constexpr const char *Custom = "Custom";
 }
 

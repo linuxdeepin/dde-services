@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Switch Windows Reversely",
-            "serial": 0,
+            "value": "Switch windows in reverse",
+            "serial": 1,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "上一个窗口",

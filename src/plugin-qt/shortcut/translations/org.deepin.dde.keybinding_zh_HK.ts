@@ -6,7 +6,7 @@
         <translation>切換多屏模式</translation>
     </message>
     <message>
-        <source>Default terminal</source>
+        <source>Terminal</source>
         <translation>終端機</translation>
     </message>
     <message>
@@ -58,7 +58,7 @@
         <translation>最大化視窗</translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation>還原視窗</translation>
     </message>
     <message>
@@ -118,15 +118,15 @@
         <translation>自訂</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>輔助工具</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>文字轉語音</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>語音轉文字</translation>
     </message>
     <message>
@@ -180,10 +180,6 @@
     <message>
         <source>Open window menu</source>
         <translation>開啟視窗選單</translation>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
-        <translation>顯示工作區</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>

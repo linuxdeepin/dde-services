@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Fullscreen Screenshot",
-            "serial": 0,
+            "value": "Full screenshot",
+            "serial": 1,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "全屏截图",

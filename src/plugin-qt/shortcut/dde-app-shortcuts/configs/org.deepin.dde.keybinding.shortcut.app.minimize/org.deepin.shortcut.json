@@ -13,8 +13,8 @@
       "visibility": "private"
     },
     "displayName": {
-      "value": "Minimize Window",
-      "serial": 0,
+      "value": "Minimize window",
+      "serial": 1,
       "flags": [],
       "name": "displayName",
       "name[zh_CN]": "快捷键显示名称",

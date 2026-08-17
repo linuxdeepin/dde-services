@@ -67,8 +67,8 @@
             "visibility": "private"
         },
         "category": {
-            "value": "AssistiveTools",
-            "serial": 1,
+            "value": "Accessibility",
+            "serial": 2,
             "flags": [],
             "name": "category",
             "name[zh_CN]": "快捷键类别（辅助功能）",

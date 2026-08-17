@@ -13,8 +13,8 @@
       "visibility": "private"
     },
     "displayName": {
-      "value": "Move to Left Workspace",
-      "serial": 0,
+      "value": "Move to left workspace",
+      "serial": 1,
       "flags": [],
       "name": "displayName",
       "name[zh_CN]": "快捷键显示名称",

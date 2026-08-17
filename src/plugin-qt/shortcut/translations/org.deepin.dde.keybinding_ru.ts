@@ -6,7 +6,7 @@
         <translation>Переключить между несколькими дисплеями</translation>
     </message>
     <message>
-        <source>Default terminal</source>
+        <source>Terminal</source>
         <translation>Терминал по умолчанию</translation>
     </message>
     <message>
@@ -58,7 +58,7 @@
         <translation>Развернуть окно</translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation>Восстановить окно</translation>
     </message>
     <message>
@@ -118,15 +118,15 @@
         <translation>Пользовательский</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Специальные возможности</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>Синтез речи</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>Распознавание речи</translation>
     </message>
     <message>
@@ -180,10 +180,6 @@
     <message>
         <source>Open window menu</source>
         <translation>Открыть меню окна</translation>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
-        <translation>Переключить режим многозадачности</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>

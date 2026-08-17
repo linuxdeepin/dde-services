@@ -6,7 +6,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Default terminal</source>
+        <source>Terminal</source>
         <translation>Terminal parazgjedhje</translation>
     </message>
     <message>
@@ -58,7 +58,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -118,15 +118,15 @@
         <translation>Vetjake</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -179,10 +179,6 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
         <translation type="unfinished"/>
     </message>
     <message>
