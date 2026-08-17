@@ -119,7 +119,7 @@
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation>Gravador de tela</translation>
+        <translation>Gravar tela</translation>
     </message>
     <message>
         <source>Scrollshot</source>
