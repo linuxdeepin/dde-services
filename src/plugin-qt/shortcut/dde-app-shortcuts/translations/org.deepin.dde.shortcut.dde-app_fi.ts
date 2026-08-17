@@ -103,23 +103,23 @@
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä vasempaan työtilaan</translation>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä oikeaan työtilaan</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Ei mitään</translation>
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>Ikkunan koko</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>Näytön tallennin</translation>
     </message>
     <message>
         <source>Scrollshot</source>
