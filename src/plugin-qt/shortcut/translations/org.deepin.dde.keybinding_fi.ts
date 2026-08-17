@@ -199,7 +199,7 @@
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation type="unfinished"/>
+        <translation>Tehtävänäkymä</translation>
     </message>
     <message>
         <source>Select next task</source>
