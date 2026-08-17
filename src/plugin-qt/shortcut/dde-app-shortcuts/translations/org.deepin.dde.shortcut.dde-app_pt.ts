@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de ecrã inteiro</translation>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor do sistema</translation>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de ecrã da janela</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (imagem para texto)</translation>
     </message>
     <message>
         <source>System</source>
@@ -95,11 +95,11 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimizar janela</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Mover janela</translation>
     </message>
     <message>
         <source>Move to left workspace</source>
