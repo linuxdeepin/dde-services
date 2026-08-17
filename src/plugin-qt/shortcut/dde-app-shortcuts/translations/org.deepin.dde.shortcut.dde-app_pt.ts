@@ -171,11 +171,11 @@
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>Repor zoom</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimizar janela</translation>
     </message>
 </context>
 </TS>
