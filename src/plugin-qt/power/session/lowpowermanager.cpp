@@ -10,18 +10,28 @@
 #include <QDBusConnection>
 #include <QProcess>
 #include <QLoggingCategory>
+#include <QDBusMessage>
 
 Q_DECLARE_LOGGING_CATEGORY(logPowerSession)
 
 using namespace PowerFS;
 using namespace PowerDConfig;
 
-LowPowerManager::LowPowerManager(PowerManager *powerManager, QObject *parent)
-    : QObject(parent), m_powerManager(powerManager)
+LowPowerManager::LowPowerManager(PowerManager *powerManager)
+    : QDBusAbstractAdaptor(powerManager), m_powerManager(powerManager)
 {
     m_countTicker = new QTimer(this);
     m_countTicker->setInterval(1000);
+    m_validationTimer = new QTimer(this);
+    m_validationTimer->setSingleShot(true);
+    m_validationTimer->setInterval(20000);
 
+    connect(m_validationTimer, &QTimer::timeout, this, [this] {
+        if (!configValid()) {
+            qWarning(logPowerSession) << "Warn-level configuration is invalid; resetting";
+            Reset();
+        }
+    });
     connect(m_countTicker, &QTimer::timeout, this, [this]() {
         m_count++;
         if (!m_powerManager) {
@@ -45,17 +55,49 @@ LowPowerManager::LowPowerManager(PowerManager *powerManager, QObject *parent)
 
     connect(m_powerManager, &PowerManager::batteryPercentageChanged,
             this, &LowPowerManager::updateWarnLevel);
+    connect(m_powerManager, &PowerManager::batteryTimeToEmptyChanged,
+            this, &LowPowerManager::updateWarnLevel);
     connect(m_powerManager, &PowerManager::onBatteryChanged,
             this, &LowPowerManager::updateWarnLevel);
+    connect(m_powerManager, &PowerManager::lowPowerNotifyThresholdChanged, this, [this] {
+        setLowPowerNotifyThreshold(m_powerManager->lowPowerNotifyThreshold());
+        scheduleValidation();
+    });
+    connect(m_powerManager, &PowerManager::lowPowerAutoSleepThresholdChanged, this, [this] {
+        setActionPercentage(m_powerManager->lowPowerAutoSleepThreshold());
+        scheduleValidation();
+    });
 }
+
+#define SET_CONFIG_VALUE(Type, Name, member, signal, dbusName) \
+    void LowPowerManager::set##Name(Type value) \
+    { \
+        if (member == static_cast<decltype(member)>(value)) \
+            return; \
+        member = static_cast<decltype(member)>(value); \
+        Q_EMIT signal(); \
+        notifyPropertyChanged(dbusName, QVariant::fromValue(value)); \
+        updateWarnLevel(); \
+    }
+
+SET_CONFIG_VALUE(bool, UsePercentageForPolicy, m_usePercentageForPolicy,
+                 usePercentageForPolicyChanged, "UsePercentageForPolicy")
+SET_CONFIG_VALUE(qint64, LowTime, m_timeToEmptyLow, lowTimeChanged, "LowTime")
+SET_CONFIG_VALUE(qint64, DangerTime, m_timeToEmptyDanger, dangerTimeChanged, "DangerTime")
+SET_CONFIG_VALUE(qint64, CriticalTime, m_timeToEmptyCritical, criticalTimeChanged, "CriticalTime")
+SET_CONFIG_VALUE(qint64, ActionTime, m_timeToEmptyAction, actionTimeChanged, "ActionTime")
+SET_CONFIG_VALUE(qint64, LowPowerNotifyThreshold, m_lowPowerNotifyThreshold,
+                 lowPowerNotifyThresholdChanged, "LowPowerNotifyThreshold")
+SET_CONFIG_VALUE(qint64, ActionPercentage, m_percentageAction,
+                 actionPercentageChanged, "ActionPercentage")
+
+#undef SET_CONFIG_VALUE
 
 void LowPowerManager::initConfig(Dtk::Core::DConfig *config)
 {
     m_config = config;
-    if (!m_config) return;
-
-    connect(m_config, &Dtk::Core::DConfig::valueChanged,
-            this, &LowPowerManager::onConfigChanged);
+    if (!m_config)
+        return;
 
     m_usePercentageForPolicy = m_config->value(kUsePercentageForPolicy, true).toBool();
     m_lowPowerNotifyThreshold = m_config->value(kLowPowerNotifyThreshold, 0).toInt();
@@ -66,28 +108,22 @@ void LowPowerManager::initConfig(Dtk::Core::DConfig *config)
     m_timeToEmptyAction = static_cast<quint64>(m_config->value(kTimeToEmptyAction, 0).toLongLong());
 }
 
-void LowPowerManager::onConfigChanged(const QString &key)
+void LowPowerManager::applyConfigValue(const QString &key, const QVariant &value)
 {
-    if (!m_config) return;
-
     if (key == QLatin1String(kUsePercentageForPolicy))
-        m_usePercentageForPolicy = m_config->value(kUsePercentageForPolicy, true).toBool();
-    else if (key == QLatin1String(kLowPowerNotifyThreshold))
-        m_lowPowerNotifyThreshold = m_config->value(kLowPowerNotifyThreshold, 0).toInt();
-    else if (key == QLatin1String(kPercentageAction))
-        m_percentageAction = m_config->value(kPercentageAction, 0).toInt();
+        setUsePercentageForPolicy(value.toBool());
     else if (key == QLatin1String(kTimeToEmptyLow))
-        m_timeToEmptyLow = static_cast<quint64>(m_config->value(kTimeToEmptyLow, 0).toLongLong());
+        setLowTime(value.toLongLong());
     else if (key == QLatin1String(kTimeToEmptyDanger))
-        m_timeToEmptyDanger = static_cast<quint64>(m_config->value(kTimeToEmptyDanger, 0).toLongLong());
+        setDangerTime(value.toLongLong());
     else if (key == QLatin1String(kTimeToEmptyCritical))
-        m_timeToEmptyCritical = static_cast<quint64>(m_config->value(kTimeToEmptyCritical, 0).toLongLong());
+        setCriticalTime(value.toLongLong());
     else if (key == QLatin1String(kTimeToEmptyAction))
-        m_timeToEmptyAction = static_cast<quint64>(m_config->value(kTimeToEmptyAction, 0).toLongLong());
+        setActionTime(value.toLongLong());
     else
         return;
 
-    updateWarnLevel();
+    scheduleValidation();
 }
 
 uint LowPowerManager::getWarnLevel(double percentage, quint64 timeToEmpty)
@@ -130,23 +166,25 @@ uint LowPowerManager::getWarnLevel(double percentage, quint64 timeToEmpty)
 void LowPowerManager::updateWarnLevel()
 {
     if (!m_powerManager || !m_powerManager->onBattery()) {
+        disableTicker();
         if (m_currentLevel != None) {
             m_currentLevel = None;
             handleLevelChanged(None);
         }
-        disableTicker();
-        closeLowPower();
         return;
     }
 
     double pct = 100.0;
-    auto bat = m_powerManager->batteryPercentage();
-    if (!bat.isEmpty())
-        pct = bat.first();
+    const auto batteries = m_powerManager->batteryPercentage();
+    if (!batteries.isEmpty())
+        pct = batteries.first();
 
-    quint64 tte = m_powerManager->batteryTimeToEmpty();
+    // Some firmware transiently reports 0%. Keep an already-active warning
+    // until a credible percentage or AC state arrives.
+    if (m_usePercentageForPolicy && pct == 0.0 && m_currentLevel != None)
+        return;
 
-    uint newLevel = getWarnLevel(pct, tte);
+    const uint newLevel = getWarnLevel(pct, m_powerManager->batteryTimeToEmpty());
     if (newLevel == m_currentLevel)
         return;
 
@@ -158,6 +196,10 @@ void LowPowerManager::handleLevelChanged(uint level)
 {
     qDebug(logPowerSession) << "Battery level changed: " << level;
     disableTicker();
+    if (m_powerManager && m_powerManager->m_warnLevel != level) {
+        m_powerManager->m_warnLevel = level;
+        Q_EMIT m_powerManager->warnLevelChanged();
+    }
 
     switch (level) {
     case Action: {
@@ -175,15 +217,11 @@ void LowPowerManager::handleLevelChanged(uint level)
         playBatterySound();
         sendNotify(tr("Battery low, please plug in"));
         break;
-    case None: {
+    case None:
         closeLowPower();
-        if (m_powerManager) {
-            m_powerManager->closeNotify();
-            if (m_powerManager->scheduledShutdownState())
-                m_powerManager->scheduledShutdown(SchedInit);
-        }
+        if (m_powerManager && m_powerManager->scheduledShutdownState())
+            m_powerManager->scheduledShutdown(SchedInit);
         break;
-    }
     }
 }
 
@@ -250,4 +288,49 @@ void LowPowerManager::closeLowPower()
 {
     if (!QProcess::startDetached(kLowPowerCmd, {"--quit"}))
         qWarning(logPowerSession) << "Failed to start dde-lowpower --quit";
+}
+
+void LowPowerManager::scheduleValidation()
+{
+    m_validationTimer->start();
+}
+
+bool LowPowerManager::configValid() const
+{
+    // Legacy dde-daemon only accepted 1%-9% action thresholds; 10% is the
+    // separate critical threshold, so equality would collapse two warning levels.
+    return m_timeToEmptyLow > m_timeToEmptyDanger
+        && m_timeToEmptyDanger > m_timeToEmptyCritical
+        && m_timeToEmptyCritical > m_timeToEmptyAction
+        && m_percentageAction < 10;
+}
+
+void LowPowerManager::Reset()
+{
+    if (!m_config)
+        return;
+    static const char *keys[] = {
+        kUsePercentageForPolicy,
+        kLowPowerNotifyThreshold,
+        kPercentageAction,
+        kTimeToEmptyLow,
+        kTimeToEmptyDanger,
+        kTimeToEmptyCritical,
+        kTimeToEmptyAction,
+    };
+    for (const char *key : keys)
+        m_config->reset(QLatin1String(key));
+}
+
+void LowPowerManager::notifyPropertyChanged(const char *name, const QVariant &value)
+{
+    if (!m_powerManager || !m_powerManager->m_conn)
+        return;
+    QDBusMessage message = QDBusMessage::createSignal(
+        PowerDBus::kPath, QStringLiteral("org.freedesktop.DBus.Properties"),
+        QStringLiteral("PropertiesChanged"));
+    message << QStringLiteral("org.deepin.dde.Power1.WarnLevelConfig")
+            << QVariantMap{{QString::fromLatin1(name), value}}
+            << QStringList();
+    m_powerManager->m_conn->send(message);
 }

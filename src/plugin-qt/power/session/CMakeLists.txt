@@ -15,6 +15,7 @@ include(GNUInstallDirs)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus Gui WaylandClient LinguistTools)
 find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(X11 REQUIRED x11 xext xscrnsaver)
 pkg_check_modules(WAYLAND_PROTOCOLS REQUIRED wayland-protocols)
 pkg_check_modules(WLR_PROTOCOLS REQUIRED wlr-protocols)
 pkg_check_modules(TREELAND_PROTOCOLS REQUIRED treeland-protocols)
@@ -76,6 +77,7 @@ qt_add_translations(${BIN_NAME}
 target_include_directories(${BIN_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${X11_INCLUDE_DIRS}
 )
 
 target_link_libraries(${BIN_NAME} PRIVATE
@@ -84,6 +86,7 @@ target_link_libraries(${BIN_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::WaylandClient
     Dtk${DTK_VERSION_MAJOR}::Core
+    ${X11_LIBRARIES}
 )
 
 install(TARGETS ${BIN_NAME}
@@ -91,11 +94,11 @@ DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/
 )
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/plugin-power-session.json
-DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/deepin-service-manager/user/
+DESTINATION ${CMAKE_INSTALL_DATADIR}/deepin-service-manager/user/
 )
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/dbus/org.deepin.dde.Power1.service
-DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/services/
+DESTINATION ${CMAKE_INSTALL_DATADIR}/dbus-1/services/
 )
 
 install(FILES ${QM_FILES} 

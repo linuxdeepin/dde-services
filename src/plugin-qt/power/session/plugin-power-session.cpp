@@ -15,8 +15,6 @@ static QTranslator *g_trans = nullptr;
 
 extern "C" int DSMRegister(const char *name, void *data)
 {
-    if (qEnvironmentVariable("XDG_SESSION_TYPE") != QLatin1String("wayland"))
-        return 0;
 
     g_trans = new QTranslator;
     const QString &path = QStandardPaths::locate(QStandardPaths::GenericDataLocation,
