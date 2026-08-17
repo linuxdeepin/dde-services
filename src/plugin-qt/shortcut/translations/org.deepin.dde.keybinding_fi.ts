@@ -211,11 +211,11 @@
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Valitse sovelluksen seuraava ikkuna</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Valitse sovelluksen edellinen ikkuna</translation>
     </message>
 </context>
 </TS>
