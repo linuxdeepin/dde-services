@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Pois</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -119,19 +119,19 @@
     </message>
     <message>
         <source>Accessibility</source>
-        <translation type="unfinished"/>
+        <translation>Apuvälineet</translation>
     </message>
     <message>
         <source>Text to speech</source>
-        <translation type="unfinished"/>
+        <translation>Teksti puheeksi</translation>
     </message>
     <message>
         <source>Speech to text</source>
-        <translation type="unfinished"/>
+        <translation>Puhe tekstiksi</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"/>
+        <translation>Käännös</translation>
     </message>
     <message>
         <source>None</source>
