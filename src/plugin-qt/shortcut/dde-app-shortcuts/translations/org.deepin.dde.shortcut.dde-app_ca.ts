@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation type="unfinished"/>
+        <translation>Centre de notificacions</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,19 +19,19 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra del terminal Quake</translation>
     </message>
     <message>
         <source>Launcher</source>
-        <translation type="unfinished"/>
+        <translation>Llançador</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Tanca la finestra</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maximitza la finestra</translation>
     </message>
     <message>
         <source>Show desktop</source>
