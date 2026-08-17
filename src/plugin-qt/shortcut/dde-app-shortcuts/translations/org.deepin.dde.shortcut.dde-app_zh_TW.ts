@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation type="unfinished"/>
+        <translation>通知中心</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation type="unfinished"/>
+        <translation>終端雷神模式</translation>
     </message>
     <message>
         <source>Launcher</source>
-        <translation type="unfinished"/>
+        <translation>啟動器</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>關閉視窗</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>最大化視窗</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>顯示桌面</translation>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>顯示多工檢視</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>延遲截圖</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>檔案管理員</translation>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>全螢幕截圖</translation>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>系統監視器</translation>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>視窗截圖</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>圖文識別</translation>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation type="unfinished"/>
+        <translation>最小化視窗</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>移動視窗</translation>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>移至左側工作區</translation>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>移至右側工作區</translation>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>調整視窗大小</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>螢幕錄影</translation>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,55 +127,55 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>切換視窗特效</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>切換視窗</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>反向切換視窗</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation type="unfinished"/>
+        <translation>切換同類型視窗</translation>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>反向切換同類型視窗</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>切換至左側工作區</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>切換至右側工作區</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation type="unfinished"/>
+        <translation>將視窗拼貼到左側</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation type="unfinished"/>
+        <translation>將視窗拼貼到右側</translation>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation type="unfinished"/>
+        <translation>放大螢幕</translation>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation type="unfinished"/>
+        <translation>縮小螢幕</translation>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>重設螢幕縮放</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>還原視窗</translation>
     </message>
 </context>
 </TS>
