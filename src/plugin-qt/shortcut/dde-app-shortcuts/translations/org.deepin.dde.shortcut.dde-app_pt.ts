@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation>Centro de Notificações</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation>Janela do Terminal Quake</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Launcher</source>
-        <translation>lançador</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Close window</source>
-        <translation>Fechar Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>Maximizar Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>Mostrar Ambiente de Trabalho</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>Alternar Vista de Multi-tarefa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Atrasar Captura de Ecrã</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File manager</source>
-        <translation>Gestor de Ficheiros</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Captura de Ecrã Completo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation>Monitor do Sistema</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation>Captura de imagem da Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation>OCR (Imagem para Texto)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation>Minimizar Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move window</source>
-        <translation>Mover Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation>Mover para a Área de trabalho Esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation>Mover para a Área de trabalho Direita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation>Redimensionar Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation>Gravador de Ecrã</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,51 +127,51 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation>Mudar Efeitos da Janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation>Mudar Janelas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation>Mudar Janelas Reversivamente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation>Mudar Janelas do Mesmo Tipo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation>Mudar Janelas do Mesmo Tipo Reversivamente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation>Mudar para a Área de trabalho Esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation>Mudar para a Área de trabalho Direita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation>Janela Quick Tile Esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation>Janela Quick Tile Direita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation>Aumentar Zoom</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation>Diminuir Zoom</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation>Aumentar para o Tamanho Atual</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unmaximize window</source>
