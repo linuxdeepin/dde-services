@@ -171,7 +171,7 @@
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>Tavallinen koko</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
