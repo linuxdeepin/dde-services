@@ -14,6 +14,7 @@ namespace PowerDConfig {
     inline constexpr auto kLinePowerLockDelay              = "linePowerLockDelay";
     inline constexpr auto kLinePowerLidClosedAction        = "linePowerLidClosedAction";
     inline constexpr auto kLinePowerPressPowerButton       = "linePowerPressPowerButton";
+    inline constexpr auto kLinePowerShortIdleDelay         = "linePowerShortIdleDelay";
 
     inline constexpr auto kBatteryScreensaverDelay         = "batteryScreensaverDelay";
     inline constexpr auto kBatteryScreenBlackDelay         = "batteryScreenBlackDelay";
@@ -21,11 +22,21 @@ namespace PowerDConfig {
     inline constexpr auto kBatteryLockDelay                = "batteryLockDelay";
     inline constexpr auto kBatteryLidClosedAction          = "batteryLidClosedAction";
     inline constexpr auto kBatteryPressPowerButton         = "batteryPressPowerButton";
+    inline constexpr auto kBatteryShortIdleDelay           = "batteryShortIdleDelay";
 
     inline constexpr auto kScreenBlackLock                 = "screenBlackLock";
     inline constexpr auto kSleepLock                       = "sleepLock";
     inline constexpr auto kPowerButtonPressedExec          = "powerButtonPressedExec";
+    inline constexpr auto kShortIdleEnable                 = "shortIdleEnable";
+    inline constexpr auto kShortIdleState                  = "shortIdleState";
+    inline constexpr auto kShortIdleBlacklistApplications = "shortIdleBlacklistApplications";
+    inline constexpr auto kSystemApplications             = "systemApplications";
+    inline constexpr auto kSystemServices                 = "systemServices";
+    inline constexpr auto kFullscreenWorkaroundAppList     = "fullscreenWorkaroundAppList";
+    inline constexpr auto kAllowScreenSaver                  = "allowScreenSaver";
+    inline constexpr auto kDelayHandleIdleOffIntervalWhenScreenBlack = "delayHandleIdleOffIntervalWhenScreenBlack";
 
+inline constexpr auto kDelayWakeupInterval = "delayWakeupInterval";
     inline constexpr auto kLowPowerNotifyEnable            = "lowPowerNotifyEnable";
     inline constexpr auto kLowPowerNotifyThreshold         = "lowPowerNotifyThreshold";
     inline constexpr auto kUsePercentageForPolicy          = "usePercentageForPolicy";
@@ -37,13 +48,15 @@ namespace PowerDConfig {
     inline constexpr auto kLowPowerAction                  = "lowPowerAction";
     inline constexpr auto kPowerSavingModeBrightnessDropPercent = "powerSavingModeBrightnessDropPercent";
     inline constexpr auto kPowerSavingModeEnabled               = "powerSavingModeEnabled";
+    inline constexpr auto kSaveBrightnessWhilePsm             = "saveBrightnessWhilePsm";
     inline constexpr auto kPowerSavingModeAuto                  = "powerSavingModeAuto";
     inline constexpr auto kPowerSavingModeAutoWhenBatteryLow    = "powerSavingModeAutoWhenBatteryLow";
     inline constexpr auto kPowerSavingModeAutoBatteryPercent    = "powerSavingModeAutoBatteryPercent";
-    inline constexpr auto kLastMode                         = "lastMode";
+    inline constexpr auto kPowerMappingConfig              = "powerMappingConfig";
     inline constexpr auto kMode                            = "mode";
     inline constexpr auto kAdjustBrightnessEnabled         = "adjustBrightnessEnabled";
     inline constexpr auto kHighPerformanceEnabled           = "highPerformanceEnabled";
+
 
     inline constexpr auto kScheduledShutdownState          = "scheduledShutdownState";
     inline constexpr auto kShutdownTime                    = "shutdownTime";
@@ -80,6 +93,11 @@ namespace PowerDBus {
 
     inline constexpr auto kScreensaver    = "com.deepin.ScreenSaver";
     inline constexpr auto kScreensaverPath = "/com/deepin/ScreenSaver";
+    inline constexpr auto kIdleService     = "org.deepin.dde.ScreenSaver1";
+    inline constexpr auto kX11IdleService  = "org.freedesktop.ScreenSaver";
+    inline constexpr auto kX11IdlePath     = "/org/freedesktop/ScreenSaver";
+    inline constexpr auto kX11IdleInterface = "org.freedesktop.ScreenSaver";
+    inline constexpr auto kIdlePath        = "/org/deepin/dde/ScreenSaver1";
 
     inline constexpr auto kDisplay        = "org.deepin.dde.Display1";
     inline constexpr auto kDisplayPath    = "/org/deepin/dde/Display1";
@@ -99,6 +117,10 @@ namespace PowerDBus {
     inline constexpr auto kCalendarService = "com.deepin.dataserver.Calendar";
     inline constexpr auto kCalendarPath    = "/com/deepin/dataserver/Calendar/HuangLi";
     inline constexpr auto kCalendarIface   = "com.deepin.dataserver.Calendar.HuangLi";
+
+    inline constexpr auto kDisplayManagerService = "org.freedesktop.DisplayManager";
+    inline constexpr auto kDisplayManagerPath    = "/org/freedesktop/DisplayManager";
+    inline constexpr auto kDisplayManagerIface   = "org.freedesktop.DisplayManager";
 }
 
 namespace PowerFS {
@@ -106,7 +128,6 @@ namespace PowerFS {
     inline constexpr auto kCpuGovernorFmt    = "/sys/devices/system/cpu/%1/cpufreq/scaling_governor";
     inline constexpr auto kCpuBoostPath      = "/sys/devices/system/cpu/cpufreq/boost";
     inline constexpr auto kLidStatePath      = "/proc/acpi/button/lid/LID/state";
-    inline constexpr auto kDpmsStateFile     = "/tmp/dpms-state";
     inline constexpr auto kNoSuspendFile     = "/etc/deepin/no_suspend";
     inline constexpr auto kLowPowerCmd       = "/usr/lib/deepin-daemon/dde-lowpower";
 }
