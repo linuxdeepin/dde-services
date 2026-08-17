@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation>Qendër Njoftimesh</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation>Dritare Terminali Quake</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Launcher</source>
-        <translation>nisës</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Close window</source>
-        <translation>Mbylle Dritaren</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>Maksimizoje Dritaren</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>Shfaqe Desktopin</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>Shfaq/Fshih Pamjen Shumëpunëshe</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Vonoje Foton e Ekranit</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File manager</source>
-        <translation>Përgjegjës Kartelash</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Foto Ekrani Sa Krejt Ekrani</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,11 +67,11 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation>Mbikëqyrës Sistemi</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation>Foto Ekrani Dritareje</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OCR (image to text)</source>
