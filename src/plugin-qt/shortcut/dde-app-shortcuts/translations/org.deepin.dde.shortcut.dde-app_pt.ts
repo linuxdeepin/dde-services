@@ -43,15 +43,15 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar vista multi-tarefa</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Atrasar captura de ecrã</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Gestor de ficheiros</translation>
     </message>
     <message>
         <source>Full screenshot</source>
