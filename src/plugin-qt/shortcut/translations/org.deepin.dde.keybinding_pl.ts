@@ -6,8 +6,8 @@
         <translation>Przełącz wiele ekranów</translation>
     </message>
     <message>
-        <source>Default terminal</source>
-        <translation>Domyślny terminal</translation>
+        <source>Terminal</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
@@ -58,8 +58,8 @@
         <translation>Maksymalizuj okno</translation>
     </message>
     <message>
-        <source>Restore window</source>
-        <translation>Przywróć okno</translation>
+        <source>Unmaximize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Current window left split</source>
@@ -118,15 +118,15 @@
         <translation>Własny</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Narzędzia pomocnicze</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>Zmiana tekstu na mowę</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>Zmiana mowy na tekst</translation>
     </message>
     <message>
@@ -180,10 +180,6 @@
     <message>
         <source>Open window menu</source>
         <translation>Otwórz menu okna</translation>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
-        <translation>Przełącz widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
