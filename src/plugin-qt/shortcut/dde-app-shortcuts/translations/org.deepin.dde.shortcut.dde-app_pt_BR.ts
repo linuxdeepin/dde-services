@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Capturar tela com atraso</translation>
+        <translation>Atrasar captura de tela</translation>
     </message>
     <message>
         <source>File manager</source>
