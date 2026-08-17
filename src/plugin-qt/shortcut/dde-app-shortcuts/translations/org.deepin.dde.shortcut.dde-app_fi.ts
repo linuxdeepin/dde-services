@@ -10,52 +10,52 @@
         <translation>Lukitse näyttö</translation>
     </message>
     <message>
-        <source>Notification Center</source>
-        <translation>Ilmoituskeskus</translation>
+        <source>Notification center</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
         <translation>Sammutus käyttöliittymä</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
-        <translation>Quake terminaali</translation>
+        <source>Terminal quake window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>launcher</source>
-        <translation>käynnistäjä</translation>
+        <source>Launcher</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Close Window</source>
-        <translation>Sulje ikkuna</translation>
+        <source>Close window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Maximize Window</source>
-        <translation>Suurenna ikkuna</translation>
+        <source>Maximize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show Desktop</source>
-        <translation>Näytä työpöytä</translation>
+        <source>Show desktop</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
-        <translation>Vaihda työtilat näkymä</translation>
+        <source>Show multitasking view</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Delay Screenshot</source>
-        <translation>Kaappaus viiveellä</translation>
+        <source>Delay screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>File Manager</source>
-        <translation>Tiedostonhallinta</translation>
+        <source>File manager</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
-        <translation>Kokonäytön kaappaus</translation>
+        <source>Full screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -66,15 +66,15 @@
         <translation>Kaappaus</translation>
     </message>
     <message>
-        <source>System Monitor</source>
-        <translation>Järjestelmän valvonta</translation>
+        <source>System monitor</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Screenshot</source>
-        <translation>Ikkunan kaappaus</translation>
+        <source>Window screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
+        <source>OCR (image to text)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -90,23 +90,23 @@
         <translation>Työtila</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Minimize Window</source>
+        <source>Minimize window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move Window</source>
+        <source>Move window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
+        <source>Move to left workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
+        <source>Move to right workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -114,11 +114,11 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Resize Window</source>
+        <source>Resize window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Screen Recorder</source>
+        <source>Screen recorder</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -126,55 +126,55 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Window Effects</source>
+        <source>Switch window effects</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows</source>
+        <source>Switch windows</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
+        <source>Switch windows in reverse</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
+        <source>Switch similar windows</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
+        <source>Switch similar windows in reverse</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
+        <source>Switch to left workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
+        <source>Switch to right workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
+        <source>Tile window to left of screen</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
+        <source>Tile window to right of screen</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom In</source>
+        <source>Zoom in</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom Out</source>
+        <source>Zoom out</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
+        <source>Reset zoom</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation type="unfinished"/>
     </message>
 </context>
