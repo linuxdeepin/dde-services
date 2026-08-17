@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de tela inteira</translation>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor do sistema</translation>
     </message>
     <message>
         <source>Window screenshot</source>
