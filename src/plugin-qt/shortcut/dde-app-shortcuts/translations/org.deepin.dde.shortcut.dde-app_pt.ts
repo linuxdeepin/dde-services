@@ -163,11 +163,11 @@
     </message>
     <message>
         <source>Zoom in</source>
-        <translation type="unfinished"/>
+        <translation>Aumentar zoom</translation>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation type="unfinished"/>
+        <translation>Diminuir zoom</translation>
     </message>
     <message>
         <source>Reset zoom</source>
