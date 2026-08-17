@@ -39,15 +39,15 @@
     </message>
     <message>
         <source>Swipe up with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise ylös kolmella sormella</translation>
     </message>
     <message>
         <source>Four-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Neljän sormen painallus</translation>
     </message>
     <message>
         <source>Three-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Kolmen sormen painallus</translation>
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
