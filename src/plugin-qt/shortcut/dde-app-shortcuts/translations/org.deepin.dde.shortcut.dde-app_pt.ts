@@ -135,7 +135,7 @@
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Mudar janelas em ordem inversa</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
