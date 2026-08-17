@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation>Notificações</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation>Janela Quake do terminal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Launcher</source>
-        <translation>Launcher</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Close window</source>
-        <translation>Fechar janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>Maximizar janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>Exibir área de trabalho</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>Alternar multitarefas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Capturar tela com atraso</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File manager</source>
-        <translation>Gerenciador de Arquivos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Capturar tela inteira</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation>Monitor do sistema</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation>Capturar janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation>OCR (imagem para texto)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation>Minimizar janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move window</source>
-        <translation>Mover janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation>Mover para o espaço de trabalho à esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation>Mover para o espaço de trabalho à direita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation>Redimensionar janela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation>Gravador de tela</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,55 +127,55 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation>Alternar efeitos visuais</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation>Alternar janelas</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation>Alternar janelas na ordem inversa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation>Alternar janelas do mesmo tipo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation>Alternar janelas do mesmo tipo na ordem inversa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation>Alternar para o espaço de trabalho à esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation>Alternar para o espaço de trabalho à direita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation>Ajustar rapidamente a janela à esquerda</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation>Ajustar rapidamente a janela à direita</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation>Ampliar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation>Reduzir</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation>Exibir no tamanho real</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation>Restaurar janela</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
