@@ -91,15 +91,15 @@
     </message>
     <message>
         <source>Accessibility</source>
-        <translation type="unfinished"/>
+        <translation>Apuvälineet</translation>
     </message>
     <message>
         <source>Minimize window</source>
-        <translation type="unfinished"/>
+        <translation>Pienennä ikkuna</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä ikkunaa</translation>
     </message>
     <message>
         <source>Move to left workspace</source>
