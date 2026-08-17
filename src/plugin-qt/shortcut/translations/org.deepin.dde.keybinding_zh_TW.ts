@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Terminal</source>
-        <translation type="unfinished"/>
+        <translation>終端機</translation>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>還原視窗</translation>
     </message>
     <message>
         <source>Current window left split</source>
