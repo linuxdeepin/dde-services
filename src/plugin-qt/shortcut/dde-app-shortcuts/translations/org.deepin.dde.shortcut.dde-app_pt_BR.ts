@@ -10,52 +10,52 @@
         <translation>Tela de bloqueio</translation>
     </message>
     <message>
-        <source>Notification Center</source>
-        <translation>Notificações</translation>
+        <source>Notification center</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
         <translation>Interface de desligamento</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
-        <translation>Janela Quake do terminal</translation>
+        <source>Terminal quake window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>launcher</source>
-        <translation>Launcher</translation>
+        <source>Launcher</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Close Window</source>
-        <translation>Fechar janela</translation>
+        <source>Close window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Maximize Window</source>
-        <translation>Maximizar janela</translation>
+        <source>Maximize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show Desktop</source>
-        <translation>Exibir área de trabalho</translation>
+        <source>Show desktop</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
         <translation>Abrir menu da janela</translation>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
-        <translation>Alternar multitarefas</translation>
+        <source>Show multitasking view</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Delay Screenshot</source>
-        <translation>Capturar tela com atraso</translation>
+        <source>Delay screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>File Manager</source>
-        <translation>Gerenciador de Arquivos</translation>
+        <source>File manager</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
-        <translation>Capturar tela inteira</translation>
+        <source>Full screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -66,16 +66,16 @@
         <translation>Captura de Tela</translation>
     </message>
     <message>
-        <source>System Monitor</source>
-        <translation>Monitor do sistema</translation>
+        <source>System monitor</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Screenshot</source>
-        <translation>Capturar janela</translation>
+        <source>Window screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
-        <translation>OCR (imagem para texto)</translation>
+        <source>OCR (image to text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
@@ -90,92 +90,92 @@
         <translation>Espaço de trabalho</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Ferramentas de acessibilidade</translation>
     </message>
     <message>
-        <source>Minimize Window</source>
-        <translation>Minimizar janela</translation>
+        <source>Minimize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move Window</source>
-        <translation>Mover janela</translation>
+        <source>Move window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
-        <translation>Mover para o espaço de trabalho à esquerda</translation>
+        <source>Move to left workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
-        <translation>Mover para o espaço de trabalho à direita</translation>
+        <source>Move to right workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>None</source>
         <translation>Nenhum</translation>
     </message>
     <message>
-        <source>Resize Window</source>
-        <translation>Redimensionar janela</translation>
+        <source>Resize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Screen Recorder</source>
-        <translation>Gravador de tela</translation>
+        <source>Screen recorder</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Scrollshot</source>
         <translation>Captura de tela por rolagem</translation>
     </message>
     <message>
-        <source>Switch Window Effects</source>
-        <translation>Alternar efeitos visuais</translation>
+        <source>Switch window effects</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows</source>
-        <translation>Alternar janelas</translation>
+        <source>Switch windows</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
-        <translation>Alternar janelas na ordem inversa</translation>
+        <source>Switch windows in reverse</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
-        <translation>Alternar janelas do mesmo tipo</translation>
+        <source>Switch similar windows</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
-        <translation>Alternar janelas do mesmo tipo na ordem inversa</translation>
+        <source>Switch similar windows in reverse</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
-        <translation>Alternar para o espaço de trabalho à esquerda</translation>
+        <source>Switch to left workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
-        <translation>Alternar para o espaço de trabalho à direita</translation>
+        <source>Switch to right workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
-        <translation>Ajustar rapidamente a janela à esquerda</translation>
+        <source>Tile window to left of screen</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
-        <translation>Ajustar rapidamente a janela à direita</translation>
+        <source>Tile window to right of screen</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom In</source>
-        <translation>Ampliar</translation>
+        <source>Zoom in</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom Out</source>
-        <translation>Reduzir</translation>
+        <source>Zoom out</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
-        <translation>Exibir no tamanho real</translation>
+        <source>Reset zoom</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Restore window</source>
-        <translation>Restaurar janela</translation>
+        <source>Unmaximize window</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
