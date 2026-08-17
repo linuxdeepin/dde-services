@@ -195,7 +195,7 @@
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Poistu</translation>
     </message>
     <message>
         <source>Enter task switcher</source>
