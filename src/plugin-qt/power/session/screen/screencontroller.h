@@ -58,3 +58,5 @@ Q_SIGNALS:
     /// Emitted when the brightness of an output changes.
     void brightnessChanged(int index, double value);
 };
+
+ScreenController *createX11ScreenController(QObject *parent = nullptr);

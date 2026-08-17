@@ -7,6 +7,8 @@
 #include <QGuiApplication>
 #include <QLoggingCategory>
 
+#include <limits>
+
 Q_DECLARE_LOGGING_CATEGORY(logPowerSession)
 
 IdleNotification::IdleNotification(::ext_idle_notification_v1 *id)
@@ -185,5 +187,7 @@ uint32_t WaylandIdleWatcher::idleTimeMs() const
     if (!m_idleTimer.isValid())
         return 0;
 
-    return static_cast<uint32_t>(m_idleTimer.elapsed());
+    const qint64 total = static_cast<qint64>(m_timeoutSec) * 1000 + m_idleTimer.elapsed();
+    return static_cast<uint32_t>(qMin(
+        static_cast<qint64>(std::numeric_limits<uint32_t>::max()), total));
 }

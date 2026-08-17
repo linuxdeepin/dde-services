@@ -44,3 +44,5 @@ Q_SIGNALS:
     /// Emitted when the user resumes activity.
     void resumed();
 };
+
+IdleWatcher *createX11IdleWatcher(QObject *parent = nullptr);

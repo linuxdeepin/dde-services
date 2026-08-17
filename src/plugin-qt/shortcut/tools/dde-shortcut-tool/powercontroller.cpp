@@ -15,7 +15,6 @@
 #include <QDBusObjectPath>
 #include <QDBusReply>
 #include <QDebug>
-#include <QFile>
 #include <QProcess>
 #include <QThread>
 
@@ -469,9 +468,6 @@ void PowerController::systemTurnOffScreen()
 
     undoPrepareSuspend();
 
-    QFile dpmsState("/tmp/dpms-state");
-    if (dpmsState.open(QIODevice::WriteOnly | QIODevice::Truncate))
-        dpmsState.write("1");
 }
 
 void PowerController::showShutdownUI()

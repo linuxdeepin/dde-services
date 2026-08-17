@@ -5,6 +5,7 @@
 #pragma once
 
 #include <QObject>
+#include <QMap>
 #include <QDBusUnixFileDescriptor>
 #include <DDBusInterface>
 
@@ -16,7 +17,7 @@ class SessionDBusProxy : public QObject {
 public:
     explicit SessionDBusProxy(QObject *parent = nullptr);
 
-    // ── Power (system bus) — DDBusInterface 自动转发 PropertiesChanged ──
+    // ── Power (system bus) ──
     Q_PROPERTY(bool OnBattery READ onBattery NOTIFY OnBatteryChanged)
     bool onBattery() const;
 
@@ -44,9 +45,19 @@ public:
     Q_PROPERTY(uint PowerSavingModeBrightnessDropPercent READ powerSavingModeBrightnessDropPercent NOTIFY PowerSavingModeBrightnessDropPercentChanged)
     uint powerSavingModeBrightnessDropPercent() const;
 
+    Q_PROPERTY(QString PowerSavingModeBrightnessData READ powerSavingModeBrightnessData NOTIFY PowerSavingModeBrightnessDataChanged)
+    QString powerSavingModeBrightnessData() const;
+    void setPowerSavingModeBrightnessData(const QString &value);
+    void setShortIdleState(bool state);
+    void setIdleState(bool state);
+    void setScreenState(bool state);
+    void refreshBatteries();
+
+    void refreshMains();
     // ── SessionWatcher ──
     Q_PROPERTY(bool SessionActive READ sessionActive NOTIFY SessionActiveChanged)
     bool sessionActive() const;
+    bool sessionLocked() const;
 
     // ── SessionManager ──
     void requestSuspend();
@@ -57,6 +68,8 @@ public:
 
     // ── ShutdownFront ──
     void requestSuspendByFront();
+    void requestHibernateByFront();
+    void requestShutdownByFront();
 
     // ── LockFront ──
     void showLockAuth(bool autoStart);
@@ -66,12 +79,21 @@ public:
     QDBusUnixFileDescriptor inhibit(const QString &what, const QString &who,
                                     const QString &why, const QString &mode);
 
+    QDBusMessage inhibitors() const;
+    QDBusMessage listSessions() const;
     // ── BlackScreen ──
     void setBlackScreenActive(bool active);
 
     // ── Display ──
+    QMap<QString, double> brightness() const;
     void setBrightness(const QString &monitor, double value);
     void setAndSaveBrightness(const QString &monitor, double value);
+    void refreshBrightness();
+    Q_SIGNAL void BrightnessChanged(const QMap<QString, double> &value);
+
+    // ── AmbientBrightness ──
+    bool ambientBrightnessSupported() const;
+    bool ambientBrightnessEnabled() const;
 
     // ── Notifications ──
     uint notify(uint replaceId, const QString &appName, const QString &icon,
@@ -83,7 +105,7 @@ public:
     QString getFestivalMonth(int year, int month);
 
 signals:
-    // DDBusInterface 自动转发：属性名 + Changed
+    // Forwarded from org.freedesktop.DBus.PropertiesChanged by DDBusInterface.
     void OnBatteryChanged(bool value);
     void HasLidSwitchChanged(bool value);
     void HasBatteryChanged(bool value);
@@ -93,11 +115,21 @@ signals:
     void IsHighPerformanceSupportedChanged(bool value);
     void PowerSavingModeEnabledChanged(bool value);
     void PowerSavingModeBrightnessDropPercentChanged(uint value);
+    void PowerSavingModeBrightnessDataChanged(const QString &value);
     void SessionActiveChanged(bool value);
 
     void notifyActionInvoked(uint id, const QString &actionKey);
     void timeUpdate();
     void login1OwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    void ambientBrightnessPropertiesChanged(const QString &interface,
+                                            const QVariantMap &changed,
+                                            const QStringList &invalidated);
+
+
+private Q_SLOTS:
+    void handleDisplayPropertiesChanged(const QString &interface,
+                                        const QVariantMap &changed,
+                                        const QStringList &invalidated);
 
 private:
     DDBusInterface *m_powerInter;
@@ -112,4 +144,5 @@ private:
     DDBusInterface *m_calendarInter;
     DDBusInterface *m_timedateInter;
     DDBusInterface *m_freedesktopDBusInter;
+    DDBusInterface *m_ambientBrightnessInter;
 };

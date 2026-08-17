@@ -27,4 +27,5 @@ private Q_SLOTS:
 private:
     void inhibit();
     int m_fd = -1;
+    bool m_prepared = false;
 };

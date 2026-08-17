@@ -35,20 +35,26 @@ SleepInhibitor::~SleepInhibitor()
 void SleepInhibitor::handleSleep(bool beforeSleep)
 {
     if (beforeSleep) {
-        unblock();
+        m_prepared = true;
         Q_EMIT aboutToSleep();
-    } else {
-        Q_EMIT wokeUp();
-        block();
+        unblock();
+        return;
     }
+    if (!m_prepared)
+        return;
+    Q_EMIT wokeUp();
+    block();
+    m_prepared = false;
 }
 
 void SleepInhibitor::onNameOwnerChanged(const QString &name,
                                          const QString &,
                                          const QString &newOwner)
 {
-    if (name == QLatin1String(kLogin1Service) && !newOwner.isEmpty())
+    if (name == QLatin1String(kLogin1Service) && !newOwner.isEmpty() && m_fd >= 0) {
+        unblock();
         inhibit();
+    }
 }
 
 void SleepInhibitor::inhibit()

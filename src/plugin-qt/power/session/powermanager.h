@@ -8,6 +8,7 @@
 
 #include <QVariantMap>
 #include <QByteArray>
+#include <QSet>
 #include <DConfig>
 
 using BatteryPercentageMap = QMap<QString, double>;
@@ -45,11 +46,13 @@ enum RepetitionMode {
 };
 
 enum PrepareSuspendState {
-    PS_Normal   = 0, // 正常/空闲
-    PS_LidClose = 3, // 合盖进入挂起流程
-    PS_Finish   = 4, // 阈值：> PS_Finish 表示处于休眠/唤醒过渡中，应忽略 idle 事件
-    PS_Resume   = 5, // 从挂起中唤醒 / 开盖恢复
-    PS_Sleeping = 6, // 即将进入休眠 (handleBeforeSleep)
+    PS_Unknown     = 1,
+    PS_LidOpen     = 2,
+    PS_LidClose    = 3,
+    PS_Finish      = 4,
+    PS_Resume      = 5,
+    PS_Prepare     = 6,
+    PS_ButtonClick = 7,
 };
 
 enum PowerAction {
@@ -57,7 +60,7 @@ enum PowerAction {
     PA_Suspend      = 1, // 休眠
     PA_Hibernate    = 2, // 休眠
     PA_TurnOffScreen = 3, // 关闭显示器
-    PA_Lock         = 4, // 锁屏
+    PA_ShowShutdownInterface = 4, // 显示关机界面
     PA_DoNothing    = 5, // 无操作
 };
 
@@ -67,6 +70,7 @@ class PowerManager : public QObject
     Q_CLASSINFO("D-Bus Interface", "org.deepin.dde.Power1")
 
     Q_PROPERTY(bool OnBattery READ onBattery NOTIFY onBatteryChanged)
+    Q_PROPERTY(bool UseWayland READ useWayland CONSTANT)
     Q_PROPERTY(bool LidIsPresent READ lidIsPresent NOTIFY lidIsPresentChanged)
     Q_PROPERTY(BatteryIsPresentMap BatteryIsPresent READ batteryIsPresent NOTIFY batteryIsPresentChanged)
     Q_PROPERTY(BatteryPercentageMap BatteryPercentage READ batteryPercentage NOTIFY batteryPercentageChanged)
@@ -79,11 +83,13 @@ class PowerManager : public QObject
     Q_PROPERTY(int LinePowerScreenBlackDelay READ linePowerScreenBlackDelay WRITE setLinePowerScreenBlackDelay NOTIFY linePowerScreenBlackDelayChanged)
     Q_PROPERTY(int LinePowerSleepDelay READ linePowerSleepDelay WRITE setLinePowerSleepDelay NOTIFY linePowerSleepDelayChanged)
     Q_PROPERTY(int LinePowerLockDelay READ linePowerLockDelay WRITE setLinePowerLockDelay NOTIFY linePowerLockDelayChanged)
+    Q_PROPERTY(int LinePowerShortIdleDelay READ linePowerShortIdleDelay WRITE setLinePowerShortIdleDelay NOTIFY linePowerShortIdleDelayChanged)
 
     Q_PROPERTY(int BatteryScreensaverDelay READ batteryScreensaverDelay WRITE setBatteryScreensaverDelay NOTIFY batteryScreensaverDelayChanged)
     Q_PROPERTY(int BatteryScreenBlackDelay READ batteryScreenBlackDelay WRITE setBatteryScreenBlackDelay NOTIFY batteryScreenBlackDelayChanged)
     Q_PROPERTY(int BatterySleepDelay READ batterySleepDelay WRITE setBatterySleepDelay NOTIFY batterySleepDelayChanged)
     Q_PROPERTY(int BatteryLockDelay READ batteryLockDelay WRITE setBatteryLockDelay NOTIFY batteryLockDelayChanged)
+    Q_PROPERTY(int BatteryShortIdleDelay READ batteryShortIdleDelay WRITE setBatteryShortIdleDelay NOTIFY batteryShortIdleDelayChanged)
 
     Q_PROPERTY(bool ScreenBlackLock READ screenBlackLock WRITE setScreenBlackLock NOTIFY screenBlackLockChanged)
     Q_PROPERTY(bool SleepLock READ sleepLock WRITE setSleepLock NOTIFY sleepLockChanged)
@@ -116,6 +122,7 @@ public Q_SLOTS:
     void TurnOffScreen();
     void TurnOnScreen();
 
+public:
     bool onBattery() const { return m_onBattery; }
     bool lidIsPresent() const { return m_lidIsPresent; }
     BatteryIsPresentMap batteryIsPresent() const { return m_batteryIsPresent; }
@@ -134,6 +141,8 @@ public Q_SLOTS:
     void setLinePowerSleepDelay(int v);
     int linePowerLockDelay() const { return m_linePowerLockDelay; }
     void setLinePowerLockDelay(int v);
+    int linePowerShortIdleDelay() const { return m_linePowerShortIdleDelay; }
+    void setLinePowerShortIdleDelay(int v);
 
     int batteryScreensaverDelay() const { return m_batteryScreensaverDelay; }
     void setBatteryScreensaverDelay(int v);
@@ -143,6 +152,8 @@ public Q_SLOTS:
     void setBatterySleepDelay(int v);
     int batteryLockDelay() const { return m_batteryLockDelay; }
     void setBatteryLockDelay(int v);
+    int batteryShortIdleDelay() const { return m_batteryShortIdleDelay; }
+    void setBatteryShortIdleDelay(int v);
 
     bool screenBlackLock() const { return m_screenBlackLock; }
     void setScreenBlackLock(bool v);
@@ -166,6 +177,8 @@ public Q_SLOTS:
     void setLowPowerAutoSleepThreshold(int v);
     int lowPowerAction() const { return m_lowPowerAction; }
     void setLowPowerAction(int v);
+    bool ambientLightAdjustBrightness() const;
+    bool adjustBrightnessEnabled() const { return m_adjustBrightnessEnabled; }
 
     bool scheduledShutdownState() const { return m_scheduledShutdownState; }
     void setScheduledShutdownState(bool v);
@@ -181,12 +194,24 @@ public:
     IdleWatcher *idleWatcher() const { return m_idleWatcher; }
     ScreenController *screenController() const { return m_screenCtrl; }
     bool useWayland() const { return m_useWayland; }
+    bool allowScreenSaver() const { return m_allowScreenSaver; }
+    int idleOffDelayWhenScreenBlack() const { return m_delayHandleIdleOffIntervalWhenScreenBlack; }
     bool shouldIgnoreIdleOn() const;
+    bool shouldIgnoreIdleOff() const;
+    bool isSessionActive() const;
+    void setShortIdleState(bool state);
+    void setScreenIdleState(bool state);
+    void setKernelIdleState(bool state);
+    bool canEnterShortIdle() const;
+    bool shouldPreventIdle() const;
+    bool shortIdleEnabled() const { return m_shortIdleEnabled; }
     int prepareSuspendState() const { return static_cast<int>(m_prepareSuspendState); }
 
     void doSuspend();
+    void doSuspendByFront();
     void doShutdown();
     void doHibernate();
+    void doHibernateByFront();
     void doTurnOffScreen();
     void doLock(bool autoStartAuth = true);
     bool canSuspend() const;
@@ -196,6 +221,7 @@ public:
     void handleBeforeSleep(bool beforeSleep);
     void handleWakeup();
     void sendNotify(const QString &summary, const QString &body);
+    QMap<QString, double> displayBrightness() const;
     void setDisplayBrightness(const QMap<QString, double> &table);
     void setAndSaveDisplayBrightness(const QMap<QString, double> &table);
     void setBlackScreenActive(bool active);
@@ -233,16 +259,19 @@ Q_SIGNALS:
     void batteryIsPresentChanged();
     void batteryPercentageChanged();
     void batteryStateChanged();
+    void batteryTimeToEmptyChanged();
     void hasAmbientLightSensorChanged();
     void warnLevelChanged();
     void isHighPerformanceSupportedChanged();
     void linePowerScreensaverDelayChanged();
     void linePowerScreenBlackDelayChanged();
     void linePowerSleepDelayChanged();
+    void linePowerShortIdleDelayChanged();
     void linePowerLockDelayChanged();
     void batteryScreensaverDelayChanged();
     void batteryScreenBlackDelayChanged();
     void batterySleepDelayChanged();
+    void batteryShortIdleDelayChanged();
     void batteryLockDelayChanged();
     void screenBlackLockChanged();
     void sleepLockChanged();
@@ -260,12 +289,22 @@ Q_SIGNALS:
     void customShutdownWeekDaysChanged();
 
 private:
-    void doSuspendByFront();
-
-private:
+    // These state-machine collaborators need coordinated access without exposing
+    // implementation details through the public PowerManager API.
+    friend class LowPowerManager;
+    friend class PowerSavePlan;
     IdleWatcher *createIdleWatcher();
     ScreenController *createScreenController();
     void initDConfig();
+    void persist(const char *key, const QVariant &value);
+    void resetConfig(const char *key);
+    void initAmbientBrightness();
+    bool screensaverProperty(const char *name) const;
+    bool isInConfigOrPowerButtonInhibitors(const QString &whatOnly,
+                                           QString &who,
+                                           bool blockOnly = true) const;
+    bool hasMultipleDisplaySessions() const;
+
     void initSubmodules();
     void recalculateScheduledShutdown();
     qint64 getNextShutdownTime(qint64 baseTime) const;
@@ -281,6 +320,10 @@ private:
     IdleWatcher *m_idleWatcher = nullptr;
     ScreenController *m_screenCtrl = nullptr;
     Dtk::Core::DConfig *m_config = nullptr;
+    Dtk::Core::DConfig *m_configReader = nullptr;
+    QSet<QString> m_writingConfigKeys;
+    bool m_applyingConfig = false;
+    bool m_loadingConfig = false;
     PowerSavePlan *m_powerSavePlan = nullptr;
     LidSwitchHandler *m_lidSwitch = nullptr;
     SleepInhibitor *m_sleepInhibitor = nullptr;
@@ -294,16 +337,19 @@ private:
     BatteryStateMap m_batteryState;
     quint64 m_batteryTimeToEmpty = 0;
     bool m_hasAmbientLightSensor = false;
+    // Shared warning state updated by LowPowerManager and consumed by shutdown logic.
     uint m_warnLevel = 0;
     bool m_isHighPerformanceSupported = false;
     int m_linePowerScreensaverDelay = 0;
     int m_linePowerScreenBlackDelay = 0;
     int m_linePowerSleepDelay = 0;
     int m_linePowerLockDelay = 0;
+    int m_linePowerShortIdleDelay = 0;
     int m_batteryScreensaverDelay = 0;
     int m_batteryScreenBlackDelay = 0;
     int m_batterySleepDelay = 0;
     int m_batteryLockDelay = 0;
+    int m_batteryShortIdleDelay = 0;
     bool m_screenBlackLock = false;
     bool m_sleepLock = false;
     int m_linePowerLidClosedAction = 0;
@@ -314,18 +360,27 @@ private:
     int m_lowPowerNotifyThreshold = 0;
     int m_lowPowerAutoSleepThreshold = 0;
     int m_lowPowerAction = 0;
+    QStringList m_shortIdleBlacklistApplications;
+    QStringList m_systemApplications;
+    QStringList m_systemServices;
+    QStringList m_fullscreenWorkaroundApplications;
+    bool m_allowScreenSaver = true;
+    int m_delayHandleIdleOffIntervalWhenScreenBlack = 0;
+    bool m_adjustBrightnessEnabled = true;
+    bool m_shortIdleEnabled = false;
     bool m_scheduledShutdownState = false;
     QString m_shutdownTime;
     int m_shutdownRepetition = 0;
     QByteArray m_customShutdownWeekDays;
 
-    PrepareSuspendState m_prepareSuspendState = PS_Normal;
+    PrepareSuspendState m_prepareSuspendState = PS_Unknown;
 
     bool m_screensaverWasRunning = false;
     bool m_screensaverLockAtAwake = false;
     bool m_screensaverStateCaptured = false;
     bool m_delayInActive = false;
-    int m_delayWakeupInterval = 2;
+    bool m_sleepCycleHandled = false;
+    int m_delayWakeupInterval = 0;
     int m_inhibitFd = -1;
 
     QTimer *m_shutdownTimer = nullptr;
