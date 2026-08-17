@@ -87,27 +87,27 @@
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Näytä työpöytä</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Piilota työpöytä</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota haku</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota käynnistin</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota leikepöytä</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota ilmoitukset</translation>
     </message>
     <message>
         <source>Disable</source>
