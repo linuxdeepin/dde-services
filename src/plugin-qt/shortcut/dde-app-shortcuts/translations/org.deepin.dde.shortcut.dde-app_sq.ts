@@ -10,7 +10,7 @@
         <translation>Kyçe ekranin</translation>
     </message>
     <message>
-        <source>Notification Center</source>
+        <source>Notification center</source>
         <translation>Qendër Njoftimesh</translation>
     </message>
     <message>
@@ -18,23 +18,23 @@
         <translation>Fike ndërfaqen</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
+        <source>Terminal quake window</source>
         <translation>Dritare Terminali Quake</translation>
     </message>
     <message>
-        <source>launcher</source>
+        <source>Launcher</source>
         <translation>nisës</translation>
     </message>
     <message>
-        <source>Close Window</source>
+        <source>Close window</source>
         <translation>Mbylle Dritaren</translation>
     </message>
     <message>
-        <source>Maximize Window</source>
+        <source>Maximize window</source>
         <translation>Maksimizoje Dritaren</translation>
     </message>
     <message>
-        <source>Show Desktop</source>
+        <source>Show desktop</source>
         <translation>Shfaqe Desktopin</translation>
     </message>
     <message>
@@ -42,19 +42,19 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
+        <source>Show multitasking view</source>
         <translation>Shfaq/Fshih Pamjen Shumëpunëshe</translation>
     </message>
     <message>
-        <source>Delay Screenshot</source>
+        <source>Delay screenshot</source>
         <translation>Vonoje Foton e Ekranit</translation>
     </message>
     <message>
-        <source>File Manager</source>
+        <source>File manager</source>
         <translation>Përgjegjës Kartelash</translation>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
+        <source>Full screenshot</source>
         <translation>Foto Ekrani Sa Krejt Ekrani</translation>
     </message>
     <message>
@@ -66,15 +66,15 @@
         <translation>Foto Ekrani</translation>
     </message>
     <message>
-        <source>System Monitor</source>
+        <source>System monitor</source>
         <translation>Mbikëqyrës Sistemi</translation>
     </message>
     <message>
-        <source>Window Screenshot</source>
+        <source>Window screenshot</source>
         <translation>Foto Ekrani Dritareje</translation>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
+        <source>OCR (image to text)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -90,23 +90,23 @@
         <translation>Hapësirë pune</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Minimize Window</source>
+        <source>Minimize window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move Window</source>
+        <source>Move window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
+        <source>Move to left workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
+        <source>Move to right workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -114,11 +114,11 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Resize Window</source>
+        <source>Resize window</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Screen Recorder</source>
+        <source>Screen recorder</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -126,55 +126,55 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Window Effects</source>
+        <source>Switch window effects</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows</source>
+        <source>Switch windows</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
+        <source>Switch windows in reverse</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
+        <source>Switch similar windows</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
+        <source>Switch similar windows in reverse</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
+        <source>Switch to left workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
+        <source>Switch to right workspace</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
+        <source>Tile window to left of screen</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
+        <source>Tile window to right of screen</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom In</source>
+        <source>Zoom in</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom Out</source>
+        <source>Zoom out</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
+        <source>Reset zoom</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation type="unfinished"/>
     </message>
 </context>

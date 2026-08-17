@@ -13,8 +13,8 @@
       "visibility": "private"
     },
     "displayName": {
-      "value": "Zoom Out",
-      "serial": 0,
+      "value": "Zoom out",
+      "serial": 1,
       "flags": [],
       "name": "displayName",
       "name[zh_CN]": "屏幕缩小",
@@ -77,8 +77,8 @@
       "visibility": "private"
     },
     "category": {
-      "value": "AssistiveTools",
-      "serial": 0,
+      "value": "Accessibility",
+      "serial": 1,
       "flags": [],
       "name": "category",
       "name[zh_CN]": "快捷键类别",

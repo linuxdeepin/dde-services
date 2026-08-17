@@ -10,7 +10,7 @@
         <translation>Ekran blokady</translation>
     </message>
     <message>
-        <source>Notification Center</source>
+        <source>Notification center</source>
         <translation>Centrum powiadomień</translation>
     </message>
     <message>
@@ -18,23 +18,23 @@
         <translation>Interfejs wyłączania</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
+        <source>Terminal quake window</source>
         <translation>Okno terminala Quake</translation>
     </message>
     <message>
-        <source>launcher</source>
+        <source>Launcher</source>
         <translation>Launcher</translation>
     </message>
     <message>
-        <source>Close Window</source>
+        <source>Close window</source>
         <translation>Zamknij okno</translation>
     </message>
     <message>
-        <source>Maximize Window</source>
+        <source>Maximize window</source>
         <translation>Maksymalizuj okno</translation>
     </message>
     <message>
-        <source>Show Desktop</source>
+        <source>Show desktop</source>
         <translation>Pokaż pulpit</translation>
     </message>
     <message>
@@ -42,19 +42,19 @@
         <translation>Otwórz menu okna</translation>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
+        <source>Show multitasking view</source>
         <translation>Przełącz widok wielozadaniowości</translation>
     </message>
     <message>
-        <source>Delay Screenshot</source>
+        <source>Delay screenshot</source>
         <translation>Opóźniony zrzutu ekranu</translation>
     </message>
     <message>
-        <source>File Manager</source>
+        <source>File manager</source>
         <translation>Menedżer plików</translation>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
+        <source>Full screenshot</source>
         <translation>Zrzut pełnego ekranu</translation>
     </message>
     <message>
@@ -66,15 +66,15 @@
         <translation>Zrzut ekranu</translation>
     </message>
     <message>
-        <source>System Monitor</source>
+        <source>System monitor</source>
         <translation>Monitor systemu</translation>
     </message>
     <message>
-        <source>Window Screenshot</source>
+        <source>Window screenshot</source>
         <translation>Zrzut okna</translation>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
+        <source>OCR (image to text)</source>
         <translation>OCR (Tekst z obrazu)</translation>
     </message>
     <message>
@@ -90,23 +90,23 @@
         <translation>Obszar roboczy</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Narzędzia pomocnicze</translation>
     </message>
     <message>
-        <source>Minimize Window</source>
+        <source>Minimize window</source>
         <translation>Minimalizuj okno</translation>
     </message>
     <message>
-        <source>Move Window</source>
+        <source>Move window</source>
         <translation>Przenieś okno</translation>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
+        <source>Move to left workspace</source>
         <translation>Przenieś na lewy obszar roboczy</translation>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
+        <source>Move to right workspace</source>
         <translation>Przenieś na prawy obszar roboczy</translation>
     </message>
     <message>
@@ -114,11 +114,11 @@
         <translation>Brak</translation>
     </message>
     <message>
-        <source>Resize Window</source>
+        <source>Resize window</source>
         <translation>Zmień rozmiar okna</translation>
     </message>
     <message>
-        <source>Screen Recorder</source>
+        <source>Screen recorder</source>
         <translation>Nagrywanie ekranu</translation>
     </message>
     <message>
@@ -126,55 +126,55 @@
         <translation>Pionowy zrzut ekranu</translation>
     </message>
     <message>
-        <source>Switch Window Effects</source>
+        <source>Switch window effects</source>
         <translation>Przełącz efekty okna</translation>
     </message>
     <message>
-        <source>Switch Windows</source>
+        <source>Switch windows</source>
         <translation>Przełącz okno</translation>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
+        <source>Switch windows in reverse</source>
         <translation>Przełącz okna w odwrotnej kolejności</translation>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
+        <source>Switch similar windows</source>
         <translation>Przełącz okna tego samego typu</translation>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
+        <source>Switch similar windows in reverse</source>
         <translation>Przełącz okna tego samego typu w odwrotnej kolejności</translation>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
+        <source>Switch to left workspace</source>
         <translation>Przełącz na lewy obszar roboczy</translation>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
+        <source>Switch to right workspace</source>
         <translation>Przełącz na prawy obszar roboczy</translation>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
+        <source>Tile window to left of screen</source>
         <translation>Kafelkuj okno do lewej</translation>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
+        <source>Tile window to right of screen</source>
         <translation>Kafelkuj okno do prawej</translation>
     </message>
     <message>
-        <source>Zoom In</source>
+        <source>Zoom in</source>
         <translation>Powiększ</translation>
     </message>
     <message>
-        <source>Zoom Out</source>
+        <source>Zoom out</source>
         <translation>Pomniejsz</translation>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
+        <source>Reset zoom</source>
         <translation>Przybliż do rozmiaru rzeczywistego</translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation type="unfinished"/>
     </message>
 </context>

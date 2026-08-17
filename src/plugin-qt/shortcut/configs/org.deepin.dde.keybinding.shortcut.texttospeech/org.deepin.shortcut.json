@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Text to Speech",
-            "serial": 0,
+            "value": "Text to speech",
+            "serial": 1,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "语音朗读",
@@ -67,8 +67,8 @@
             "visibility": "private"
         },
         "category": {
-            "value": "AssistiveTools",
-            "serial": 1,
+            "value": "Accessibility",
+            "serial": 2,
             "flags": [],
             "name": "category",
             "name[zh_CN]": "快捷键类别（辅助功能）",

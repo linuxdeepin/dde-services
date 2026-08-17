@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Switch Windows of the Same Type Reversely",
-            "serial": 0,
+            "value": "Switch similar windows in reverse",
+            "serial": 1,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "同一应用上一个窗口",

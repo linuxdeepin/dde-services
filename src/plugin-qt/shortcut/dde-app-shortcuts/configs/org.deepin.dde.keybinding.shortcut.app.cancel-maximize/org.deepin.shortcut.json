@@ -13,8 +13,8 @@
             "visibility": "private"
         },
         "displayName": {
-            "value": "Restore window",
-            "serial": 1,
+            "value": "Unmaximize window",
+            "serial": 2,
             "flags": [],
             "name": "displayName",
             "name[zh_CN]": "恢复窗口",

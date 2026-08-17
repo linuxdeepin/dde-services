@@ -56,7 +56,7 @@ const QHash<QString, int> &reservedCategoryOrder()
         {QStringLiteral("System"), 0},
         {QStringLiteral("Window"), 1},
         {QStringLiteral("Workspace"), 2},
-        {QStringLiteral("AssistiveTools"), 3},
+        {QStringLiteral("Accessibility"), 3},
         {QStringLiteral("Custom"), 99},
     };
     return order;

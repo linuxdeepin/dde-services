@@ -10,7 +10,7 @@
         <translation>Pantalla de blocatge</translation>
     </message>
     <message>
-        <source>Notification Center</source>
+        <source>Notification center</source>
         <translation>Centre de notificacions</translation>
     </message>
     <message>
@@ -18,23 +18,23 @@
         <translation>Interfície d&apos;aturada</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
+        <source>Terminal quake window</source>
         <translation>Finestra del terminal Quake</translation>
     </message>
     <message>
-        <source>launcher</source>
+        <source>Launcher</source>
         <translation>Llançador</translation>
     </message>
     <message>
-        <source>Close Window</source>
+        <source>Close window</source>
         <translation>Tanca la finestra</translation>
     </message>
     <message>
-        <source>Maximize Window</source>
+        <source>Maximize window</source>
         <translation>Maximitza la finestra</translation>
     </message>
     <message>
-        <source>Show Desktop</source>
+        <source>Show desktop</source>
         <translation>Mostra l&apos;escriptori</translation>
     </message>
     <message>
@@ -42,19 +42,19 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
+        <source>Show multitasking view</source>
         <translation>Commuta la vista de multitasca</translation>
     </message>
     <message>
-        <source>Delay Screenshot</source>
+        <source>Delay screenshot</source>
         <translation>Retarda la captura</translation>
     </message>
     <message>
-        <source>File Manager</source>
+        <source>File manager</source>
         <translation>Gestor de fitxers</translation>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
+        <source>Full screenshot</source>
         <translation>Captura de la pantalla completa</translation>
     </message>
     <message>
@@ -66,15 +66,15 @@
         <translation>Captura de pantalla</translation>
     </message>
     <message>
-        <source>System Monitor</source>
+        <source>System monitor</source>
         <translation>Monitor del sistema</translation>
     </message>
     <message>
-        <source>Window Screenshot</source>
+        <source>Window screenshot</source>
         <translation>Captura de la finestra</translation>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
+        <source>OCR (image to text)</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -90,23 +90,23 @@
         <translation>Espai de treball</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Eines d&apos;assistència</translation>
     </message>
     <message>
-        <source>Minimize Window</source>
+        <source>Minimize window</source>
         <translation>Minimitza la finestra</translation>
     </message>
     <message>
-        <source>Move Window</source>
+        <source>Move window</source>
         <translation>Mou la finestra</translation>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
+        <source>Move to left workspace</source>
         <translation>Mou a l&apos;espai de treball de l&apos;esquerra</translation>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
+        <source>Move to right workspace</source>
         <translation>Mou a l&apos;espai de treball de la dreta</translation>
     </message>
     <message>
@@ -114,11 +114,11 @@
         <translation>Cap</translation>
     </message>
     <message>
-        <source>Resize Window</source>
+        <source>Resize window</source>
         <translation>Canvia la mida de la finestra</translation>
     </message>
     <message>
-        <source>Screen Recorder</source>
+        <source>Screen recorder</source>
         <translation>Gravador de pantalla</translation>
     </message>
     <message>
@@ -126,55 +126,55 @@
         <translation>Captura de desplaçament</translation>
     </message>
     <message>
-        <source>Switch Window Effects</source>
+        <source>Switch window effects</source>
         <translation>Commuta els efectes de les finestres</translation>
     </message>
     <message>
-        <source>Switch Windows</source>
+        <source>Switch windows</source>
         <translation>Canvia finestres</translation>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
+        <source>Switch windows in reverse</source>
         <translation>Canvia finestres a la inversa</translation>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
+        <source>Switch similar windows</source>
         <translation>Canvia entre finestres del mateix tipus</translation>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
+        <source>Switch similar windows in reverse</source>
         <translation>Canvia finestres del mateix tipus en ordre invers</translation>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
+        <source>Switch to left workspace</source>
         <translation>Canvia a l&apos;espai de treball de l&apos;esquerra</translation>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
+        <source>Switch to right workspace</source>
         <translation>Canvia a l&apos;espai de treball de la dreta</translation>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
+        <source>Tile window to left of screen</source>
         <translation>Mosaic ràpid de finestres a l&apos;esquerra</translation>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
+        <source>Tile window to right of screen</source>
         <translation>Mosaic ràpid de finestres a la dreta</translation>
     </message>
     <message>
-        <source>Zoom In</source>
+        <source>Zoom in</source>
         <translation>Apropa</translation>
     </message>
     <message>
-        <source>Zoom Out</source>
+        <source>Zoom out</source>
         <translation>Allunya</translation>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
+        <source>Reset zoom</source>
         <translation>Mida real</translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation type="unfinished"/>
     </message>
 </context>

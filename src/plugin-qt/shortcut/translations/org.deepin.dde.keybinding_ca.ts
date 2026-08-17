@@ -6,7 +6,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Default terminal</source>
+        <source>Terminal</source>
         <translation>Terminal per defecte</translation>
     </message>
     <message>
@@ -58,7 +58,7 @@
         <translation>Minimitza la finestra</translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation>Restaura la finestra</translation>
     </message>
     <message>
@@ -118,15 +118,15 @@
         <translation>Personalitzat</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Eines d&apos;assistència</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>De text a discurs</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>De discurs a text</translation>
     </message>
     <message>
@@ -180,10 +180,6 @@
     <message>
         <source>Open window menu</source>
         <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
-        <translation>Commuta la vista de multitasca</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>

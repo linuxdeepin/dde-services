@@ -8,7 +8,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Default terminal</source>
+        <source>Terminal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -60,7 +60,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -120,15 +120,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Assistive Tools</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>Text to Speech</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>Speech to Text</translation>
     </message>
     <message>
@@ -181,10 +181,6 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

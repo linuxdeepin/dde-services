@@ -6,7 +6,7 @@
         <translation>Alternar entre vários monitores</translation>
     </message>
     <message>
-        <source>Default terminal</source>
+        <source>Terminal</source>
         <translation>Terminal padrão</translation>
     </message>
     <message>
@@ -58,7 +58,7 @@
         <translation>Maximizar janela</translation>
     </message>
     <message>
-        <source>Restore window</source>
+        <source>Unmaximize window</source>
         <translation>Restaurar janela</translation>
     </message>
     <message>
@@ -118,15 +118,15 @@
         <translation>Personalizado</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Ferramentas assistivas</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>Texto para fala</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>Fala para texto</translation>
     </message>
     <message>
@@ -180,10 +180,6 @@
     <message>
         <source>Open window menu</source>
         <translation>Abrir menu da janela</translation>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
-        <translation>Alternar visão multitarefa</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
