@@ -167,15 +167,15 @@
     </message>
     <message>
         <source>Switch to workspace 6</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 6</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä ikkunaa</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Sulje ikkuna</translation>
     </message>
     <message>
         <source>Open window menu</source>
