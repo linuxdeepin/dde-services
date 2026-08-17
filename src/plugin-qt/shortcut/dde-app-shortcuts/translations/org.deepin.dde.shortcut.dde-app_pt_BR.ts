@@ -147,15 +147,15 @@
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para área de trabalho à esquerda</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Alternar para área de trabalho à direita</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation type="unfinished"/>
+        <translation>Posicionar janela lado a lado à esquerda da tela</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
