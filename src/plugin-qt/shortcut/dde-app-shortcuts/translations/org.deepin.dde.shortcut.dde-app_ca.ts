@@ -10,52 +10,52 @@
         <translation>Pantalla de blocatge</translation>
     </message>
     <message>
-        <source>Notification Center</source>
-        <translation>Centre de notificacions</translation>
+        <source>Notification center</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
         <translation>Interfície d&apos;aturada</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
-        <translation>Finestra del terminal Quake</translation>
+        <source>Terminal quake window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>launcher</source>
-        <translation>Llançador</translation>
+        <source>Launcher</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Close Window</source>
-        <translation>Tanca la finestra</translation>
+        <source>Close window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Maximize Window</source>
-        <translation>Maximitza la finestra</translation>
+        <source>Maximize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show Desktop</source>
-        <translation>Mostra l&apos;escriptori</translation>
+        <source>Show desktop</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
         <translation>Obre el menú de la finestra</translation>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
-        <translation>Commuta la vista de multitasca</translation>
+        <source>Show multitasking view</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Delay Screenshot</source>
-        <translation>Retarda la captura</translation>
+        <source>Delay screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>File Manager</source>
-        <translation>Gestor de fitxers</translation>
+        <source>File manager</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
-        <translation>Captura de la pantalla completa</translation>
+        <source>Full screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -66,16 +66,16 @@
         <translation>Captura de pantalla</translation>
     </message>
     <message>
-        <source>System Monitor</source>
-        <translation>Monitor del sistema</translation>
+        <source>System monitor</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Screenshot</source>
-        <translation>Captura de la finestra</translation>
+        <source>Window screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
-        <translation>OCR (de imatge a text)</translation>
+        <source>OCR (image to text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
@@ -90,92 +90,92 @@
         <translation>Espai de treball</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Eines d&apos;assistència</translation>
     </message>
     <message>
-        <source>Minimize Window</source>
-        <translation>Minimitza la finestra</translation>
+        <source>Minimize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move Window</source>
-        <translation>Mou la finestra</translation>
+        <source>Move window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
-        <translation>Mou a l&apos;espai de treball de l&apos;esquerra</translation>
+        <source>Move to left workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
-        <translation>Mou a l&apos;espai de treball de la dreta</translation>
+        <source>Move to right workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>None</source>
         <translation>Cap</translation>
     </message>
     <message>
-        <source>Resize Window</source>
-        <translation>Canvia la mida de la finestra</translation>
+        <source>Resize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Screen Recorder</source>
-        <translation>Gravador de pantalla</translation>
+        <source>Screen recorder</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Scrollshot</source>
         <translation>Captura de desplaçament</translation>
     </message>
     <message>
-        <source>Switch Window Effects</source>
-        <translation>Commuta els efectes de les finestres</translation>
+        <source>Switch window effects</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows</source>
-        <translation>Canvia finestres</translation>
+        <source>Switch windows</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
-        <translation>Canvia finestres a la inversa</translation>
+        <source>Switch windows in reverse</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
-        <translation>Canvia entre finestres del mateix tipus</translation>
+        <source>Switch similar windows</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
-        <translation>Canvia finestres del mateix tipus en ordre invers</translation>
+        <source>Switch similar windows in reverse</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
-        <translation>Canvia a l&apos;espai de treball de l&apos;esquerra</translation>
+        <source>Switch to left workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
-        <translation>Canvia a l&apos;espai de treball de la dreta</translation>
+        <source>Switch to right workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
-        <translation>Mosaic ràpid de finestres a l&apos;esquerra</translation>
+        <source>Tile window to left of screen</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
-        <translation>Mosaic ràpid de finestres a la dreta</translation>
+        <source>Tile window to right of screen</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom In</source>
-        <translation>Apropa</translation>
+        <source>Zoom in</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom Out</source>
-        <translation>Allunya</translation>
+        <source>Zoom out</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
-        <translation>Mida real</translation>
+        <source>Reset zoom</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Restore window</source>
-        <translation>Restaura la finestra</translation>
+        <source>Unmaximize window</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
