@@ -15,15 +15,15 @@
     </message>
     <message>
         <source>Swipe down with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise alas kolmella sormella</translation>
     </message>
     <message>
         <source>Swipe left with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise vasemmalle neljällä sormella</translation>
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise vasemmalle kolmella sormella</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
