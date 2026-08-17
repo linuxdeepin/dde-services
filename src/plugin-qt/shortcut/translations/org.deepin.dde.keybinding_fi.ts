@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Ilmoita</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
