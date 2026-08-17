@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Alternar entre janelas semelhantes na ordem inversa</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
