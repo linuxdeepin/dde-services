@@ -103,11 +103,11 @@
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mover para área de trabalho à esquerda</translation>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mover para área de trabalho à direita</translation>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>Redimensionar janela</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>Gravador de Ecrã</translation>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,11 +127,11 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>Mudar Efeitos da Janela</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>Mudar janelas</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
