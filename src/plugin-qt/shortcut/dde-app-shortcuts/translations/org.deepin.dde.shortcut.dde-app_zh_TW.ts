@@ -10,52 +10,52 @@
         <translation>鎖屏介面</translation>
     </message>
     <message>
-        <source>Notification Center</source>
-        <translation>通知中心</translation>
+        <source>Notification center</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
         <translation>關機介面</translation>
     </message>
     <message>
-        <source>Terminal Quake Window</source>
-        <translation>終端雷神模式</translation>
+        <source>Terminal quake window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>launcher</source>
-        <translation>啟動器</translation>
+        <source>Launcher</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Close Window</source>
-        <translation>關閉視窗</translation>
+        <source>Close window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Maximize Window</source>
-        <translation>最大化視窗</translation>
+        <source>Maximize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Show Desktop</source>
-        <translation>顯示桌面</translation>
+        <source>Show desktop</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
         <translation>開啟視窗選單</translation>
     </message>
     <message>
-        <source>Toggle Multitask View</source>
-        <translation>顯示工作區</translation>
+        <source>Show multitasking view</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Delay Screenshot</source>
-        <translation>延遲截圖</translation>
+        <source>Delay screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>File Manager</source>
-        <translation>檔案管理員</translation>
+        <source>File manager</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Fullscreen Screenshot</source>
-        <translation>全螢幕截圖</translation>
+        <source>Full screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -66,16 +66,16 @@
         <translation>截圖</translation>
     </message>
     <message>
-        <source>System Monitor</source>
-        <translation>系統監視器</translation>
+        <source>System monitor</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Screenshot</source>
-        <translation>視窗截圖</translation>
+        <source>Window screenshot</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>OCR (Image to Text)</source>
-        <translation>圖文識別</translation>
+        <source>OCR (image to text)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
@@ -90,92 +90,92 @@
         <translation>工作區</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>輔助工具</translation>
     </message>
     <message>
-        <source>Minimize Window</source>
-        <translation>最小化視窗</translation>
+        <source>Minimize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move Window</source>
-        <translation>移動視窗</translation>
+        <source>Move window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Left Workspace</source>
-        <translation>移至左側工作區</translation>
+        <source>Move to left workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Move to Right Workspace</source>
-        <translation>移至右側工作區</translation>
+        <source>Move to right workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>None</source>
         <translation>無</translation>
     </message>
     <message>
-        <source>Resize Window</source>
-        <translation>調整視窗大小</translation>
+        <source>Resize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Screen Recorder</source>
-        <translation>螢幕錄影</translation>
+        <source>Screen recorder</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Scrollshot</source>
         <translation>捲動截圖</translation>
     </message>
     <message>
-        <source>Switch Window Effects</source>
-        <translation>切換視窗特效</translation>
+        <source>Switch window effects</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows</source>
-        <translation>切換視窗</translation>
+        <source>Switch windows</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows Reversely</source>
-        <translation>反向切換視窗</translation>
+        <source>Switch windows in reverse</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type</source>
-        <translation>切換同類型視窗</translation>
+        <source>Switch similar windows</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch Windows of the Same Type Reversely</source>
-        <translation>反向切換同類型視窗</translation>
+        <source>Switch similar windows in reverse</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Left Workspace</source>
-        <translation>切換至左側工作區</translation>
+        <source>Switch to left workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Switch to Right Workspace</source>
-        <translation>切換至右側工作區</translation>
+        <source>Switch to right workspace</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Left</source>
-        <translation>視窗快速平鋪至左側</translation>
+        <source>Tile window to left of screen</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Window Quick Tile Right</source>
-        <translation>視窗快速平鋪至右側</translation>
+        <source>Tile window to right of screen</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom In</source>
-        <translation>放大螢幕</translation>
+        <source>Zoom in</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom Out</source>
-        <translation>縮小螢幕</translation>
+        <source>Zoom out</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Zoom to Actual Size</source>
-        <translation>重設螢幕縮放</translation>
+        <source>Reset zoom</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>Restore window</source>
-        <translation>還原視窗</translation>
+        <source>Unmaximize window</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
