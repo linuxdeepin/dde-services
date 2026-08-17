@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>ROC (Imatge a text)</translation>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimitza la finestra</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Mou la finestra</translation>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mou a l&apos;espai de treball de l&apos;esquerra</translation>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Mou a l&apos;espai de treball de la dreta</translation>
     </message>
     <message>
         <source>None</source>
