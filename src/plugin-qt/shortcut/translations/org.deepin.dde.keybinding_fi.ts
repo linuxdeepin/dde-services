@@ -51,15 +51,15 @@
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
-        <translation type="unfinished"/>
+        <translation>Tätä elettä ei tällä hetkellä tueta</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Suurenna ikkuna</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Palauta ikkuna</translation>
     </message>
     <message>
         <source>Current window left split</source>
