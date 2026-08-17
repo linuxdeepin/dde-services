@@ -139,15 +139,15 @@
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda samankaltaiset ikkunat</translation>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda samankaltaiset ikkunat vastakkaisiksi</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Siirry vasempaan työtilaan</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
