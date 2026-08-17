@@ -31,15 +31,15 @@
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Suurenna ikkuna</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Näytä työpöytä</translation>
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Avaa ikkunavalikko</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
