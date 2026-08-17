@@ -19,7 +19,7 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation type="unfinished"/>
+        <translation>Janela suspensa do terminal</translation>
     </message>
     <message>
         <source>Launcher</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Fechar janela</translation>
     </message>
     <message>
         <source>Maximize window</source>
