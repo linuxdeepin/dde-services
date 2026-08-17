@@ -43,15 +43,15 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Näytä moniajonäkymä</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Viivytä kaappausta</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Tiedostonhallinta</translation>
     </message>
     <message>
         <source>Full screenshot</source>
