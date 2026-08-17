@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Terminal</source>
-        <translation>Terminal parazgjedhje</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
