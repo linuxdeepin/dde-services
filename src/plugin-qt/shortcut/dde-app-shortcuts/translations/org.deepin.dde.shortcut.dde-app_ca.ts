@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Mostra l&apos;escriptori</translation>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Mostra la vista de multitasca</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Ajorna la captura</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Gestor de fitxers</translation>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de pantalla completa</translation>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,11 +67,11 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor del sistema</translation>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de la finestra</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
