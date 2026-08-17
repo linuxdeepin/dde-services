@@ -179,7 +179,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Avaa ikkunavalikko</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
