@@ -123,19 +123,19 @@
     </message>
     <message>
         <source>Scrollshot</source>
-        <translation type="unfinished"/>
+        <translation>Vierityskuva</translation>
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda ikkunatehosteita</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda ikkunoita</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda ikkunoita päinvastoin</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
