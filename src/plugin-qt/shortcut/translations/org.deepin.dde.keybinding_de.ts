@@ -6,8 +6,8 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Default terminal</source>
-        <translation>Standard-Terminal</translation>
+        <source>Terminal</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
@@ -58,8 +58,8 @@
         <translation>Fenster maximieren</translation>
     </message>
     <message>
-        <source>Restore window</source>
-        <translation>Fenster wiederherstellen</translation>
+        <source>Unmaximize window</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Current window left split</source>
@@ -118,15 +118,15 @@
         <translation>Benutzerdefiniert</translation>
     </message>
     <message>
-        <source>AssistiveTools</source>
+        <source>Accessibility</source>
         <translation>Hilfsmittel</translation>
     </message>
     <message>
-        <source>Text to Speech</source>
+        <source>Text to speech</source>
         <translation>Text zu Sprache</translation>
     </message>
     <message>
-        <source>Speech to Text</source>
+        <source>Speech to text</source>
         <translation>Sprache zu Text</translation>
     </message>
     <message>
@@ -180,10 +180,6 @@
     <message>
         <source>Open window menu</source>
         <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Toggle multitasking view</source>
-        <translation>Multitasking-Ansicht umschalten</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
