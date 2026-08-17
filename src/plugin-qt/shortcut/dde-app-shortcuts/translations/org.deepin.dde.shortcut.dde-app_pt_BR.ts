@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>Redimensionar janela</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>Gravador de tela</translation>
     </message>
     <message>
         <source>Scrollshot</source>
