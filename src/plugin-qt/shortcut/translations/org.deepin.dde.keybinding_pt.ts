@@ -59,7 +59,7 @@
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimizar janela</translation>
     </message>
     <message>
         <source>Current window left split</source>
