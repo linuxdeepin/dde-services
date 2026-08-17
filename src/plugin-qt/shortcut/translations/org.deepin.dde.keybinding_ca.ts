@@ -3,11 +3,11 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Toggle multiple displays</source>
-        <translation type="unfinished"/>
+        <translation>Commuta les pantalles múltiples</translation>
     </message>
     <message>
         <source>Terminal</source>
-        <translation>Terminal per defecte</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation>Restaura la finestra</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Current window left split</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Obre el menú de la finestra</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
