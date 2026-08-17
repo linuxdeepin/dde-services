@@ -147,23 +147,23 @@
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 1</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 2</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 3</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 4</translation>
     </message>
     <message>
         <source>Switch to workspace 5</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 5</translation>
     </message>
     <message>
         <source>Switch to workspace 6</source>
