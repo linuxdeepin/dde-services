@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>顯示工作區</translation>
+        <translation>顯示多工檢視</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
@@ -155,11 +155,11 @@
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation>視窗快速平鋪至左側</translation>
+        <translation>將視窗拼貼到左側</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation>視窗快速平鋪至右側</translation>
+        <translation>將視窗拼貼到右側</translation>
     </message>
     <message>
         <source>Zoom in</source>

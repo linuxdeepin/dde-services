@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation>通知センター</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation>ドロップダウンターミナル</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Launcher</source>
-        <translation>ランチャー</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Close window</source>
-        <translation>ウィンドウを閉じる</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>ウィンドウを最大化</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>デスクトップを表示</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>マルチタスクビューの切り替え</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>指定時間後にスクリーンショットを撮影</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File manager</source>
-        <translation>ファイルマネージャー</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>画面全体のスクリーンショット</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,11 +67,11 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation>システム モニター</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation>ウィンドウのスクリーンショット</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OCR (image to text)</source>

@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation>Ilmoituskeskus</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation>Quake terminaali</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Launcher</source>
-        <translation>käynnistäjä</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Close window</source>
-        <translation>Sulje ikkuna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>Suurenna ikkuna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>Näytä työpöytä</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>Vaihda työtilat näkymä</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Kaappaus viiveellä</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File manager</source>
-        <translation>Tiedostonhallinta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Kokonäytön kaappaus</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,11 +67,11 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation>Järjestelmän valvonta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation>Ikkunan kaappaus</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OCR (image to text)</source>

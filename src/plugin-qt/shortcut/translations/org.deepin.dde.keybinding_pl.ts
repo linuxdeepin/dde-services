@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Terminal</source>
-        <translation>Domyślny terminal</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation>Przywróć okno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Current window left split</source>

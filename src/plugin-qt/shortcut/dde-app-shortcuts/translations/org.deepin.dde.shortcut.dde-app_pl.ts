@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation>Centrum powiadomień</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation>Okno terminala Quake</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Launcher</source>
-        <translation>Launcher</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Close window</source>
-        <translation>Zamknij okno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>Maksymalizuj okno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>Pokaż pulpit</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>Przełącz widok wielozadaniowości</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Opóźniony zrzutu ekranu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File manager</source>
-        <translation>Menedżer plików</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Zrzut pełnego ekranu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation>Monitor systemu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation>Zrzut okna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation>OCR (Tekst z obrazu)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation>Minimalizuj okno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move window</source>
-        <translation>Przenieś okno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation>Przenieś na lewy obszar roboczy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation>Przenieś na prawy obszar roboczy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation>Zmień rozmiar okna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation>Nagrywanie ekranu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,51 +127,51 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation>Przełącz efekty okna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation>Przełącz okno</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation>Przełącz okna w odwrotnej kolejności</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation>Przełącz okna tego samego typu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation>Przełącz okna tego samego typu w odwrotnej kolejności</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation>Przełącz na lewy obszar roboczy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation>Przełącz na prawy obszar roboczy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation>Kafelkuj okno do lewej</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation>Kafelkuj okno do prawej</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation>Powiększ</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation>Pomniejsz</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation>Przybliż do rozmiaru rzeczywistego</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unmaximize window</source>
