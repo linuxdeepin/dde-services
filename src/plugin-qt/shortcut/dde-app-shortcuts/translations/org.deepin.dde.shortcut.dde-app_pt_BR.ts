@@ -71,11 +71,11 @@
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Captura de janela</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (imagem para texto)</translation>
     </message>
     <message>
         <source>System</source>
