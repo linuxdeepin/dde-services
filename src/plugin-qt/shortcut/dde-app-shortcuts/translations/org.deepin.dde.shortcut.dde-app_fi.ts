@@ -155,11 +155,11 @@
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation type="unfinished"/>
+        <translation>Vierekkäin vasemmalle puolelle</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation type="unfinished"/>
+        <translation>Vierekkäin oikealle puolelle</translation>
     </message>
     <message>
         <source>Zoom in</source>
