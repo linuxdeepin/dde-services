@@ -183,15 +183,15 @@
     </message>
     <message>
         <source>Toggle FPS display</source>
-        <translation type="unfinished"/>
+        <translation>FPS-näyttö käyttöön</translation>
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"/>
+        <translation>Lukitse näyttö</translation>
     </message>
     <message>
         <source>Show shutdown menu</source>
-        <translation type="unfinished"/>
+        <translation>Näytä sammutusvalikko</translation>
     </message>
     <message>
         <source>Quit</source>
