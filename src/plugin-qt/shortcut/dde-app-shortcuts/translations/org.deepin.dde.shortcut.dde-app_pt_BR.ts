@@ -31,11 +31,11 @@
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maximizar janela</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Exibir área de trabalho</translation>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,15 +43,15 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Exibir visão multitarefa</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Capturar tela com atraso</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Gerenciador de Arquivos</translation>
     </message>
     <message>
         <source>Full screenshot</source>
