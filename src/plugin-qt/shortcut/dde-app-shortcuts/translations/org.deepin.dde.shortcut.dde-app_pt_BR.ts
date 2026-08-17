@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Captura de tela inteira</translation>
+        <translation>Capturar tela inteira</translation>
     </message>
     <message>
         <source>Grand search</source>
