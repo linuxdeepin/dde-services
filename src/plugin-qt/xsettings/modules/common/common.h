@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #ifndef COMMON_H
@@ -51,5 +51,19 @@ const int8_t HeadTypeInvalid = -1;
 const int8_t HeadTypeInteger = 0;
 const int8_t HeadTypeString = 1;
 const int8_t HeadTypeColor = 2;
+
+struct XftDpiUpdate
+{
+    bool needsPersist;
+    XsSetting setting;
+};
+
+inline XftDpiUpdate makeXftDpiUpdate(int storedDpi, int scaledDpi)
+{
+    return {
+        storedDpi != scaledDpi,
+        { HeadTypeInteger, QStringLiteral("Xft/DPI"), scaledDpi },
+    };
+}
 
 #endif // COMMON_H
