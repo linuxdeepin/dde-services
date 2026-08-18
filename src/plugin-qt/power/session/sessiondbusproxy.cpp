@@ -6,10 +6,19 @@
 #include "../powerconstants.h"
 
 #include <QDBusConnection>
+#include <QDBusArgument>
+#include <QDBusInterface>
 #include <QDBusReply>
+#include <QDBusVariant>
 #include <QDBusUnixFileDescriptor>
 
 using namespace PowerDBus;
+
+namespace {
+constexpr auto kAmbientBrightnessService = "org.deepin.dde.AmbientBrightness1";
+constexpr auto kAmbientBrightnessPath = "/org/deepin/dde/AmbientBrightness1";
+constexpr auto kAmbientBrightnessInterface = "org.deepin.dde.AmbientBrightness1";
+}
 
 SessionDBusProxy::SessionDBusProxy(QObject *parent)
     : QObject(parent)
@@ -33,7 +42,7 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
           QDBusConnection::sessionBus(), this))
     , m_displayInter(new DDBusInterface(
           kDisplay, kDisplayPath, kDisplay,
-          QDBusConnection::sessionBus(), this))
+          QDBusConnection::sessionBus(), nullptr))
     , m_notificationsInter(new DDBusInterface(
           kNotifications, kNotificationsPath, kNotifications,
           QDBusConnection::sessionBus(), this))
@@ -49,7 +58,11 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
     , m_freedesktopDBusInter(new DDBusInterface(
           kFreedesktopDBus, kFreedesktopPath, kFreedesktopDBus,
           QDBusConnection::systemBus(), this))
+    , m_ambientBrightnessInter(new DDBusInterface(
+          kAmbientBrightnessService, kAmbientBrightnessPath, kAmbientBrightnessInterface,
+          QDBusConnection::sessionBus(), this))
 {
+    m_displayInter->setParent(this);
     QDBusConnection::sessionBus().connect(
         m_notificationsInter->service(), m_notificationsInter->path(),
         m_notificationsInter->interface(),
@@ -64,6 +77,18 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
         m_freedesktopDBusInter->service(), m_freedesktopDBusInter->path(),
         m_freedesktopDBusInter->interface(),
         "NameOwnerChanged", this, SIGNAL(login1OwnerChanged(QString,QString,QString)));
+
+    QDBusConnection::sessionBus().connect(
+        kAmbientBrightnessService, kAmbientBrightnessPath,
+        QStringLiteral("org.freedesktop.DBus.Properties"),
+        QStringLiteral("PropertiesChanged"), this,
+        SIGNAL(ambientBrightnessPropertiesChanged(QString,QVariantMap,QStringList)));
+
+    QDBusConnection::sessionBus().connect(
+        kDisplay, kDisplayPath, QStringLiteral("org.freedesktop.DBus.Properties"),
+        QStringLiteral("PropertiesChanged"), this,
+        SLOT(handleDisplayPropertiesChanged(QString,QVariantMap,QStringList)));
+
 }
 
 bool SessionDBusProxy::onBattery() const
@@ -111,9 +136,64 @@ uint SessionDBusProxy::powerSavingModeBrightnessDropPercent() const
     return m_powerInter->property("PowerSavingModeBrightnessDropPercent").toUInt();
 }
 
+QString SessionDBusProxy::powerSavingModeBrightnessData() const
+{
+    return m_powerInter->property("PowerSavingModeBrightnessData").toString();
+}
+
+void SessionDBusProxy::setPowerSavingModeBrightnessData(const QString &value)
+{
+    m_powerInter->setProperty("PowerSavingModeBrightnessData", value);
+}
+void SessionDBusProxy::handleDisplayPropertiesChanged(const QString &interface,
+                                                       const QVariantMap &changed,
+                                                       const QStringList &)
+{
+    if (interface == QLatin1String(kDisplay)
+        && changed.contains(QStringLiteral("Brightness")))
+        Q_EMIT BrightnessChanged(
+            qdbus_cast<QMap<QString, double>>(changed.value(QStringLiteral("Brightness"))));
+}
+
+
+
+void SessionDBusProxy::setShortIdleState(bool state)
+{
+    m_powerInter->asyncCall("SetShortIdleState", state);
+}
+
+void SessionDBusProxy::setIdleState(bool state)
+{
+    QDBusInterface daemon(kDaemonService, kDaemonPath, kDaemonService,
+                          QDBusConnection::systemBus());
+    daemon.asyncCall("SetIdleState", state);
+}
+
+void SessionDBusProxy::setScreenState(bool state)
+{
+    QDBusInterface daemon(kDaemonService, kDaemonPath, kDaemonService,
+                          QDBusConnection::systemBus());
+    daemon.asyncCall("SetScreenState", state);
+}
+
+void SessionDBusProxy::refreshBatteries()
+{
+    m_powerInter->asyncCall("RefreshBatteries");
+}
+
+void SessionDBusProxy::refreshMains()
+{
+    m_powerInter->asyncCall("RefreshMains");
+}
+
 bool SessionDBusProxy::sessionActive() const
 {
     return m_sessionWatcherInter->property("IsActive").toBool();
+}
+
+bool SessionDBusProxy::sessionLocked() const
+{
+    return m_sessionManagerInter->property("Locked").toBool();
 }
 
 void SessionDBusProxy::requestSuspend()
@@ -148,6 +228,16 @@ void SessionDBusProxy::requestSuspendByFront()
     m_shutdownFrontInter->asyncCall("Suspend");
 }
 
+void SessionDBusProxy::requestHibernateByFront()
+{
+    m_shutdownFrontInter->asyncCall("Hibernate");
+}
+
+void SessionDBusProxy::requestShutdownByFront()
+{
+    m_shutdownFrontInter->asyncCall("Shutdown");
+}
+
 void SessionDBusProxy::showLockAuth(bool autoStart)
 {
     m_lockFrontInter->call("ShowAuth", autoStart);
@@ -170,9 +260,36 @@ QDBusUnixFileDescriptor SessionDBusProxy::inhibit(const QString &what, const QSt
     return {};
 }
 
+QDBusMessage SessionDBusProxy::inhibitors() const
+{
+    return m_login1Inter->call(QStringLiteral("ListInhibitors"));
+}
+
+QDBusMessage SessionDBusProxy::listSessions() const
+{
+    return m_login1Inter->call(QStringLiteral("ListSessions"));
+}
+
 void SessionDBusProxy::setBlackScreenActive(bool active)
 {
     m_blackScreenInter->asyncCall("setActive", active);
+    QDBusInterface kwin(QStringLiteral("org.kde.KWin"), QStringLiteral("/BlackScreen"),
+                        QStringLiteral("org.kde.kwin.BlackScreen"),
+                        QDBusConnection::sessionBus());
+    kwin.asyncCall(QStringLiteral("setActive"), active);
+}
+
+QMap<QString, double> SessionDBusProxy::brightness() const
+{
+    QDBusInterface properties(kDisplay, kDisplayPath,
+                              QStringLiteral("org.freedesktop.DBus.Properties"),
+                              QDBusConnection::sessionBus());
+    const QDBusReply<QDBusVariant> reply = properties.call(
+        QStringLiteral("Get"), QString::fromLatin1(kDisplay),
+        QStringLiteral("Brightness"));
+    return reply.isValid()
+        ? qdbus_cast<QMap<QString, double>>(reply.value().variant())
+        : QMap<QString, double>();
 }
 
 void SessionDBusProxy::setBrightness(const QString &monitor, double value)
@@ -183,6 +300,21 @@ void SessionDBusProxy::setBrightness(const QString &monitor, double value)
 void SessionDBusProxy::setAndSaveBrightness(const QString &monitor, double value)
 {
     m_displayInter->asyncCall("SetAndSaveBrightness", monitor, value);
+}
+
+void SessionDBusProxy::refreshBrightness()
+{
+    m_displayInter->asyncCall("RefreshBrightness");
+}
+
+bool SessionDBusProxy::ambientBrightnessSupported() const
+{
+    return m_ambientBrightnessInter->property("Supported").toBool();
+}
+
+bool SessionDBusProxy::ambientBrightnessEnabled() const
+{
+    return m_ambientBrightnessInter->property("Enabled").toBool();
 }
 
 uint SessionDBusProxy::notify(uint replaceId, const QString &appName, const QString &icon,

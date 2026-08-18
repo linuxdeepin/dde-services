@@ -4,6 +4,7 @@
 
 #include "batterymanager.h"
 #include "powermanager.h"
+#include "batterydevice.h"
 #include "../powerconstants.h"
 
 #include <QDBusInterface>
@@ -14,6 +15,7 @@
 #include <QFile>
 #include <QDir>
 #include <QLoggingCategory>
+#include <algorithm>
 
 #include <libudev.h>
 
@@ -28,10 +30,10 @@ BatteryManager::BatteryManager(SystemPowerManager *mgr, QObject *parent)
     probe();
     initUdev();
 
-    m_batteryPollTimer = new QTimer(this);
-    m_batteryPollTimer->setInterval(60000);
-    connect(m_batteryPollTimer, &QTimer::timeout, this, &BatteryManager::pollBattery);
-    m_batteryPollTimer->start();
+    auto *batteryPollTimer = new QTimer(this);
+    batteryPollTimer->setInterval(60000);
+    connect(batteryPollTimer, &QTimer::timeout, this, &BatteryManager::refreshBatteries);
+    batteryPollTimer->start();
 }
 
 BatteryManager::~BatteryManager()
@@ -48,57 +50,167 @@ BatteryManager::~BatteryManager()
 
 void BatteryManager::probe()
 {
-    QDir ps("/sys/class/power_supply");
-    for (const auto &entry : ps.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-        QFile tf("/sys/class/power_supply/" + entry + "/type");
-        if (tf.open(QIODevice::ReadOnly)) {
-            if (tf.readAll().trimmed() == "Battery") { m_hasBattery = true; break; }
+    syncDevices();
+    refreshMains();
+    pollBattery();
+}
+
+void BatteryManager::syncDevices()
+{
+    QDir supplies("/sys/class/power_supply");
+    QStringList paths;
+    for (const auto &entry : supplies.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        const QString path = supplies.filePath(entry);
+        QFile type(path + "/type");
+        if (!type.open(QIODevice::ReadOnly)
+            || QString::fromUtf8(type.readAll()).trimmed().compare(
+                QLatin1String("Battery"), Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+        QFile scope(path + "/scope");
+        if (scope.open(QIODevice::ReadOnly)
+            && QString::fromUtf8(scope.readAll()).trimmed().compare(
+                QLatin1String("device"), Qt::CaseInsensitive) == 0) {
+            continue;
+        }
+        paths.append(path);
+    }
+
+    for (int i = m_batteries.size() - 1; i >= 0; --i) {
+        auto *battery = m_batteries.at(i);
+        if (paths.contains(battery->sysfsPath()))
+            continue;
+        m_batteries.removeAt(i);
+        m_mgr->unregisterBattery(battery);
+        battery->deleteLater();
+    }
+    for (const auto &path : paths) {
+        const auto exists = std::any_of(m_batteries.cbegin(), m_batteries.cend(),
+                                        [&path](const auto *battery) { return battery->sysfsPath() == path; });
+        if (!exists) {
+            auto *battery = new BatteryDevice(path, this);
+            if (!battery->isPresent()) {
+                delete battery;
+                continue;
+            }
+            battery->setRefreshDoneCallback([this] { refreshBatteries(); });
+            m_batteries.append(battery);
+            m_mgr->registerBattery(battery);
         }
     }
-    if (m_hasBattery) { m_mgr->updateHasBattery(true); pollBattery(); }
-    // AC initial state will be picked up by udev on next event,
-    // or by the fallback poll if no udev events arrive.
+}
+
+void BatteryManager::refreshBatteries()
+{
+    syncDevices();
+    for (int i = m_batteries.size() - 1; i >= 0; --i) {
+        auto *battery = m_batteries.at(i);
+        battery->refresh();
+        if (battery->isPresent())
+            continue;
+        m_batteries.removeAt(i);
+        m_mgr->unregisterBattery(battery);
+        battery->deleteLater();
+    }
+    pollBattery();
+}
+
+void BatteryManager::refreshMains()
+{
+    QDir supplies("/sys/class/power_supply");
+    bool found = false;
+    bool online = false;
+    for (const auto &entry : supplies.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        const QString path = supplies.filePath(entry);
+        QFile type(path + "/type");
+        if (!type.open(QIODevice::ReadOnly)
+            || QString::fromUtf8(type.readAll()).trimmed().compare(
+                QLatin1String("Mains"), Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+        found = true;
+        QFile state(path + "/online");
+        online = state.open(QIODevice::ReadOnly) && state.readAll().trimmed() == "1";
+        break;
+    }
+    const bool onBattery = found ? !online : m_hasBattery;
+    if (m_onBattery != onBattery) {
+        m_onBattery = onBattery;
+        Q_EMIT onBatteryChanged(onBattery);
+    }
 }
 
 void BatteryManager::pollBattery()
 {
-    if (!m_hasBattery) {
-        QDir ps("/sys/class/power_supply");
-        for (const auto &entry : ps.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-            QFile tf("/sys/class/power_supply/" + entry + "/type");
-            if (tf.open(QIODevice::ReadOnly) && tf.readAll().trimmed() == "Battery")
-                { m_hasBattery = true; m_mgr->updateHasBattery(true); break; }
-        }
+    m_hasBattery = !m_batteries.isEmpty();
+    m_mgr->updateHasBattery(m_hasBattery);
+    if (m_batteries.isEmpty()) {
+        m_mgr->updateBatteryInfo(0, 0, 0, 0, 0);
+        return;
     }
-    if (!m_hasBattery) return;
 
-    double pct = 100.0; uint status = 0; quint64 tte = 0; double cap = 100.0;
-    QDir ps("/sys/class/power_supply");
-    for (const auto &entry : ps.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-        QFile tf("/sys/class/power_supply/" + entry + "/type");
-        if (!tf.open(QIODevice::ReadOnly) || tf.readAll().trimmed() != "Battery") continue;
-        auto readInt = [&](const QString &f) -> int {
-            QFile ff("/sys/class/power_supply/" + entry + "/" + f);
-            if (ff.open(QIODevice::ReadOnly)) return ff.readAll().trimmed().toInt();
-            return 0;
-        };
-        QFile cf("/sys/class/power_supply/" + entry + "/capacity");
-        if (cf.open(QIODevice::ReadOnly)) { pct = cf.readAll().trimmed().toInt(); cf.close(); }
-        QFile sf("/sys/class/power_supply/" + entry + "/status");
-        if (sf.open(QIODevice::ReadOnly)) {
-            QString s = sf.readAll().trimmed(); sf.close();
-            if (s == "Charging") status = 1;
-            else if (s == "Discharging") { status = 2; int pw = readInt("power_now");
-                tte = pw > 0 ? static_cast<quint64>(readInt("energy_now")) * 3600 / pw : 0; }
-            else if (s == "Full") status = 4;
+    double percentage = 0;
+    uint status = 0;
+    quint64 timeToEmpty = 0;
+    quint64 timeToFull = 0;
+    double capacity = 100;
+
+    if (m_batteries.size() == 1) {
+        const auto *battery = m_batteries.first();
+        percentage = battery->percentage();
+        status = battery->status();
+        timeToEmpty = battery->timeToEmpty();
+        timeToFull = battery->timeToFull();
+        capacity = battery->capacity();
+    } else {
+        double energy = 0;
+        double energyFull = 0;
+        double energyFullDesign = 0;
+        double energyRate = 0;
+        QList<uint> states;
+        for (auto *battery : std::as_const(m_batteries)) {
+            energy += battery->energy();
+            energyFull += battery->energyFull();
+            energyFullDesign += battery->energyFullDesign();
+            energyRate += battery->energyRate();
+            states.append(battery->status());
         }
-        int ef = readInt("energy_full"), efd = readInt("energy_full_design");
-        if (efd > 0) cap = ef * 100.0 / efd;
-        break;
+
+        percentage = energyFull > 0
+            ? qBound(0.0, energy * 100.0 / energyFull, 100.0)
+            : m_batteries.first()->percentage();
+        const bool allSame = std::all_of(states.cbegin(), states.cend(),
+                                         [first = states.first()](uint value) { return value == first; });
+        if (allSame)
+            status = states.first();
+        else if (states.contains(2))
+            status = 2;
+        else if (states.contains(1))
+            status = 1;
+        if (status == 2 && energyRate > 0)
+            timeToEmpty = static_cast<quint64>(3600.0 * energy / energyRate);
+        else if (status == 1 && energyRate > 0)
+            timeToFull = static_cast<quint64>(3600.0 * qMax(0.0, energyFull - energy) / energyRate);
+        if (energyFullDesign > 0)
+            capacity = qBound(0.0, energyFull * 100.0 / energyFullDesign, 100.0);
     }
-    bool chg = (pct != m_percentage || status != m_status || tte != m_timeToEmpty || cap != m_capacity);
-    m_percentage = pct; m_status = status; m_timeToEmpty = tte; m_capacity = cap;
-    if (chg) { m_mgr->updateBatteryInfo(pct, status, tte, m_timeToFull, cap); Q_EMIT batteryChanged(); }
+
+    if (timeToEmpty > 240ULL * 60 * 60)
+        timeToEmpty = 0;
+    if (timeToFull > 20ULL * 60 * 60)
+        timeToFull = 0;
+    if (status == 0) {
+        if (m_onBattery)
+            status = 2;
+        else if (percentage == 100)
+            status = 4;
+        else
+            status = 3;
+    }
+
+    m_mgr->updateBatteryInfo(percentage, status, timeToEmpty, timeToFull, capacity);
+    for (auto *battery : std::as_const(m_batteries))
+        battery->setStatus(status);
 }
 
 // ── udev-based AC / battery monitoring ──────────────────────────
@@ -139,67 +251,41 @@ void BatteryManager::initUdev()
 
 void BatteryManager::onUdevEvent()
 {
-    if (!m_udevMon) return;
+    if (!m_udevMon)
+        return;
 
     auto *dev = udev_monitor_receive_device(m_udevMon);
-    if (!dev) return;
+    if (!dev)
+        return;
 
-    const char *action = udev_device_get_action(dev);
-    const char *type = udev_device_get_sysattr_value(dev, "type");
-
-    if (!action || !type) {
+    const char *actionValue = udev_device_get_action(dev);
+    const char *typeValue = udev_device_get_sysattr_value(dev, "type");
+    if (!actionValue || !typeValue) {
         udev_device_unref(dev);
         return;
     }
+    const char *scopeValue = udev_device_get_sysattr_value(dev, "scope");
+    const QString action = QString::fromUtf8(actionValue);
+    const QString type = QString::fromUtf8(typeValue);
+    const QString scope = scopeValue ? QString::fromUtf8(scopeValue) : QString();
+    const bool systemBattery = type.compare(QLatin1String("Battery"), Qt::CaseInsensitive) == 0
+        && scope.compare(QLatin1String("device"), Qt::CaseInsensitive) != 0;
 
-    if (strcmp(action, "change") == 0) {
-        if (strcmp(type, "Mains") == 0 || strcmp(type, "USB") == 0) {
-            refreshACFromUdev(dev);
+    if (action == QLatin1String("change")) {
+        if (type.compare(QLatin1String("Mains"), Qt::CaseInsensitive) == 0) {
+            refreshMains();
             scheduleBatteryRefreshAfterAC();
-        } else if (strcmp(type, "Battery") == 0) {
-            refreshBatteryFromUdev(dev);
+        } else if (systemBattery) {
+            refreshBatteries();
         }
-    } else if (strcmp(action, "add") == 0) {
-        if (strcmp(type, "Battery") == 0) {
-            m_hasBattery = true;
-            m_mgr->updateHasBattery(true);
-            pollBattery();
-        }
-    } else if (strcmp(action, "remove") == 0) {
-        if (strcmp(type, "Battery") == 0) {
-            // re-probe to see if any batteries remain
-            m_hasBattery = false;
-            QDir ps("/sys/class/power_supply");
-            for (const auto &entry : ps.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-                QFile tf("/sys/class/power_supply/" + entry + "/type");
-                if (tf.open(QIODevice::ReadOnly) && tf.readAll().trimmed() == "Battery") {
-                    m_hasBattery = true;
-                    break;
-                }
-            }
-            if (!m_hasBattery)
-                m_mgr->updateHasBattery(false);
-        }
+    } else if (systemBattery) {
+        probe();
     }
 
     udev_device_unref(dev);
 }
 
-void BatteryManager::refreshACFromUdev(struct udev_device *dev)
-{
-    const char *online = udev_device_get_sysattr_value(dev, "online");
-    bool onBatt = !(online && strcmp(online, "1") == 0);
-    if (onBatt != m_onBattery) {
-        m_onBattery = onBatt;
-        Q_EMIT onBatteryChanged(onBatt);
-    }
-}
 
-void BatteryManager::refreshBatteryFromUdev(struct udev_device *)
-{
-    // udev notified us of a battery change; full poll picks up all values
-    pollBattery();
-}
 
 // AC 变更后, 在 1s, 3s, 5s, 10s, 15s, ... 60s 递进刷新电池
 void BatteryManager::scheduleBatteryRefreshAfterAC()
@@ -208,5 +294,5 @@ void BatteryManager::scheduleBatteryRefreshAfterAC()
                                  25000, 30000, 35000, 40000, 45000, 50000,
                                  55000, 60000};
     for (int d : delays)
-        QTimer::singleShot(d, this, &BatteryManager::pollBattery);
+        QTimer::singleShot(d, this, &BatteryManager::refreshBatteries);
 }

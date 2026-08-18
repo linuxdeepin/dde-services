@@ -36,6 +36,8 @@ LidSwitchHandler::LidSwitchHandler(PowerManager *manager, QObject *parent)
 
 void LidSwitchHandler::onLidClosed()
 {
+    if (!m_manager || !m_manager->isSessionActive())
+        return;
     qDebug(logPowerSession) << "Lid closed";
     m_pendingOpen = false;
     m_debounce->start();
@@ -43,6 +45,8 @@ void LidSwitchHandler::onLidClosed()
 
 void LidSwitchHandler::onLidOpened()
 {
+    if (!m_manager || !m_manager->isSessionActive())
+        return;
     qDebug(logPowerSession) << "Lid opened";
     m_pendingOpen = true;
     m_debounce->start();
@@ -50,7 +54,8 @@ void LidSwitchHandler::onLidOpened()
 
 void LidSwitchHandler::doLidStateChanged(bool opened)
 {
-    if (!m_manager) return;
+    if (!m_manager)
+        return;
 
     if (!opened) {
         // 合盖
@@ -65,16 +70,16 @@ void LidSwitchHandler::doLidStateChanged(bool opened)
             m_manager->doShutdown();
             break;
         case PA_Suspend:
-            m_manager->doSuspend();
+            if (m_manager->useWayland())
+                m_manager->doSuspend();
+            else
+                m_manager->doSuspendByFront();
             break;
         case PA_Hibernate:
             m_manager->doHibernate();
             break;
         case PA_TurnOffScreen:
             m_manager->doTurnOffScreen();
-            break;
-        case PA_Lock:
-            m_manager->doLock();
             break;
         case PA_DoNothing:
             return;
@@ -86,7 +91,7 @@ void LidSwitchHandler::doLidStateChanged(bool opened)
             m_manager->setBlackScreenActive(true);
     } else {
         if (m_manager->useWayland())
-            m_manager->SetPrepareSuspend(PS_Resume);
+            m_manager->SetPrepareSuspend(PS_Finish);
 
         if (auto *iw = m_manager->idleWatcher())
             iw->simulateActivity();

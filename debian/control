@@ -18,6 +18,8 @@ Build-Depends:  debhelper (>= 11),
  libdtk6gui-dev,
  libdtk6core-dev,
  libx11-dev,
+ libxext-dev,
+ libxss-dev,
  libxcb-randr0-dev,
  libxcb1-dev,
  libxcb-xinput-dev,
@@ -41,11 +43,12 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends},
  deepin-service-manager (>> 1.0.21),
- dbus
+ dbus,
+ deepin-power-control (>= 2.0.1)
 Recommends:
  iio-sensor-proxy
-Breaks: dde-daemon (<< 6.1.94)
-Replaces: dde-daemon (<< 6.1.94)
+Breaks: dde-daemon (<< 6.1.102)
+Replaces: dde-daemon (<< 6.1.102)
 Description: deepin desktop-environment plugins service
  This package provides various system service plugins for Deepin Desktop
  Environment, including:
