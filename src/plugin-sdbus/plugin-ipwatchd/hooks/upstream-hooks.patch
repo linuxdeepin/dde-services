@@ -1,0 +1,126 @@
+--- upstream/analyse.c.orig
++++ upstream/analyse.c
+@@ -22,6 +22,7 @@
+ 
+ 
+ #include "ipwatchd.h"
++#include "hooks/ipwatchd_hooks.h"
+ 
+ 
+ extern IPWD_S_DEVS devices;
+@@ -113,6 +114,12 @@
+ 
+ 	ipwd_message (IPWD_MSG_TYPE_ERROR, "Received ARP packet: S:%s-%s D:%s-%s", rcv_sip, rcv_smac, rcv_dip, rcv_dmac);
+ 
++	/* Call hook for ARP packet processing */
++	if (ipwd_hook_on_arp_packet(rcv_sip, rcv_smac, rcv_dip, rcv_dmac) != 0)
++	{
++		return; /* Hook handled the packet, skip further processing */
++	}
++
+ 	/* Update devices structure with actual IP and MAC addresses of interfaces */
+ 	for (i = 0; i < devices.devnum; i++)
+ 	{
+@@ -130,14 +137,7 @@
+ 		/* Ignore packets coming from local interfaces */
+ 		if (strcasecmp (rcv_smac, devices.dev[i].mac) == 0)
+ 		{
+-			if (strcasecmp (rcv_sip, devices.dev[i].ip) == 0)
+-			{
+-				ipwd_message (IPWD_MSG_TYPE_DEBUG, "ARP packet ignored because it comes from local interface.");
+-			}
+-			else
+-			{
+-				/* Happens when there is more than one interface connected to the same subnet */
+-				ipwd_message (IPWD_MSG_TYPE_DEBUG, "ARP packet ignored because it comes from local machine.");
+-			}
+-
+ 			return;
+ 		}
+ 	}
+@@ -154,11 +154,8 @@
+ 			/* Check if received packet causes conflict with IP address of this interface */
+ 			if (!((strcasecmp (rcv_sip, devices.dev[i].ip) == 0) && (strcasecmp (rcv_smac, devices.dev[i].mac) != 0)))
+ 			{
+-				ipwd_message (IPWD_MSG_TYPE_DEBUG, "Packet does not conflict with: %s %s-%s", devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac);
+-				
+ 				/* Call hook for potential conflict resolution */
+-				ipwd_message (IPWD_MSG_TYPE_DEBUG, "Calling conflict_resolved hook for device:%s ip:%s mac:%s remote:%s", 
+-				             devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac, rcv_smac);
+ 				ipwd_hook_on_conflict_resolved(devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac, rcv_smac);
+-				
+ 				continue;
+ 			}
+ 		}
+@@ -199,6 +196,10 @@
+ 			ipwd_message (IPWD_MSG_TYPE_ALERT, "MAC address %s causes IP conflict with address %s set on interface %s - passive mode - reply not sent", rcv_smac, devices.dev[i].ip, devices.dev[i].device);
+ 		}
+ 
++		/* Call hook for conflict notification */
++		ipwd_hook_on_conflict(devices.dev[i].device, devices.dev[i].ip, devices.dev[i].mac, rcv_smac, 
++		                      devices.dev[i].mode == IPWD_PROTECTION_MODE_ACTIVE);
++
+ 		if (config.script != NULL)
+ 		{
+ 			/* Run user-defined script in form: script "dev" "ip" "mac" */
+@@ -211,11 +212,7 @@
+ 
+ 			snprintf (command, command_len, "%s \"%s\" \"%s\" \"%s\"", config.script, devices.dev[i].device, devices.dev[i].ip, rcv_smac);
+ 
+-			ipwd_message (IPWD_MSG_TYPE_DEBUG, "Running user-defined script: %s", command);
+-
+ 			rv = system (command);
+ 			if (rv == -1)
+ 			{
+ 				ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to execute user-defined script: %s", command);
+ 			}
+ 
+ 			free (command);
+ 			command = NULL;
+-		}
+-		else
+-		{
+-			ipwd_message (IPWD_MSG_TYPE_DEBUG, "No user-defined script specified");
+ 		}
+
+--- upstream/config.c.orig
++++ upstream/config.c
+@@ -24,6 +24,7 @@
+ 
+ 
+ #include "ipwatchd.h"
++#include "hooks/ipwatchd_hooks.h"
+ 
+ 
+ extern int debug_flag;
+@@ -293,6 +294,9 @@
+ 		}
+ 	}
+ 
++	/* Call hook after configuration is loaded */
++	ipwd_hook_on_config_loaded();
++
+ 	return (IPWD_RV_SUCCESS);
+ 
+ }
+
+--- upstream/ipwatchd.c.orig
++++ upstream/ipwatchd.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "ipwatchd.h"
++#include "hooks/ipwatchd_hooks.h"
+ 
+ 
+ //! Flag indicating debug mode
+@@ -186,6 +187,9 @@
+ 
+ 	pcap_freecode (&fp);
+ 
++	/* Call hook after pcap is ready */
++	ipwd_hook_on_pcap_ready(h_pcap);
++
+ 	ipwd_message (IPWD_MSG_TYPE_DEBUG, "Entering pcap loop");
+ 
+ 	/* Loop until SIGTERM calls pcap_breakloop */

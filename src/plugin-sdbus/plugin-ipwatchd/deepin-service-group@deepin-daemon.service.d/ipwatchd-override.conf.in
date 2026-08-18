@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+[Unit]
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN
+PrivateNetwork=false

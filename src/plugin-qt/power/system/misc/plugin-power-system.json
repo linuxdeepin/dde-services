@@ -1,0 +1,12 @@
+{
+    "name": "org.deepin.dde.Power1",
+    "libPath": "libplugin-power-system.so",
+    "group": "dde",
+    "startType": "Resident",
+    "pluginType": "qt",
+    "policy": [
+        {
+            "path": "/org/deepin/dde/Power1"
+        }
+    ]
+}

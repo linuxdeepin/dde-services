@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=org.deepin.dde.Power1
+Exec=/usr/bin/deepin-service-manager -n org.deepin.dde.Power1
+User=deepin-daemon
+SystemdService=org.deepin.dde.Power1.service

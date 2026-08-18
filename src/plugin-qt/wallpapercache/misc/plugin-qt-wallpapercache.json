@@ -1,0 +1,19 @@
+{
+    "name": "org.deepin.dde.WallpaperCache",
+    "libPath": "libplugin-qt-wallpapercache.so",
+    "policyStartType": "OnDemand",
+    "pluginType": "qt",
+    "idleTime": 1,
+    "startDelay": 0,
+    "policy": [
+      {
+        "path": "/org/deepin/dde/WallpaperCache"
+      },
+      {
+        "path": "/org/deepin/dde/ImageEffect1"
+      },
+      {
+        "path": "/org/deepin/dde/ImageBlur1"
+      }
+    ]
+  }

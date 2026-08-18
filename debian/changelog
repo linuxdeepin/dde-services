@@ -1,0 +1,167 @@
+dde-services (1.0.25) unstable; urgency=medium
+
+  * perf: optimize XSettings1 startup — remove Before constraint, skip
+    redundant init, clean up debug code
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 15 May 2026 09:35:57 +0800
+
+dde-services (1.0.24) unstable; urgency=medium
+
+  * fix(wallpapercache): use QImageReader scaled decoding to avoid OOM
+    on large images
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 08 May 2026 15:03:28 +0800
+
+dde-services (1.0.23) unstable; urgency=medium
+
+  * chore: add Breaks and Replaces for dde-daemon
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 24 Apr 2026 16:48:56 +0800
+
+dde-services (1.0.22) unstable; urgency=medium
+
+  * feat: implement wallpaper cache plugin for dde-services
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 24 Apr 2026 09:58:27 +0800
+
+dde-services (1.0.21) unstable; urgency=medium
+
+  * fix: apply scale factor to GTK cursor theme size
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 27 Feb 2026 15:49:37 +0800
+
+dde-services (1.0.20) unstable; urgency=medium
+
+  * chore: disable direct D-Bus service execution
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 29 Jan 2026 20:35:37 +0800
+
+dde-services (1.0.19) unstable; urgency=medium
+
+  * feat: 移除ipwatchd插件
+
+ -- fuleyi <fuleyi@uniontech.com>  Wed, 14 Jan 2026 14:49:28 +0800
+
+dde-services (1.0.18) unstable; urgency=medium
+
+  * fix: correct default scale factor initialization
+  * feat: add automatic screen scaling recommendation
+
+ -- zhangkun <zhangkun2@uniontech.com>  Tue, 06 Jan 2026 20:29:23 +0800
+
+dde-services (1.0.17) unstable; urgency=medium
+
+  * chore: remove OOMScoreAdjust plugin
+  * fix: remove unnecessary dependencies from xsettings service
+  * feat: refactor ipwatchd plugin to use service group framework
+  * refactor: convert xsettings from executable to plugin
+
+ -- fuleyi <fuleyi@uniontech.com>  Fri, 19 Dec 2025 13:28:07 +0800
+
+dde-services (1.0.16) unstable; urgency=medium
+
+  * feat: convert xsettings from plugin to standalone application
+  * fix: correct Xft/DPI property name in XSettings update
+
+ -- YeShanShan <yeshanshan@uniontech.com>  Thu, 11 Dec 2025 20:31:28 +0800
+
+dde-services (1.0.15) unstable; urgency=medium
+
+  * fix: correct DPI scaling value in XSettings
+
+ -- zhangkun <zhangkun2@uniontech.com>  Mon, 08 Dec 2025 10:59:12 +0800
+
+dde-services (1.0.14) unstable; urgency=medium
+
+  * feat: add xsettings plugin implementation
+  * feat: add cursor size scaling with system scale factor
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 04 Dec 2025 19:13:45 +0800
+
+dde-services (1.0.13) unstable; urgency=medium
+
+  * fix: add null pointer checks after malloc calls
+
+ -- zhaoyingzhen <zhaoyingzhen@uniontech.com>  Thu, 27 Nov 2025 17:37:19 +0800
+
+dde-services (1.0.12) unstable; urgency=medium
+
+  * feat: implement sd_bus_read_dict function
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 13 Nov 2025 19:49:03 +0800
+
+dde-services (1.0.11) unstable; urgency=medium
+
+  * feat: refactor wallpaper slideshow for multi-monitor support
+
+ -- wujiangyu <wujiangyu@uniontech.com>  Thu, 23 Oct 2025 16:00:46 +0800
+
+dde-services (1.0.10) unstable; urgency=medium
+
+  * refactor: replace session ID with D-Bus session path for login
+    detection
+
+ -- YeShanShan <yeshanshan@uniontech.com>  Fri, 10 Oct 2025 17:30:55 +0800
+
+dde-services (1.0.9) unstable; urgency=high
+
+  * Chore: add oom-adjust-score plugin
+
+ -- zyz <zhaoyingzhen@uniontech.com>  Thu, 21 Aug 2025 21:52:48 +0800
+
+dde-services (1.0.8) unstable; urgency=medium
+
+  * fix: add time-based sorting for wallpaper files
+
+ -- YeShanShan <yeshanshan@uniontech.com>  Thu, 31 Jul 2025 19:43:28 +0800
+
+dde-services (1.0.7) unstable; urgency=medium
+
+  * refactor: optimize build system security flags
+
+ -- WuJiangYu <wujiangyu@uniontech.com>  Thu, 03 Jul 2025 19:52:04 +0800
+
+dde-services (1.0.6) unstable; urgency=medium
+
+  * fix: Unable to rotate newly added images
+  * fix: m_curMonitorSpace should be initialized in advance
+  * fix: 修复系统预装QT应用问题
+
+ -- zhangkun <zhangkun2@uniontech.com>  Wed, 12 Mar 2025 13:38:55 +0800
+
+dde-services (1.0.5) unstable; urgency=medium
+
+  * chore: adapt to Qt6.8
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 06 Mar 2025 19:41:54 +0800
+
+dde-services (1.0.4) unstable; urgency=medium
+
+  * chore: update custom solidwallpapers path
+  * chore: adapt wallpaper slideshow
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 21 Feb 2025 16:01:54 +0800
+
+dde-services (1.0.3) unstable; urgency=medium
+
+  * feat: 新增thememanager的qt服务
+
+ -- xionglinlin <xionglinlin@uniontech.com>  Thu, 13 Feb 2025 19:44:47 +0800
+
+dde-services (1.0.2) unstable; urgency=medium
+
+  * feat: 项目调整，名称变更，删除oom模块
+
+ -- fuleyi <fuleyi@uniontech.com>  Tue, 11 Feb 2025 10:48:32 +0800
+
+deepin-service-plugins (1.0.1) unstable; urgency=medium
+
+  * chore: fix license check
+
+ -- fuleyi <fuleyi@uniontech.com>  Thu, 24 Oct 2024 13:20:15 +0800
+
+deepin-service-plugins (1.0.0) unstable; urgency=medium
+
+  * Initial release. 
+
+ -- fuleyi <fuleyi@uniontech.com>  Mon, 14 Oct 2024 13:48:23 +0800

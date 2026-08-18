@@ -1,0 +1,36 @@
+Source: dde-services
+Section: admin
+Priority: optional
+Maintainer: Deepin Sysdev <sysdev@deepin.com>
+Build-Depends:  debhelper (>= 11),
+ pkg-config,
+ cmake,
+ qt6-base-dev,
+ qt6-tools-dev-tools,
+ qt6-wayland-dev,
+ qt6-wayland-private-dev,
+ qt6-wayland-dev-tools,
+ libsystemd-dev,
+ libpcap-dev,
+ libnet-dev,
+ libglib2.0-dev,
+ libdtk6gui-dev,
+ libdtk6core-dev,
+ libx11-dev,
+ libxcb-randr0-dev,
+ libxcb1-dev,
+ treeland-protocols,
+ wlr-protocols,
+ wayland-protocols,
+Standards-Version: 4.1.3
+Homepage: https://github.com/linuxdeepin
+
+Package: dde-services
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ deepin-service-manager (>= 1.0.5)
+Breaks: dde-daemon (<< 6.1.87)
+Replaces: dde-daemon (<< 6.1.87)
+Description: deepin desktop-environment plugins service

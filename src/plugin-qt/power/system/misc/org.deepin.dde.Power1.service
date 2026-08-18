@@ -1,0 +1,11 @@
+[Unit]
+Description=org.deepin.dde.Power1 (System)
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Service]
+Type=dbus
+BusName=org.deepin.dde.Power1
+ExecStart=/usr/bin/deepin-service-manager -n org.deepin.dde.Power1
+Restart=on-failure
+Slice=system.slice
