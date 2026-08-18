@@ -1,3 +1,9 @@
+dde-services (1.0.41) unstable; urgency=medium
+
+  * fix: change default ambient brightness to off
+
+ -- fuleyi <fuleyi@uniontech.com>  Tue, 18 Aug 2026 15:22:13 +0800
+
 dde-services (1.0.40) unstable; urgency=medium
 
   * i18n: [Transifex] Updates for project Deepin Desktop Environment
