@@ -3,115 +3,115 @@
     <name>org.deepin.dde.keybinding</name>
     <message>
         <source>Toggle multiple displays</source>
-        <translation type="unfinished"/>
+        <translation>Kytke useita näyttöjä</translation>
     </message>
     <message>
         <source>Terminal</source>
-        <translation type="unfinished"/>
+        <translation>Pääte</translation>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise alas neljällä sormella</translation>
     </message>
     <message>
         <source>Swipe down with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise alas kolmella sormella</translation>
     </message>
     <message>
         <source>Swipe left with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise vasemmalle neljällä sormella</translation>
     </message>
     <message>
         <source>Swipe left with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise vasemmalle kolmella sormella</translation>
     </message>
     <message>
         <source>Swipe right with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise oikealle neljällä sormella</translation>
     </message>
     <message>
         <source>Swipe right with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise oikealle kolmella sormella</translation>
     </message>
     <message>
         <source>Swipe up with four fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise ylös neljällä sormella</translation>
     </message>
     <message>
         <source>Swipe up with three fingers</source>
-        <translation type="unfinished"/>
+        <translation>Pyyhkäise ylös kolmella sormella</translation>
     </message>
     <message>
         <source>Four-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Neljän sormen painallus</translation>
     </message>
     <message>
         <source>Three-finger tap</source>
-        <translation type="unfinished"/>
+        <translation>Kolmen sormen painallus</translation>
     </message>
     <message>
         <source>This gesture action is not currently supported</source>
-        <translation type="unfinished"/>
+        <translation>Tätä elettä ei tällä hetkellä tueta</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Suurenna ikkuna</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Palauta ikkuna</translation>
     </message>
     <message>
         <source>Current window left split</source>
-        <translation type="unfinished"/>
+        <translation>Ikkuna vasemmalle jaettuna</translation>
     </message>
     <message>
         <source>Current window right split</source>
-        <translation type="unfinished"/>
+        <translation>Ikkuna oikealle jaettuna</translation>
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Näytä moniajonäkymä</translation>
     </message>
     <message>
         <source>Hide multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Piilota moniajonäkymä</translation>
     </message>
     <message>
         <source>Switch to previous workspace</source>
-        <translation type="unfinished"/>
+        <translation>Siirry edelliseen työtilaan</translation>
     </message>
     <message>
         <source>Switch to next workspace</source>
-        <translation type="unfinished"/>
+        <translation>Siirry seuraavaan työtilaan</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Näytä työpöytä</translation>
     </message>
     <message>
         <source>Hide desktop</source>
-        <translation type="unfinished"/>
+        <translation>Piilota työpöytä</translation>
     </message>
     <message>
         <source>Show/hide grand search</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota haku</translation>
     </message>
     <message>
         <source>Show/hide launcher</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota käynnistin</translation>
     </message>
     <message>
         <source>Show/hide clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota leikepöytä</translation>
     </message>
     <message>
         <source>Show/hide notification center</source>
-        <translation type="unfinished"/>
+        <translation>Näytä tai piillota ilmoitukset</translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"/>
+        <translation>Pois</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -119,19 +119,19 @@
     </message>
     <message>
         <source>Accessibility</source>
-        <translation type="unfinished"/>
+        <translation>Apuvälineet</translation>
     </message>
     <message>
         <source>Text to speech</source>
-        <translation type="unfinished"/>
+        <translation>Teksti puheeksi</translation>
     </message>
     <message>
         <source>Speech to text</source>
-        <translation type="unfinished"/>
+        <translation>Puhe tekstiksi</translation>
     </message>
     <message>
         <source>Translation</source>
-        <translation type="unfinished"/>
+        <translation>Käännös</translation>
     </message>
     <message>
         <source>None</source>
@@ -143,79 +143,79 @@
     </message>
     <message>
         <source>Notify</source>
-        <translation type="unfinished"/>
+        <translation>Ilmoita</translation>
     </message>
     <message>
         <source>Switch to workspace 1</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 1</translation>
     </message>
     <message>
         <source>Switch to workspace 2</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 2</translation>
     </message>
     <message>
         <source>Switch to workspace 3</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 3</translation>
     </message>
     <message>
         <source>Switch to workspace 4</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 4</translation>
     </message>
     <message>
         <source>Switch to workspace 5</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 5</translation>
     </message>
     <message>
         <source>Switch to workspace 6</source>
-        <translation type="unfinished"/>
+        <translation>Vaihda työtilaan 6</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä ikkunaa</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Sulje ikkuna</translation>
     </message>
     <message>
         <source>Open window menu</source>
-        <translation type="unfinished"/>
+        <translation>Avaa ikkunavalikko</translation>
     </message>
     <message>
         <source>Toggle FPS display</source>
-        <translation type="unfinished"/>
+        <translation>FPS-näyttö käyttöön</translation>
     </message>
     <message>
         <source>Lock screen</source>
-        <translation type="unfinished"/>
+        <translation>Lukitse näyttö</translation>
     </message>
     <message>
         <source>Show shutdown menu</source>
-        <translation type="unfinished"/>
+        <translation>Näytä sammutusvalikko</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished"/>
+        <translation>Poistu</translation>
     </message>
     <message>
         <source>Enter task switcher</source>
-        <translation type="unfinished"/>
+        <translation>Tehtävänäkymä</translation>
     </message>
     <message>
         <source>Select next task</source>
-        <translation type="unfinished"/>
+        <translation>Seuraava tehtävä</translation>
     </message>
     <message>
         <source>Select previous task</source>
-        <translation type="unfinished"/>
+        <translation>Edellinen tehtävä</translation>
     </message>
     <message>
         <source>Select next window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Valitse sovelluksen seuraava ikkuna</translation>
     </message>
     <message>
         <source>Select previous window of current application</source>
-        <translation type="unfinished"/>
+        <translation>Valitse sovelluksen edellinen ikkuna</translation>
     </message>
 </context>
 </TS>
