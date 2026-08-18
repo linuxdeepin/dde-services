@@ -1,3 +1,18 @@
+dde-services (1.0.40) unstable; urgency=medium
+
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#141)
+  * fix: report explicit shortcut capture outcomes
+  * fix: support ambient light automatic brightness
+  * fix: align shortcut display names
+  * feat: migrate camera shortcut and helper scripts
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#149)
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#150)
+
+ -- zhangkun <zhangkun2@uniontech.com>  Tue, 18 Aug 2026 13:26:28 +0800
+
 dde-services (1.0.39) unstable; urgency=medium
 
   * fix: persist NumLock state on X11
