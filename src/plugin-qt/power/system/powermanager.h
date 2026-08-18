@@ -4,11 +4,16 @@
 #pragma once
 #include <QObject>
 #include <QDBusConnection>
+#include <QDBusContext>
 #include <QDBusObjectPath>
 #include <QString>
+#include <QSet>
+#include <QQueue>
 #include <DConfig>
 
-class SystemPowerManager : public QObject {
+class BatteryDevice;
+class QProcess;
+class SystemPowerManager : public QObject, protected QDBusContext {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.deepin.dde.Power1")
 
@@ -31,26 +36,35 @@ class SystemPowerManager : public QObject {
                WRITE setPowerSavingModeBrightnessDropPercent NOTIFY powerSavingModeBrightnessDropPercentChanged)
     Q_PROPERTY(uint PowerSavingModeAutoBatteryPercent READ powerSavingModeAutoBatteryPercent
                WRITE setPowerSavingModeAutoBatteryPercent NOTIFY powerSavingModeAutoBatteryPercentChanged)
-    Q_PROPERTY(QString Mode READ mode WRITE setMode NOTIFY modeChanged)
+    Q_PROPERTY(QString PowerSavingModeBrightnessData READ powerSavingModeBrightnessData WRITE setPowerSavingModeBrightnessData NOTIFY powerSavingModeBrightnessDataChanged)
+    Q_PROPERTY(bool ShortIdleState READ shortIdleState NOTIFY shortIdleStateChanged)
+    Q_PROPERTY(QString TlpMode READ tlpMode NOTIFY tlpModeChanged)
+    Q_PROPERTY(QString Mode READ mode NOTIFY modeChanged)
     Q_PROPERTY(bool IsHighPerformanceSupported READ isHighPerformanceSupported NOTIFY isHighPerformanceSupportedChanged)
+    Q_PROPERTY(bool IsBalanceSupported READ isBalanceSupported NOTIFY isBalanceSupportedChanged)
     Q_PROPERTY(bool IsPowerSaveSupported READ isPowerSaveSupported NOTIFY isPowerSaveSupportedChanged)
-    Q_PROPERTY(QString CpuGovernor READ cpuGovernor WRITE setCpuGovernor NOTIFY cpuGovernorChanged)
-    Q_PROPERTY(bool CpuBoost READ cpuBoost WRITE setCpuBoost NOTIFY cpuBoostChanged)
+    Q_PROPERTY(bool SupportSwitchPowerMode READ supportSwitchPowerMode WRITE setSupportSwitchPowerMode NOTIFY supportSwitchPowerModeChanged)
+    Q_PROPERTY(QString CpuGovernor READ cpuGovernor NOTIFY cpuGovernorChanged)
+    Q_PROPERTY(bool CpuBoost READ cpuBoost NOTIFY cpuBoostChanged)
 
 public:
     explicit SystemPowerManager(QDBusConnection *conn, const QString &svc, QObject *p = nullptr);
     bool initialize();
+    ~SystemPowerManager() override;
 
+    void registerBattery(BatteryDevice *battery);
+    void unregisterBattery(BatteryDevice *battery);
     void updateHasBattery(bool has);
     void updateBatteryInfo(double pct, uint status, quint64 tte, quint64 ttf, double cap);
     void initLidSwitch();
     void initPowerSavingDConfig();
-    void initCpuGovernor();
 
 private Q_SLOTS:
     void onUPowerPropertiesChanged(const QString &interface,
                                    const QVariantMap &changed,
                                    const QStringList &invalidated);
+    void notifyPropertyChanged();
+    void onDisplaySessionAdded(const QDBusObjectPath &session);
 
     bool onBattery() const { return m_onBattery; }
     bool hasBattery() const { return m_hasBattery; }
@@ -62,21 +76,27 @@ private Q_SLOTS:
     quint64 batteryTimeToFull() const { return m_batteryTimeToFull; }
     double batteryCapacity() const { return m_batteryCapacity; }
     bool powerSavingModeEnabled() const { return m_psmEnabled; }
-    void setPowerSavingModeEnabled(bool v) { if (m_psmEnabled != v) { m_psmEnabled = v; Q_EMIT powerSavingModeEnabledChanged(); } }
+    void setPowerSavingModeEnabled(bool v);
     bool powerSavingModeAuto() const { return m_psmAuto; }
-    void setPowerSavingModeAuto(bool v) { if (m_psmAuto != v) { m_psmAuto = v; Q_EMIT powerSavingModeAutoChanged(); } }
+    void setPowerSavingModeAuto(bool v);
     bool powerSavingModeAutoWhenBatteryLow() const { return m_psmAutoLow; }
-    void setPowerSavingModeAutoWhenBatteryLow(bool v) { if (m_psmAutoLow != v) { m_psmAutoLow = v; Q_EMIT powerSavingModeAutoWhenBatteryLowChanged(); } }
+    void setPowerSavingModeAutoWhenBatteryLow(bool v);
     uint powerSavingModeBrightnessDropPercent() const { return m_psmDrop; }
-    void setPowerSavingModeBrightnessDropPercent(uint v) { if (m_psmDrop != v) { m_psmDrop = v; Q_EMIT powerSavingModeBrightnessDropPercentChanged(); } }
+    void setPowerSavingModeBrightnessDropPercent(uint v);
     uint powerSavingModeAutoBatteryPercent() const { return m_psmAutoPct; }
-    void setPowerSavingModeAutoBatteryPercent(uint v) { if (m_psmAutoPct != v) { m_psmAutoPct = v; Q_EMIT powerSavingModeAutoBatteryPercentChanged(); } }
+    void setPowerSavingModeAutoBatteryPercent(uint v);
+    QString powerSavingModeBrightnessData() const { return m_psmBrightnessData; }
+    void setPowerSavingModeBrightnessData(const QString &v);
+    bool shortIdleState() const { return m_shortIdleState; }
+    QString tlpMode() const { return m_tlpMode; }
     QString mode() const { return m_mode; }
-    void setMode(const QString &v);
     QString lastMode() const { return m_lastMode; }
     bool batteryLow() const { return m_batteryLow; }
     bool isHighPerformanceSupported() const { return m_hpSupported; }
     bool isPowerSaveSupported() const { return m_psSupported; }
+    bool isBalanceSupported() const { return m_balanceSupported; }
+    bool supportSwitchPowerMode() const { return m_supportSwitchPowerMode; }
+    void setSupportSwitchPowerMode(bool v);
     QString cpuGovernor() const { return m_governor; }
     void setCpuGovernor(const QString &v) { if (m_governor != v) { m_governor = v; Q_EMIT cpuGovernorChanged(); } }
     bool cpuBoost() const { return m_boost; }
@@ -90,6 +110,9 @@ public Q_SLOTS:
     void SetCpuGovernor(const QString &gov);
     void SetCpuBoost(bool on);
     void LockCpuFreq(const QString &gov, int lockTime);
+    void SetMode(const QString &mode);
+    void SetTlpMode(const QString &mode);
+    void SetShortIdleState(bool state);
 
 Q_SIGNALS:
     void onBatteryChanged();
@@ -98,6 +121,9 @@ Q_SIGNALS:
     void lidClosedChanged();
     void LidClosed();
     void LidOpened();
+    void BatteryDisplayUpdate(qint64 timestamp);
+    void BatteryAdded(const QDBusObjectPath &path);
+    void BatteryRemoved(const QDBusObjectPath &path);
     void batteryPercentageChanged();
     void batteryStatusChanged();
     void batteryTimeToEmptyChanged();
@@ -108,16 +134,29 @@ Q_SIGNALS:
     void powerSavingModeAutoWhenBatteryLowChanged();
     void powerSavingModeBrightnessDropPercentChanged();
     void powerSavingModeAutoBatteryPercentChanged();
+    void powerSavingModeBrightnessDataChanged();
+    void shortIdleStateChanged();
+    void tlpModeChanged();
     void modeChanged();
     void isHighPerformanceSupportedChanged();
     void isPowerSaveSupportedChanged();
+    void isBalanceSupportedChanged();
+    void supportSwitchPowerModeChanged();
     void cpuGovernorChanged();
     void cpuBoostChanged();
 
 private:
     void handleLidSwitchEvent(bool closed);
     void updatePowerMode(bool init = false);
+    void initializePowerMode();
     void recalcBatteryLow();
+    void applyMode(const QString &mode);
+    void setMode(const QString &mode);
+    QString mappedDspcMode(const QString &mode) const;
+    void persist(const char *key, const QVariant &value);
+    void migrateLegacyConfig();
+    void enqueuePowerControl(const QStringList &arguments);
+    void runNextPowerControl();
 
     QDBusConnection *m_conn;
 
@@ -135,12 +174,31 @@ private:
     bool m_psmAutoLow = false;
     uint m_psmDrop = 0;
     uint m_psmAutoPct = 20;
+    QString m_psmBrightnessData;
+    bool m_shortIdleEnabled = false;
+    bool m_shortIdleState = false;
+    QString m_tlpMode;
     QString m_mode = "balance";
     QString m_lastMode = "balance";
     bool m_batteryLow = false;
-    QString m_governor = "powersave";
+    QString m_governor;
     bool m_boost = true;
     bool m_hpSupported = true;
     bool m_psSupported = true;
+    bool m_balanceSupported = true;
+    bool m_supportSwitchPowerMode = false;
+    QString m_powerMappingConfig;
+    bool m_loadingConfig = false;
+    bool m_initDone = false;
+    bool m_suppressModeUpdate = false;
+    bool m_settingMode = false;
     Dtk::Core::DConfig *m_config = nullptr;
+    Dtk::Core::DConfig *m_configReader = nullptr;
+    QSet<QString> m_writingConfigKeys;
+    bool m_applyingConfig = false;
+    QList<BatteryDevice *> m_batteries;
+    class BatteryManager *m_batteryManager = nullptr;
+    QProcess *m_powerControlProcess = nullptr;
+    QQueue<QStringList> m_powerControlQueue;
+    bool m_powerControlBusy = false;
 };
