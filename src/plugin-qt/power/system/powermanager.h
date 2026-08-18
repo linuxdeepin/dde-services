@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QDBusConnection>
 #include <QDBusContext>
+#include <QHash>
 #include <QDBusObjectPath>
 #include <QString>
 #include <QSet>
@@ -112,6 +113,7 @@ public Q_SLOTS:
     void LockCpuFreq(const QString &gov, int lockTime);
     void SetMode(const QString &mode);
     void SetTlpMode(const QString &mode);
+    void SetAllowCaller(const QString &uniqueName);
     void SetShortIdleState(bool state);
 
 Q_SIGNALS:
@@ -158,6 +160,17 @@ private:
     void enqueuePowerControl(const QStringList &arguments);
     void runNextPowerControl();
 
+    bool addAllowedCaller(const QString &uniqueName);
+    bool isAllowedCaller(const QString &uniqueName, bool &lookupFailed) const;
+    void loadAllowedCallers();
+    void saveAllowedCallers();
+    bool authorizePowerAction();
+
+    struct AllowedCaller {
+        uint uid = 0;
+        uint pid = 0;
+    };
+
     QDBusConnection *m_conn;
 
     bool m_onBattery = false;
@@ -201,4 +214,5 @@ private:
     QProcess *m_powerControlProcess = nullptr;
     QQueue<QStringList> m_powerControlQueue;
     bool m_powerControlBusy = false;
+    QHash<QString, AllowedCaller> m_allowedCallers;
 };
