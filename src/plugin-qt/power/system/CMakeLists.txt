@@ -16,6 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus)
 find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(UDEV REQUIRED libudev)
+pkg_check_modules(POLKIT_QT REQUIRED polkit-qt6-1)
 
 file(GLOB_RECURSE SRCS "*.cpp" "*.h")
 
@@ -24,6 +25,7 @@ add_library(${BIN_NAME} MODULE ${SRCS})
 target_include_directories(${BIN_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${UDEV_INCLUDE_DIRS}
+    ${POLKIT_QT_INCLUDE_DIRS}
 )
 
 target_link_libraries(${BIN_NAME} PRIVATE
@@ -31,6 +33,7 @@ target_link_libraries(${BIN_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::DBus
     Dtk${DTK_VERSION_MAJOR}::Core
     ${UDEV_LIBRARIES}
+    ${POLKIT_QT_LIBRARIES}
 )
 
 install(TARGETS ${BIN_NAME}

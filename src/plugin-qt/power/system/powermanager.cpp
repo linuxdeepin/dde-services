@@ -9,6 +9,7 @@
 #include "../powerconstants.h"
 
 #include <QDBusConnection>
+#include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDBusReply>
 #include <QVariantMap>
@@ -16,19 +17,29 @@
 #include <QProcess>
 #include <QTimer>
 #include <QFile>
+#include <QDir>
 #include <QFileInfo>
 #include <QJsonDocument>
+#include <QSaveFile>
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <DConfig>
 #include <QLoggingCategory>
+#include <polkitqt1-authority.h>
+#include <polkitqt1-subject.h>
+
+#include <grp.h>
 
 using namespace PowerDBus;
 using namespace PowerFS;
 using namespace PowerDConfig;
 
+static constexpr auto kPowerScope = "org.deepin.dde.Power1:/org/deepin/dde/Power1";
+static constexpr auto kAllowCallerStatePath = "/run/dde-services/power_allow_callers.json";
+static constexpr auto kLegacyAllowCallerStatePath = "/run/dde-daemon/security_loader_allow_callers.json";
 Q_LOGGING_CATEGORY(logPowerSystem, "dde.power.system")
 static constexpr auto kLegacyDBusError = "org.deepin.dde.DBus.Error.Unnamed";
+static constexpr auto kPowerAction = "org.deepin.dde.power.doAction";
 
 static bool readProcLidClosed(bool &closed)
 {
@@ -53,6 +64,253 @@ static bool isValidPowerMode(const QString &mode)
         || mode == QLatin1String("powersave")
         || mode == QLatin1String("performance")
         || mode == QLatin1String("lowBattery");
+}
+
+static bool deepinDaemonGroup(gid_t &gid)
+{
+    const group *entry = getgrnam("deepin-daemon");
+    if (!entry)
+        return false;
+    gid = entry->gr_gid;
+    return true;
+}
+
+static bool processHasGroup(uint pid, gid_t gid)
+{
+    QFile file(QStringLiteral("/proc/%1/status").arg(pid));
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    while (!file.atEnd()) {
+        const QString line = QString::fromLatin1(file.readLine());
+        if (!line.startsWith(QLatin1String("Gid:")) && !line.startsWith(QLatin1String("Groups:")))
+            continue;
+        const QStringList values = line.section(QLatin1Char(':'), 1).split(QChar::Space, Qt::SkipEmptyParts);
+        for (const QString &value : values) {
+            if (value.toUInt() == gid)
+                return true;
+        }
+    }
+    return false;
+}
+
+static bool readParentPid(uint pid, uint &parent)
+{
+    QFile file(QStringLiteral("/proc/%1/status").arg(pid));
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    while (!file.atEnd()) {
+        const QString line = QString::fromLatin1(file.readLine());
+        if (!line.startsWith(QLatin1String("PPid:")))
+            continue;
+        bool ok = false;
+        parent = line.section(QLatin1Char(':'), 1).trimmed().toUInt(&ok);
+        return ok;
+    }
+    return false;
+}
+
+static bool isProcessDescendant(uint pid, uint ancestor)
+{
+    if (pid == 0 || ancestor == 0 || pid == ancestor)
+        return false;
+
+    for (int depth = 0; depth < 4096 && pid != 0; ++depth) {
+        uint parent = 0;
+        if (!readParentPid(pid, parent))
+            return false;
+        if (parent == ancestor)
+            return true;
+        pid = parent;
+    }
+    return false;
+}
+
+static QString systemBusId(QDBusConnection *conn)
+{
+    if (!conn)
+        return {};
+    QDBusInterface bus(QStringLiteral("org.freedesktop.DBus"),
+                       QStringLiteral("/org/freedesktop/DBus"),
+                       QStringLiteral("org.freedesktop.DBus"),
+                       *conn);
+    const QDBusReply<QString> reply = bus.call(QStringLiteral("GetId"));
+    return reply.isValid() ? reply.value() : QString();
+}
+
+bool SystemPowerManager::addAllowedCaller(const QString &uniqueName)
+{
+    if (uniqueName.isEmpty() || !uniqueName.startsWith(QLatin1Char(':')))
+        return false;
+
+    auto *bus = m_conn ? m_conn->interface() : nullptr;
+    if (!bus)
+        return false;
+
+    const QDBusReply<uint> uid = bus->serviceUid(uniqueName);
+    const QDBusReply<uint> pid = bus->servicePid(uniqueName);
+    if (!uid.isValid() || !pid.isValid())
+        return false;
+
+    if (calledFromDBus()) {
+        const QString registrar = message().service();
+        const QDBusReply<uint> registrarUid = bus->serviceUid(registrar);
+        const QDBusReply<uint> registrarPid = bus->servicePid(registrar);
+        if (!registrarUid.isValid() || !registrarPid.isValid())
+            return false;
+        if (registrarUid.value() == 0) {
+            if (uid.value() != 0)
+                return false;
+        } else {
+            gid_t daemonGroup = 0;
+            if (!deepinDaemonGroup(daemonGroup) || !processHasGroup(registrarPid.value(), daemonGroup))
+                return false;
+            if (registrarUid.value() != uid.value() || !isProcessDescendant(pid.value(), registrarPid.value()))
+                return false;
+        }
+    }
+
+    m_allowedCallers.insert(uniqueName, {uid.value(), pid.value()});
+    saveAllowedCallers();
+    return true;
+}
+
+void SystemPowerManager::loadAllowedCallers()
+{
+    QFile file{QLatin1String(kAllowCallerStatePath)};
+    const bool migrateLegacyState = !file.open(QIODevice::ReadOnly);
+    if (migrateLegacyState) {
+        file.setFileName(QLatin1String(kLegacyAllowCallerStatePath));
+        if (!file.open(QIODevice::ReadOnly))
+            return;
+    }
+
+    QJsonParseError error;
+    const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &error);
+    if (error.error != QJsonParseError::NoError || !document.isObject())
+        return;
+
+    const QJsonObject root = document.object();
+    const QString busId = systemBusId(m_conn);
+    if (busId.isEmpty() || root.value(QLatin1String("busId")).toString() != busId)
+        return;
+
+    auto *bus = m_conn ? m_conn->interface() : nullptr;
+    if (!bus)
+        return;
+
+    const QJsonObject callers = root.value(QLatin1String("callers")).toObject()
+        .value(QLatin1String(kPowerScope)).toObject();
+    for (auto it = callers.begin(); it != callers.end(); ++it) {
+        const QString uniqueName = it.key();
+        const QJsonObject info = it.value().toObject();
+        const QDBusReply<uint> uid = bus->serviceUid(uniqueName);
+        const QDBusReply<uint> pid = bus->servicePid(uniqueName);
+        if (!uid.isValid() || !pid.isValid())
+            continue;
+        if (uid.value() != static_cast<uint>(info.value(QLatin1String("uid")).toInteger())
+            || pid.value() != static_cast<uint>(info.value(QLatin1String("pid")).toInteger())) {
+            continue;
+        }
+        m_allowedCallers.insert(uniqueName, {uid.value(), pid.value()});
+    }
+    if (migrateLegacyState && !m_allowedCallers.isEmpty())
+        saveAllowedCallers();
+}
+
+void SystemPowerManager::saveAllowedCallers()
+{
+    const QString busId = systemBusId(m_conn);
+    if (busId.isEmpty()) {
+        qWarning(logPowerSystem) << "Failed to get system bus ID";
+        return;
+    }
+
+    QJsonObject powerCallers;
+    for (auto it = m_allowedCallers.cbegin(); it != m_allowedCallers.cend(); ++it) {
+        powerCallers.insert(it.key(), QJsonObject{
+            {QLatin1String("uid"), static_cast<qint64>(it->uid)},
+            {QLatin1String("pid"), static_cast<qint64>(it->pid)},
+        });
+    }
+    const QJsonObject root{
+        {QLatin1String("busId"), busId},
+        {QLatin1String("callers"), QJsonObject{
+            {QLatin1String(kPowerScope), powerCallers},
+        }},
+    };
+
+    const QString stateDir = QFileInfo(QLatin1String(kAllowCallerStatePath)).absolutePath();
+    if (!QDir().mkpath(stateDir)
+        || !QFile::setPermissions(stateDir, QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner)) {
+        qWarning(logPowerSystem) << "Failed to create security-loader state directory";
+        return;
+    }
+    QSaveFile file{QLatin1String(kAllowCallerStatePath)};
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning(logPowerSystem) << "Failed to open security-loader state file";
+        return;
+    }
+    file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+    file.write(QJsonDocument(root).toJson(QJsonDocument::Compact));
+    if (!file.commit())
+        qWarning(logPowerSystem) << "Failed to save security-loader callers";
+}
+
+bool SystemPowerManager::isAllowedCaller(const QString &uniqueName, bool &lookupFailed) const
+{
+    lookupFailed = false;
+    const auto it = m_allowedCallers.constFind(uniqueName);
+    if (it == m_allowedCallers.cend())
+        return false;
+
+    auto *bus = m_conn ? m_conn->interface() : nullptr;
+    if (!bus) {
+        lookupFailed = true;
+        return false;
+    }
+
+    const QDBusReply<uint> uid = bus->serviceUid(uniqueName);
+    const QDBusReply<uint> pid = bus->servicePid(uniqueName);
+    if (!uid.isValid() || !pid.isValid()) {
+        lookupFailed = true;
+        return false;
+    }
+    return uid.value() == it->uid && pid.value() == it->pid;
+}
+
+bool SystemPowerManager::authorizePowerAction()
+{
+    if (!calledFromDBus())
+        return true;
+
+    const QString sender = message().service();
+    bool lookupFailed = false;
+    if (isAllowedCaller(sender, lookupFailed))
+        return true;
+    if (lookupFailed) {
+        sendErrorReply(QDBusError::AccessDenied, QStringLiteral("Failed to verify caller credentials"));
+        return false;
+    }
+    auto *authority = PolkitQt1::Authority::instance();
+    authority->clearError();
+    const auto result = authority->checkAuthorizationSync(
+        QLatin1String(kPowerAction),
+        PolkitQt1::SystemBusNameSubject(sender),
+        PolkitQt1::Authority::AllowUserInteraction);
+    if (authority->hasError()) {
+        const QString error = authority->errorDetails();
+        authority->clearError();
+        qWarning(logPowerSystem) << "Polkit authorization failed:" << error;
+        sendErrorReply(QDBusError::AccessDenied, error.isEmpty() ? QStringLiteral("Authentication failed") : error);
+        return false;
+    }
+    if (result != PolkitQt1::Authority::Yes) {
+        sendErrorReply(QDBusError::AccessDenied, QStringLiteral("Authentication failed"));
+        return false;
+    }
+    return true;
 }
 
 SystemPowerManager::SystemPowerManager(QDBusConnection *conn, const QString &svc,
@@ -85,6 +343,7 @@ bool SystemPowerManager::initialize()
         qWarning(logPowerSystem) << "registerObject failed";
         return false;
     }
+    loadAllowedCallers();
 
     m_powerControlProcess = new QProcess(this);
     connect(m_powerControlProcess,
@@ -700,11 +959,17 @@ void SystemPowerManager::setSupportSwitchPowerMode(bool value)
 
 void SystemPowerManager::SetCpuGovernor(const QString &gov)
 {
+    if (!authorizePowerAction())
+        return;
+
     setCpuGovernor(gov);
 }
 
 void SystemPowerManager::SetCpuBoost(bool on)
 {
+    if (!authorizePowerAction())
+        return;
+
     setCpuBoost(on);
 }
 
@@ -716,6 +981,9 @@ void SystemPowerManager::LockCpuFreq(const QString &gov, int lockTime)
 
 void SystemPowerManager::SetMode(const QString &mode)
 {
+    if (!authorizePowerAction())
+        return;
+
     if (m_mode == mode) {
         const QString error = QStringLiteral("repeat set mode");
         if (calledFromDBus())
@@ -742,8 +1010,22 @@ void SystemPowerManager::SetMode(const QString &mode)
     setMode(mode);
 }
 
+void SystemPowerManager::SetAllowCaller(const QString &uniqueName)
+{
+    if (!addAllowedCaller(uniqueName)) {
+        const QString error = QStringLiteral("invalid caller %1").arg(uniqueName);
+        if (calledFromDBus())
+            sendErrorReply(QDBusError::InvalidArgs, error);
+        else
+            qWarning(logPowerSystem) << error;
+    }
+}
+
 void SystemPowerManager::SetTlpMode(const QString &mode)
 {
+    if (!authorizePowerAction())
+        return;
+
     QString error;
     if (m_tlpMode == mode)
         error = QStringLiteral("repeat set tlp mode");

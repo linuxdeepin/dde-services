@@ -16,6 +16,7 @@ Build-Depends:  debhelper (>= 11),
  libnet-dev,
  libglib2.0-dev,
  libdtk6gui-dev,
+ libpolkit-qt6-1-dev,
  libdtk6core-dev,
  libx11-dev,
  libxext-dev,
@@ -44,7 +45,8 @@ Depends:
  ${misc:Depends},
  deepin-service-manager (>> 1.0.21),
  dbus,
- deepin-power-control (>= 2.0.1)
+ deepin-power-control (>= 2.0.1),
+ deepin-security-loader
 Recommends:
  iio-sensor-proxy
 Breaks: dde-daemon (<< 6.1.102)
