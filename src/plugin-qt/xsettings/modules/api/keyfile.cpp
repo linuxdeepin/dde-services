@@ -22,7 +22,7 @@ KeyFile::~KeyFile()
 bool KeyFile::getBool(const QString &section, const QString &key, bool defaultValue)
 {
     if (mainKeyMap.find(section) == mainKeyMap.end())
-        return false;
+        return defaultValue;
 
     QString valueStr = mainKeyMap[section][key];
     bool value = defaultValue;
@@ -77,7 +77,7 @@ bool KeyFile::deleteKey(const QString &section, const QString &key)
         return false;
     }
     mainKeyMap[section].remove(key);
-    return false;
+    return true;
 }
 
 // 写入文件
@@ -122,8 +122,10 @@ bool KeyFile::loadFile(const QString &filePath)
     QString line;
     while (!fp.atEnd()) {
         line = fp.readLine();
-        // 移除行首空行
+        // 移除行首空格
         line.replace(QRegularExpression("^ +"), "");
+        if (line.isEmpty())            // skip blank / whitespace-only lines, avoid front() on empty QString
+            continue;
         if (line.front() == '#') {
             continue;
         }

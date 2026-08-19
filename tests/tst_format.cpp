@@ -26,7 +26,7 @@ class TestFormatPicture : public QObject
 private slots:
     void getPictureType_data();
     void getPictureType();
-    void gifMapsToJpegByActualBehavior();
+    void gifMapsToGif();
     void unknownFileReturnsEmpty();
 };
 
@@ -59,7 +59,7 @@ void TestFormatPicture::getPictureType()
     // dir removes itself + contents on destruction (RAII)
 }
 
-void TestFormatPicture::gifMapsToJpegByActualBehavior()
+void TestFormatPicture::gifMapsToGif()
 {
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
@@ -80,9 +80,8 @@ void TestFormatPicture::gifMapsToJpegByActualBehavior()
              qint64(sizeof(gif)));
     f.close();
 
-    // Defect #4 (recorded, not fixed): typeMap maps image/gif -> "jpeg".
-    // Assert the *actual* behavior; flip to "gif" once the mapping is fixed.
-    QCOMPARE(FormatPicture::getPictureType(path), QStringLiteral("jpeg"));
+    // Fixed in DDE-135 #4: typeMap maps image/gif -> "gif".
+    QCOMPARE(FormatPicture::getPictureType(path), QStringLiteral("gif"));
 }
 
 void TestFormatPicture::unknownFileReturnsEmpty()

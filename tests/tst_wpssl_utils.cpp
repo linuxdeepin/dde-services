@@ -33,11 +33,11 @@ private slots:
     void isDirDistinguishesDirAndFile();
     void isFilesInDir();
     void isFileExistsForPlainPath();
-    void isFileExistsUriInputReturnsFalseDueToDecodeBug();
+    void isFileExistsUriInputResolvesAfterDecode();
     void isDirForNonExistentPathReturnsFalse();
     void writeStringToFileEmptyNameReturnsFalse();
-    void writeStringToFileNonEmptyAlwaysFailsDueToSwapDirBug();
-    void writeStringToFileUnwritableParentReturnsFalse();
+    void writeStringToFileWritesContentViaSwap();
+    void writeStringToFileOverwritesExistingFile();
     void checkWallpaperLockedStatusReturnsBool();
     void userHomeDirIsNonEmpty();
     void userDataConfigCacheRuntimeDirsNonEmpty();
@@ -149,11 +149,9 @@ void TestWpsslUtils::isFilesInDir()
 
 void TestWpsslUtils::isFileExistsForPlainPath()
 {
-    // NOTE: utils::isFileExists decodes the URI into a local variable `path`
-    // but then checks QFile::exists(filename) (the original input). For plain
-    // (non-URI) paths the decoded value equals the input, so the check still
-    // works. URI inputs are a latent bug (tracked separately); here we only
-    // exercise plain paths where the contract holds.
+    // For plain (non-URI) paths the decoded value equals the input, so the
+    // check works directly. URI inputs are covered separately by
+    // isFileExistsUriInputResolvesAfterDecode (fixed in DDE-135 #1).
     QTemporaryFile file;
     QVERIFY(file.open());
     QVERIFY(utils::isFileExists(file.fileName()));
@@ -169,11 +167,10 @@ void TestWpsslUtils::userHomeDirIsNonEmpty()
 
 // ---- branch-coverage additions ----
 
-void TestWpsslUtils::isFileExistsUriInputReturnsFalseDueToDecodeBug()
+void TestWpsslUtils::isFileExistsUriInputResolvesAfterDecode()
 {
-    // Defect #1 (recorded, not fixed): isFileExists decodes the URI into a
-    // local `path` but checks QFile::exists(filename) (the raw URI string),
-    // so a file:// URI never resolves even if the underlying path exists.
+    // Fixed in DDE-135 #1: isFileExists decodes the URI into a local `path`
+    // and now checks QFile::exists(path), so a file:// URI resolves correctly.
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     const QString target = dir.filePath(QStringLiteral("real.png"));
@@ -181,9 +178,11 @@ void TestWpsslUtils::isFileExistsUriInputReturnsFalseDueToDecodeBug()
 
     const QString uri = QStringLiteral("file://") + target;
     QVERIFY(QFile::exists(target));           // the plain path does exist
-    QVERIFY(!utils::isFileExists(uri));      // ... but isFileExists(URI) is false
+    QVERIFY(utils::isFileExists(uri));        // ... and isFileExists(URI) now resolves it
     // sanity: the decoded path itself is reachable
     QCOMPARE(utils::deCodeURI(uri), target);
+    // a non-existent URI still returns false
+    QVERIFY(!utils::isFileExists(QStringLiteral("file://") + target + QStringLiteral(".missing")));
 }
 
 void TestWpsslUtils::isDirForNonExistentPathReturnsFalse()
@@ -196,29 +195,47 @@ void TestWpsslUtils::writeStringToFileEmptyNameReturnsFalse()
     QCOMPARE(utils::WriteStringToFile(QString(), QStringLiteral("x")), false);
 }
 
-void TestWpsslUtils::writeStringToFileNonEmptyAlwaysFailsDueToSwapDirBug()
+void TestWpsslUtils::writeStringToFileWritesContentViaSwap()
 {
-    // Defect #6 (recorded, not fixed): WriteStringToFile builds swapFile as
-    // "<filename>/.swap" and calls QDir::mkpath(swapFile), which creates
-    // ".swap" as a DIRECTORY; subsequently opening that directory path with
-    // QFile::open(WriteOnly) fails (EISDIR), so the function always returns
-    // false for any non-empty filename. Assert the actual behavior.
+    // Fixed in DDE-135 #7: WriteStringToFile now uses a sibling temp file
+    // ("<filename>.swap") instead of a sub-directory, so writing succeeds.
+    // Verify the content lands on disk correctly.
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     const QString target = dir.filePath(QStringLiteral("out.txt"));
-    QCOMPARE(utils::WriteStringToFile(target, QStringLiteral("hello")), false);
-    // the directory "<target>/.swap" was created as a side effect; cleanup
-    QDir(dir.filePath(QStringLiteral("out.txt/.swap"))).removeRecursively();
+    QVERIFY(utils::WriteStringToFile(target, QStringLiteral("hello")));
+
+    QFile rd(target);
+    QVERIFY(rd.open(QIODevice::ReadOnly));
+    QCOMPARE(QString::fromLatin1(rd.readAll()), QStringLiteral("hello"));
+    rd.close();
+
+    // the swap file is renamed away, so no leftover .swap file remains
+    QVERIFY(!QFile::exists(target + QStringLiteral(".swap")));
 }
 
-void TestWpsslUtils::writeStringToFileUnwritableParentReturnsFalse()
+void TestWpsslUtils::writeStringToFileOverwritesExistingFile()
 {
-    // mkpath("<filename>/.swap") fails when <filename> itself is a file (not a
-    // directory), so the swap dir cannot be created underneath it.
-    QTemporaryFile fileParent;
-    QVERIFY(fileParent.open());
-    // filename = an existing regular file -> swapFile = "<file>/.swap"
-    QCOMPARE(utils::WriteStringToFile(fileParent.fileName(), QStringLiteral("x")), false);
+    // Fixed in DDE-135 #7: the old code treated <filename> as a directory
+    // prefix and always failed. Now an existing regular file is overwritten
+    // in-place via the sibling-swap-then-rename path.
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString target = dir.filePath(QStringLiteral("existing.txt"));
+
+    // seed the file with old content
+    {
+        QFile seed(target);
+        QVERIFY(seed.open(QIODevice::WriteOnly));
+        seed.write("old");
+        seed.close();
+    }
+
+    QVERIFY(utils::WriteStringToFile(target, QStringLiteral("new")));
+    QFile rd(target);
+    QVERIFY(rd.open(QIODevice::ReadOnly));
+    QCOMPARE(QString::fromLatin1(rd.readAll()), QStringLiteral("new"));
+    rd.close();
 }
 
 void TestWpsslUtils::checkWallpaperLockedStatusReturnsBool()

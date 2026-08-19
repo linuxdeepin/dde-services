@@ -21,7 +21,7 @@ private slots:
     void loadAndQuery();
     void getStrFallsBackToDefault();
     void getBoolFallsBackToDefaultForPresentSection();
-    void getBoolMissingSectionReturnsFalseNotDefault();
+    void getBoolMissingSectionReturnsDefault();
     void getStrListSplitsOnSeparator();
     void customSeparator();
     void setKeyAndSaveRoundTrip();
@@ -31,6 +31,7 @@ private slots:
     void loadFileMissingFileReturnsFalse();
     void loadFileEmptyFileReturnsTrueNoSections();
     void loadFileSkipsCommentLine();
+    void loadFileSkipsBlankAndWhitespaceLines();
     void loadFileSkipsLineWithoutEquals();
     void loadFileKeyBeforeSectionReturnsFalse();
     void loadFileSectionLineWithTrailingJunkNotParsed();
@@ -109,7 +110,7 @@ void TestKeyFile::getBoolFallsBackToDefaultForPresentSection()
     QCOMPARE(kf2.getBool("S", "Flag", true), false);
 }
 
-void TestKeyFile::getBoolMissingSectionReturnsFalseNotDefault()
+void TestKeyFile::getBoolMissingSectionReturnsDefault()
 {
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
@@ -117,10 +118,10 @@ void TestKeyFile::getBoolMissingSectionReturnsFalseNotDefault()
     KeyFile kf;
     QVERIFY(kf.loadFile(path));
 
-    // Defect #3 (recorded, not fixed): when the section is missing getBool
-    // returns false (NOT defaultValue). Assert the *actual* behavior; flip to
-    // `true` once getBool honors defaultValue for a missing section.
-    QCOMPARE(kf.getBool("Absent", "Flag", true), false);
+    // When the section is missing getBool returns defaultValue, consistent
+    // with getStr (fixed in DDE-135 #3).
+    QCOMPARE(kf.getBool("Absent", "Flag", true), true);
+    QCOMPARE(kf.getBool("Absent", "Flag", false), false);
 }
 
 void TestKeyFile::getStrListSplitsOnSeparator()
@@ -176,7 +177,7 @@ void TestKeyFile::deleteKeyRemovesEntry()
     QVERIFY(kf.loadFile(path));
 
     QVERIFY(kf.containKey("Display", "Width"));
-    kf.deleteKey("Display", "Width"); // removed from the in-memory map
+    QVERIFY(kf.deleteKey("Display", "Width")); // removed from the in-memory map, returns true
     QVERIFY(!kf.containKey("Display", "Width"));
     QVERIFY(kf.containKey("Display", "Height"));
 
@@ -217,6 +218,27 @@ void TestKeyFile::loadFileSkipsCommentLine()
     QVERIFY(kf.loadFile(path));
     QCOMPARE(kf.getStr("S", "K"), QStringLiteral("1"));
     QVERIFY(!kf.containKey("S", "# a comment"));
+}
+
+void TestKeyFile::loadFileSkipsBlankAndWhitespaceLines()
+{
+    // Regression test for DDE-135 #6: blank lines and whitespace-only lines
+    // (which become empty after stripping leading spaces) must not trigger
+    // QString::front() on an empty string (UB). A trailing line of spaces
+    // without a newline exercises the same path. After skipping the blanks,
+    // the real key=value pair must still parse correctly.
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = writeIni(dir, QStringLiteral("blank.ini"),
+        QStringLiteral("[S]\n"
+                       "\n"           // empty line
+                       "   \n"         // whitespace-only line
+                       "K=1\n"
+                       "   "           // trailing spaces, no newline
+                       ));
+    KeyFile kf;
+    QVERIFY(kf.loadFile(path));
+    QCOMPARE(kf.getStr("S", "K"), QStringLiteral("1"));
 }
 
 void TestKeyFile::loadFileSkipsLineWithoutEquals()

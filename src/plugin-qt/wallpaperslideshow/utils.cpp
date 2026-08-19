@@ -5,6 +5,7 @@
 #include "utils.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QUrl>
 #include <QStandardPaths>
@@ -51,12 +52,8 @@ bool utils::WriteStringToFile(QString filename, QString content)
         return false;
     }
 
-    QString swapFile = filename + "/.swap";
-    QDir dir(swapFile);
-    if (!dir.mkpath(swapFile)) {
-        return false;
-    }
-
+    QString swapFile = filename + ".swap";               // sibling temp file, not a sub-path
+    QDir().mkpath(QFileInfo(filename).absolutePath());    // ensure parent directory exists
     QFile file(swapFile);
     if (!file.open(QIODevice::WriteOnly))
         return false;
@@ -64,7 +61,12 @@ bool utils::WriteStringToFile(QString filename, QString content)
     file.write(content.toLatin1(), content.length());
     file.close();
 
-    return file.rename(filename);
+    // QFile::rename refuses to overwrite an existing destination, so remove
+    // the old file first (same directory → POSIX rename semantics apply).
+    if (QFile::exists(filename))
+        QFile::remove(filename);
+
+    return file.rename(filename);                         // atomic replace (same directory)
 }
 
 bool utils::isURI(QString uri)
@@ -101,7 +103,7 @@ bool utils::isFilesInDir(QVector<QString> files, QString dir)
 bool utils::isFileExists(QString filename)
 {
     QString path = utils::deCodeURI(filename);
-    if (QFile::exists(filename)) {
+    if (QFile::exists(path)) {
         return true;
     }
 

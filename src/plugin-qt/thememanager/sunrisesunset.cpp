@@ -95,6 +95,8 @@ bool SunriseSunset::getSunriseSunset(double latitude, double longitude, double u
     float sunsetUT = calculateSunChangedAsUTCHour(dayOfYear, latitude, longitude, utcOffset, CalcSunType::Sunset);
     if (sunsetUT <= -100) // 长昼 返回的sunrise-sunset区间用于判断当前是否为白天
         sunsetUT = 100;
+    if (sunriseUT <= -100) // 极昼：日出不存在 → 归一到当日0点，保持 curr>=sunrise 恒真
+        sunriseUT = 0;
 
     sunrise = date.startOfDay().addMSecs(static_cast<int>(sunriseUT * 3600 * 1000));
     sunset = date.startOfDay().addMSecs(static_cast<int>(sunsetUT * 3600 * 1000));

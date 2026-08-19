@@ -117,7 +117,9 @@ void TestSunriseSunset::polarDayStillReturnsTrue()
 {
     // At ~78°N around the June solstice the sun never sets. The algorithm
     // signals this with sentinel hours and normalises sunset so that it stays
-    // after sunrise. The contract is simply: returns true and sunset > sunrise.
+    // after sunrise. The contract is: returns true, sunset > sunrise, and
+    // (fixed in DDE-135 #5) sunrise is normalised to the requested date's
+    // start-of-day so the value is meaningful.
     QDateTime sunrise;
     QDateTime sunset;
     const QDate date(2025, 6, 21);
@@ -127,6 +129,7 @@ void TestSunriseSunset::polarDayStillReturnsTrue()
     QVERIFY(ok);
     QVERIFY(sunrise.isValid());
     QVERIFY(sunset.isValid());
+    QCOMPARE(sunrise.date(), date);  // #5: sunrise normalised to the requested date
     QVERIFY2(sunset > sunrise,
              qPrintable(QStringLiteral("polar sunset (%1) not after sunrise (%2)")
                             .arg(sunset.toString(), sunrise.toString())));

@@ -10,7 +10,7 @@ QMap<QString,QString> FormatPicture::typeMap{
     {"image/bmp", "bmp"},
     {"image/png","png"},
     {"image/tiff","tiff"},
-    {"image/gif","jpeg"}
+    {"image/gif","gif"}
 };
 
 QString FormatPicture::getPictureType(QString file)
