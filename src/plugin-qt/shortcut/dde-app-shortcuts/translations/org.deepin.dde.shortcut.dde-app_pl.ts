@@ -27,15 +27,15 @@
     </message>
     <message>
         <source>Close window</source>
-        <translation>Close window</translation>
+        <translation>Zamknij okno</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation>Maximize window</translation>
+        <translation>Maksymalizuj okno</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation>Show desktop</translation>
+        <translation>Pokaż pulpit</translation>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,11 +43,11 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation>Show multitasking view</translation>
+        <translation>Pokaż widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation>Delay screenshot</translation>
+        <translation>Opóźniony zrzutu ekranu</translation>
     </message>
     <message>
         <source>File manager</source>
@@ -163,19 +163,19 @@
     </message>
     <message>
         <source>Zoom in</source>
-        <translation type="unfinished"/>
+        <translation>Powiększ</translation>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation type="unfinished"/>
+        <translation>Pomniejsz</translation>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>Resetuj powiększenie</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć okno</translation>
     </message>
 </context>
 </TS>
