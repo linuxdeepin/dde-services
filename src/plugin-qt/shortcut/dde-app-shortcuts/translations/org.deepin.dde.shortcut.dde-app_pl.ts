@@ -139,27 +139,27 @@
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz podobne okna</translation>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz podobne okna w odwrotnej kolejności</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na lewy obszar roboczy</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na prawy obszar roboczy</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation type="unfinished"/>
+        <translation>Kafelkuj okno do lewej strony ekranu</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation type="unfinished"/>
+        <translation>Kafelkuj okno do prawej strony ekranu</translation>
     </message>
     <message>
         <source>Zoom in</source>
