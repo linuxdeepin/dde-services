@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation>Full screenshot</translation>
+        <translation>Zrzut całego ekranu</translation>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor systemu</translation>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut okna</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (Tekst z obrazu)</translation>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimalizuj okno</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś okno</translation>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś na lewy obszar roboczy</translation>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś na prawy obszar roboczy</translation>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>Zmień rozmiar okna</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>Nagrywanie ekranu</translation>
     </message>
     <message>
         <source>Scrollshot</source>
