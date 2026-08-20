@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation type="unfinished"/>
+        <translation>Centrum powiadomień</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation type="unfinished"/>
+        <translation>Okno terminala Quake</translation>
     </message>
     <message>
         <source>Launcher</source>
-        <translation type="unfinished"/>
+        <translation>Launcher</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Close window</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maximize window</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Show desktop</translation>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Show multitasking view</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Delay screenshot</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Menedżer plików</translation>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Full screenshot</translation>
     </message>
     <message>
         <source>Grand search</source>
