@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Terminal</source>
-        <translation type="unfinished"/>
+        <translation>Terminal</translation>
     </message>
     <message>
         <source>Swipe down with four fingers</source>
@@ -59,7 +59,7 @@
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć okno</translation>
     </message>
     <message>
         <source>Current window left split</source>
