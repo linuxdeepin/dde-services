@@ -127,15 +127,15 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz efekty okien</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna w odwrotnej kolejności</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
