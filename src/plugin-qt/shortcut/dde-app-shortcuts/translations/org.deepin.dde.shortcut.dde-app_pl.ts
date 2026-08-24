@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Notification center</source>
-        <translation type="unfinished"/>
+        <translation>Centrum powiadomień</translation>
     </message>
     <message>
         <source>Shutdown interface</source>
@@ -19,23 +19,23 @@
     </message>
     <message>
         <source>Terminal quake window</source>
-        <translation type="unfinished"/>
+        <translation>Okno terminala Quake</translation>
     </message>
     <message>
         <source>Launcher</source>
-        <translation type="unfinished"/>
+        <translation>Launcher</translation>
     </message>
     <message>
         <source>Close window</source>
-        <translation type="unfinished"/>
+        <translation>Zamknij okno</translation>
     </message>
     <message>
         <source>Maximize window</source>
-        <translation type="unfinished"/>
+        <translation>Maksymalizuj okno</translation>
     </message>
     <message>
         <source>Show desktop</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż pulpit</translation>
     </message>
     <message>
         <source>Open window menu</source>
@@ -43,19 +43,19 @@
     </message>
     <message>
         <source>Show multitasking view</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż widok wielozadaniowości</translation>
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Opóźniony zrzutu ekranu</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Menedżer plików</translation>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut całego ekranu</translation>
     </message>
     <message>
         <source>Grand search</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor systemu</translation>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Zrzut okna</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (Tekst z obrazu)</translation>
     </message>
     <message>
         <source>System</source>
@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>Minimize window</source>
-        <translation type="unfinished"/>
+        <translation>Minimalizuj okno</translation>
     </message>
     <message>
         <source>Move window</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś okno</translation>
     </message>
     <message>
         <source>Move to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś na lewy obszar roboczy</translation>
     </message>
     <message>
         <source>Move to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś na prawy obszar roboczy</translation>
     </message>
     <message>
         <source>None</source>
@@ -115,11 +115,11 @@
     </message>
     <message>
         <source>Resize window</source>
-        <translation type="unfinished"/>
+        <translation>Zmień rozmiar okna</translation>
     </message>
     <message>
         <source>Screen recorder</source>
-        <translation type="unfinished"/>
+        <translation>Nagrywanie ekranu</translation>
     </message>
     <message>
         <source>Scrollshot</source>
@@ -127,55 +127,55 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz efekty okien</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz okna w odwrotnej kolejności</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz podobne okna</translation>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz podobne okna w odwrotnej kolejności</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na lewy obszar roboczy</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Przełącz na prawy obszar roboczy</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
-        <translation type="unfinished"/>
+        <translation>Kafelkuj okno do lewej strony ekranu</translation>
     </message>
     <message>
         <source>Tile window to right of screen</source>
-        <translation type="unfinished"/>
+        <translation>Kafelkuj okno do prawej strony ekranu</translation>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation type="unfinished"/>
+        <translation>Powiększ</translation>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation type="unfinished"/>
+        <translation>Pomniejsz</translation>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>Resetuj powiększenie</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Przywróć okno</translation>
     </message>
 </context>
 </TS>
