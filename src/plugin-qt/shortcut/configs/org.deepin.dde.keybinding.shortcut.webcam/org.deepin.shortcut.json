@@ -46,9 +46,11 @@
         },
         "triggerValue": {
             "value": [
-                "/usr/libexec/dde-services/keybinding/camera-switch"
+                "/usr/bin/dde-shortcut-tool",
+                "camera",
+                "toggle"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",

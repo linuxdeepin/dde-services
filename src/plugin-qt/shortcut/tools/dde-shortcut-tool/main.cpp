@@ -6,6 +6,7 @@
 
 #include "commandparser.h"
 #include "audiocontroller.h"
+#include "cameracontroller.h"
 #include "displaycontroller.h"
 #include "touchpadcontroller.h"
 #include "powercontroller.h"
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
     registerControllerFactory<LaunchController>(parser);
     registerControllerFactory<NetworkController>(parser);
     registerControllerFactory<WmController>(parser);
+    registerControllerFactory<CameraController>(parser);
 
     // Execute command and return result
     return parser.run(argc, argv);

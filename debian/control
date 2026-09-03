@@ -47,7 +47,8 @@ Depends:
  deepin-service-manager (>> 1.0.21),
  dbus,
  deepin-power-control (>= 2.0.1),
- deepin-security-loader
+ deepin-security-loader,
+ dde-daemon (>> 6.1.104)
 Recommends:
  iio-sensor-proxy
 Breaks: dde-daemon (<< 6.1.104.1)

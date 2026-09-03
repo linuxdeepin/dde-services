@@ -172,7 +172,6 @@ install(FILES configs/org.deepin.dde.keybinding.ini
         DESTINATION share/deepin/org.deepin.dde.keybinding)
 
 install(PROGRAMS
-        scripts/camera-switch
         scripts/toggle-grand-search
         DESTINATION libexec/dde-services/keybinding)
 
