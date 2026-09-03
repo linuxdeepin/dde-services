@@ -22,6 +22,8 @@ add_executable(dde-shortcut-tool
     basecontroller.h
     audiocontroller.cpp
     audiocontroller.h
+    cameracontroller.cpp
+    cameracontroller.h
     displaycontroller.cpp
     displaycontroller.h
     touchpadcontroller.cpp
