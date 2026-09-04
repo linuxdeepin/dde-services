@@ -327,7 +327,7 @@ void SessionDBusProxy::closeNotification(uint id)
     m_notificationsInter->asyncCall("CloseNotification", id);
 }
 
-QString SessionDBusProxy::getFestivalMonth(int year, int month)
+QString SessionDBusProxy::getFestivalMonth(uint year, uint month)
 {
     QDBusReply<QString> r = m_calendarInter->call("getFestivalMonth", year, month);
     return r.isValid() ? r.value() : QString();

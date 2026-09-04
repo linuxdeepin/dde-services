@@ -102,7 +102,7 @@ public:
     void closeNotification(uint id);
 
     // ── Calendar ──
-    QString getFestivalMonth(int year, int month);
+    QString getFestivalMonth(uint year, uint month);
 
 signals:
     // Forwarded from org.freedesktop.DBus.PropertiesChanged by DDBusInterface.

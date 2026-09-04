@@ -1297,9 +1297,9 @@ void PowerManager::onNotifyActionInvoked(uint id, const QString &actionKey)
     qDebug(logPowerSession) << "Notification action invoked: id=" << id << " key=" << actionKey;
     if (id != m_shutdownNotifyId) return;
     int nextStatus;
-    if (actionKey == "cancel") {
+    if (actionKey == "Cancle") {
         nextStatus = SchedCancel;
-    } else if (actionKey == "shutdown") {
+    } else if (actionKey == "Shutdown") {
         nextStatus = SchedShutdown;
     } else {
         nextStatus = SchedCancel;
@@ -1362,7 +1362,7 @@ void PowerManager::shutdownCountdownNotify(int count, bool playSound)
 {
     QString body = tr("The system will shut down automatically after %1 s").arg(count);
     QString title = tr("Scheduled Shutdown");
-    QStringList actions = {"cancel", tr("Cancel"), "shutdown", tr("Shut down")};
+    QStringList actions = {"Cancle", tr("Cancel"), "Shutdown", tr("Shut down")};
     QVariantMap hints = {
         {"x-deepin-PlaySound", playSound},
         {"urgency", 2},
@@ -1515,7 +1515,7 @@ bool PowerManager::isWorkday(const QDateTime &date) const
         return dow != Qt::Saturday && dow != Qt::Sunday;
     }
     QJsonObject root = doc.array().first().toObject();
-    QJsonArray list = root["List"].toArray();
+    QJsonArray list = root[QStringLiteral("list")].toArray();
     if (list.isEmpty()) {
         int dow = date.date().dayOfWeek();
         return dow != Qt::Saturday && dow != Qt::Sunday;
@@ -1525,8 +1525,9 @@ bool PowerManager::isWorkday(const QDateTime &date) const
     QString dateStr2 = date.toString("yyyy-MM-dd");
     for (const auto &item : list) {
         QJsonObject obj = item.toObject();
-        if (obj["Date"].toString() == dateStr1 || obj["Date"].toString() == dateStr2) {
-            return obj["Status"].toInt() == 2;
+        if (obj[QStringLiteral("date")].toString() == dateStr1
+            || obj[QStringLiteral("date")].toString() == dateStr2) {
+            return obj[QStringLiteral("status")].toInt() == 2;
         }
     }
     int dow = date.date().dayOfWeek();
