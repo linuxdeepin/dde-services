@@ -26,7 +26,7 @@
     </message>
     <message>
         <source>Shut down</source>
-        <translation>關機</translation>
+        <translation>立即關機</translation>
     </message>
 </context>
 </TS>
