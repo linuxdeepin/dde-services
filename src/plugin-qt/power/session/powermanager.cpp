@@ -1355,7 +1355,14 @@ void PowerManager::doAutoShutdown()
 {
     qInfo(logPowerSession) << "Performing auto shutdown";
     closeNotify();
-    m_proxy->requestShutdown();
+
+    QString who;
+    if (isInConfigOrPowerButtonInhibitors(QStringLiteral("shutdown"), who)) {
+        qInfo(logPowerSession) << "Scheduled shutdown blocked by" << who;
+        m_proxy->requestShutdownByFront();
+    } else {
+        m_proxy->requestShutdown();
+    }
 }
 
 void PowerManager::shutdownCountdownNotify(int count, bool playSound)
