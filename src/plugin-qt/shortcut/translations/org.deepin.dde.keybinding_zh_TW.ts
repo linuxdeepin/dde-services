@@ -119,7 +119,7 @@
     </message>
     <message>
         <source>Accessibility</source>
-        <translation>輔助工具</translation>
+        <translation>輔助功能</translation>
     </message>
     <message>
         <source>Text to speech</source>
