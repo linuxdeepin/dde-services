@@ -614,7 +614,30 @@ void PowerManager::SetPrepareSuspend(int state)
 
 void PowerManager::TurnOffScreen()
 {
-    doTurnOffScreen();
+    if (!m_screenCtrl || !m_screenCtrl->isValid()) {
+        qWarning(logPowerSession) << "Ignoring screen-off request: screen controller unavailable";
+        return;
+    }
+    // The power button toggles the screen: while the screen is off a press
+    // wakes it instead of blanking it again.
+    if (m_screenCtrl->isAllOff()) {
+        qInfo(logPowerSession) << "Screen is off, turning it back on";
+        TurnOnScreen();
+        return;
+    }
+
+    if (m_useWayland) {
+        doTurnOffScreen();
+        return;
+    }
+
+    if (m_screenBlackLock)
+        doLock(true);
+    SetPrepareSuspend(PS_ButtonClick);
+
+    setDPMSModeOff();
+
+    SetPrepareSuspend(PS_Finish);
 }
 
 void PowerManager::TurnOnScreen()

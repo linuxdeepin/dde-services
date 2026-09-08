@@ -23,16 +23,6 @@
 DCORE_USE_NAMESPACE
 DGUI_USE_NAMESPACE
 
-// Power1 SetPrepareSuspend states (match dde-daemon keybinding1/utils.go).
-static constexpr int kSuspendStateFinish      = 3;
-static constexpr int kSuspendStateButtonClick = 7;
-
-// Delay between switching on the KWin BlackScreen mask and triggering DPMS off.
-// bug-209669: on some vendor machines DPMS-off blocks the lock screen Show
-// until DPMS is back on, causing a wake-flash-then-lock visual glitch. The
-// mask hides the gap; 100ms is enough for the compositor to draw it.
-static constexpr int kBlackScreenMaskDelayMs = 100;
-
 namespace {
 
 bool isWaylandSession()
@@ -160,13 +150,6 @@ int PowerController::getPowerButtonAction(DConfig *config, bool onBattery)
     return config->value(key, PowerActionShowUI).toInt();
 }
 
-bool PowerController::shouldLockOnScreenBlack(DConfig *config)
-{
-    if (!config)
-        return true;
-    return config->value(Config::KEY_SCREEN_BLACK_LOCK, true).toBool();
-}
-
 bool PowerController::shouldLockOnSleep(DConfig *config)
 {
     if (!config)
@@ -258,45 +241,6 @@ bool PowerController::hasMultipleDisplaySession()
     }
 
     return userSessions >= 2;
-}
-
-void PowerController::doPrepareSuspend()
-{
-    QDBusInterface power("org.deepin.dde.Power1", "/org/deepin/dde/Power1", "org.deepin.dde.Power1",
-                         QDBusConnection::sessionBus());
-    if (!power.isValid())
-        return;
-    power.call("SetPrepareSuspend", kSuspendStateButtonClick);
-}
-
-void PowerController::undoPrepareSuspend()
-{
-    QDBusInterface power("org.deepin.dde.Power1", "/org/deepin/dde/Power1", "org.deepin.dde.Power1",
-                         QDBusConnection::sessionBus());
-    if (!power.isValid())
-        return;
-    power.call("SetPrepareSuspend", kSuspendStateFinish);
-}
-
-bool PowerController::isWmBlackScreenActive()
-{
-    QDBusInterface kwin("org.kde.KWin", "/BlackScreen", "org.kde.kwin.BlackScreen",
-                        QDBusConnection::sessionBus());
-    if (!kwin.isValid())
-        return false;
-    QDBusReply<bool> reply = kwin.call("getActive");
-    return reply.isValid() && reply.value();
-}
-
-void PowerController::setWmBlackScreenActive(bool active)
-{
-    QDBusInterface kwin("org.kde.KWin", "/BlackScreen", "org.kde.kwin.BlackScreen",
-                        QDBusConnection::sessionBus());
-    if (!kwin.isValid()) {
-        qWarning() << "PowerController: KWin BlackScreen not available";
-        return;
-    }
-    kwin.call("setActive", active);
 }
 
 void PowerController::doLock(bool autoStartAuth)
@@ -427,47 +371,16 @@ void PowerController::systemHibernate()
 
 void PowerController::systemTurnOffScreen()
 {
-    qInfo() << "PowerController: turn off screen";
-
-    if (isWaylandSession()) {
-        QDBusInterface power("org.deepin.dde.Power1", "/org/deepin/dde/Power1",
-                             "org.deepin.dde.Power1", QDBusConnection::sessionBus());
-        if (power.isValid()) {
-            power.call("TurnOffScreen");
-        } else {
-            qWarning() << "PowerController: Power1 unavailable for TurnOffScreen";
-        }
+    qInfo() << "PowerController: turn off screen via Power1";
+    QDBusInterface power("org.deepin.dde.Power1", "/org/deepin/dde/Power1",
+                         "org.deepin.dde.Power1", QDBusConnection::sessionBus());
+    if (!power.isValid()) {
+        qWarning() << "PowerController: Power1 unavailable for TurnOffScreen";
         return;
     }
-
-    DConfig *config = createPowerConfig(this);
-    const bool screenBlackLock = shouldLockOnScreenBlack(config);
-
-    // Order matters (bug-209669):
-    //   1) lock the screen BEFORE DPMS off, otherwise the lock UI's Show
-    //      call blocks until DPMS comes back on, causing a wake-flash
-    //   2) tell power daemon we're putting the screen down so it stops
-    //      racing us
-    //   3) cover the gap between "DPMS still on" and "lock UI drawn" with
-    //      the KWin BlackScreen mask
-    if (screenBlackLock)
-        doLock(true);
-
-    doPrepareSuspend();
-
-    const bool needMask = screenBlackLock && !isWmBlackScreenActive();
-    if (needMask) {
-        setWmBlackScreenActive(true);
-        QThread::msleep(kBlackScreenMaskDelayMs);
-    }
-
-    QProcess::execute("xset", {"dpms", "force", "off"});
-
-    if (needMask)
-        setWmBlackScreenActive(false);
-
-    undoPrepareSuspend();
-
+    const QDBusReply<void> reply = power.call("TurnOffScreen");
+    if (!reply.isValid())
+        qWarning() << "PowerController: TurnOffScreen failed:" << reply.error().message();
 }
 
 void PowerController::showShutdownUI()
