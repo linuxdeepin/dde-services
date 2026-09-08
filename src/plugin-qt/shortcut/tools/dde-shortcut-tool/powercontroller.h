@@ -20,9 +20,7 @@ class DConfig;
  *
  * Invoked as `/usr/bin/dde-shortcut-tool power <action>` from the keybinding
  * shortcut for the physical power key (keycode 116) and other power-related
- * shortcuts. Ports the dde-daemon keybinding1 power-button logic, including
- * the bug-209669 turn-off-screen sequence and the X11 anti-flicker path
- * through ShutdownFront1.
+ * shortcuts. Power transitions are delegated to the owning session services.
  */
 class PowerController : public BaseController
 {
@@ -48,7 +46,6 @@ public:
 private:
     bool isOnBattery();
     int getPowerButtonAction(Dtk::Core::DConfig *config, bool onBattery);
-    bool shouldLockOnScreenBlack(Dtk::Core::DConfig *config);
     bool shouldLockOnSleep(Dtk::Core::DConfig *config);
 
     bool callSessionBool(const char *method);
@@ -58,15 +55,6 @@ private:
     bool isLocked();
     bool hasShutdownInhibit();
     bool hasMultipleDisplaySession();
-
-    // Power1 (session bus) PrepareSuspend notification, keeps the power
-    // daemon from racing the screen-off transition.
-    void doPrepareSuspend();
-    void undoPrepareSuspend();
-
-    // KWin BlackScreen effect (Treeland/X11 visual mask, separate from DPMS).
-    bool isWmBlackScreenActive();
-    void setWmBlackScreenActive(bool active);
 
     void systemShutdown();
     void systemSuspend();
