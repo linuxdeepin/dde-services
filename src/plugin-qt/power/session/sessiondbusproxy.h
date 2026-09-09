@@ -74,6 +74,10 @@ public:
     // ── LockFront ──
     void showLockAuth(bool autoStart);
 
+    // ── ScreenSaver ──
+    Q_PROPERTY(bool lockScreenAtAwake READ lockScreenAtAwake NOTIFY lockScreenAtAwakeChanged)
+    bool lockScreenAtAwake() const;
+
     // ── Login1 ──
     void lockSession(const QString &sessionId);
     QDBusUnixFileDescriptor inhibit(const QString &what, const QString &who,
@@ -117,6 +121,7 @@ signals:
     void PowerSavingModeBrightnessDropPercentChanged(uint value);
     void PowerSavingModeBrightnessDataChanged(const QString &value);
     void SessionActiveChanged(bool value);
+    void lockScreenAtAwakeChanged(bool value);
 
     void notifyActionInvoked(uint id, const QString &actionKey);
     void timeUpdate();
@@ -145,4 +150,7 @@ private:
     DDBusInterface *m_timedateInter;
     DDBusInterface *m_freedesktopDBusInter;
     DDBusInterface *m_ambientBrightnessInter;
+    DDBusInterface *m_screensaverInter;
+
+    bool m_lockScreenAtAwake = false;
 };

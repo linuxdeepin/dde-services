@@ -324,11 +324,12 @@ void PowerSavePlan::sleep()
 
     if (!m_powerManager->m_screensaverStateCaptured) {
         m_powerManager->m_screensaverLockAtAwake =
-            m_powerManager->screensaverProperty("lockScreenAtAwake");
+            m_powerManager->m_proxy->lockScreenAtAwake();
         m_powerManager->m_screensaverStateCaptured = true;
     }
-    m_powerManager->m_screensaverWasRunning =
-        m_powerManager->screensaverProperty("isRunning");
+    // The screensaver is started/stopped by this module itself, so m_screensaverRunning
+    // already reflects whether it is running before sleep; no blocking D-Bus read needed.
+    m_powerManager->m_screensaverWasRunning = m_screensaverRunning;
     if (m_powerManager->m_screensaverWasRunning) {
         QDBusInterface screensaver(kScreensaver, kScreensaverPath, kScreensaver,
                                    QDBusConnection::sessionBus());

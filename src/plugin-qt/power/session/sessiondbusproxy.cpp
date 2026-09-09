@@ -61,8 +61,23 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
     , m_ambientBrightnessInter(new DDBusInterface(
           kAmbientBrightnessService, kAmbientBrightnessPath, kAmbientBrightnessInterface,
           QDBusConnection::sessionBus(), this))
+    , m_screensaverInter(new DDBusInterface(
+          kScreensaver, kScreensaverPath, kScreensaver,
+          QDBusConnection::sessionBus(), this))
 {
     m_displayInter->setParent(this);
+
+    // Cache com.deepin.ScreenSaver lockScreenAtAwake and keep it fresh through
+    // DDBusInterface's PropertiesChanged forwarding, so the suspend/resume path
+    // never performs a blocking D-Bus read.
+    connect(this, &SessionDBusProxy::lockScreenAtAwakeChanged, this,
+            [this](bool value) { m_lockScreenAtAwake = value; });
+    m_lockScreenAtAwake = m_screensaverInter->property("lockScreenAtAwake").toBool();
+    connect(m_screensaverInter, &DDBusInterface::serviceValidChanged, this, [this](bool valid) {
+        if (valid)
+            m_lockScreenAtAwake = m_screensaverInter->property("lockScreenAtAwake").toBool();
+    });
+
     QDBusConnection::sessionBus().connect(
         m_notificationsInter->service(), m_notificationsInter->path(),
         m_notificationsInter->interface(),
@@ -190,6 +205,11 @@ bool SessionDBusProxy::sessionActive() const
 bool SessionDBusProxy::sessionLocked() const
 {
     return m_sessionManagerInter->property("Locked").toBool();
+}
+
+bool SessionDBusProxy::lockScreenAtAwake() const
+{
+    return m_lockScreenAtAwake;
 }
 
 void SessionDBusProxy::requestSuspend()
