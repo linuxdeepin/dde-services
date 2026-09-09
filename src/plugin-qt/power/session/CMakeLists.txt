@@ -50,6 +50,9 @@ set(_src_headers
     lidswitchhandler.h
     sleepinhibitor.h
     lowpowermanager.h
+    warnlevelpolicy.h
+    scheduledshutdown.h
+    shortidlepolicy.h
     powermanager.h
     sessiondbusproxy.h
 )

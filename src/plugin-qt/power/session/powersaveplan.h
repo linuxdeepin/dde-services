@@ -84,3 +84,38 @@ private:
     QElapsedTimer m_sessionActiveGrace;
     PowerManager *m_powerManager = nullptr;
 };
+
+// Task-coalescing rules shared by PowerSavePlan::Update(); extracted so the
+// ordering decisions are unit-testable (mirrors the deleted Go metaTasks.min /
+// power_save_plan ordering).
+inline bool canAddTask(const QString &type, int delay,
+                       const QVector<PowerSavePlan::MetaTask> &tasks)
+{
+    if (tasks.isEmpty())
+        return true;
+    if (type == QLatin1String("sleep"))
+        return true;
+    if (type == QLatin1String("screenSaverStart")) {
+        int min = tasks.first().delay;
+        for (const auto &t : tasks)
+            if (t.delay < min) min = t.delay;
+        return delay <= min;
+    }
+    if (type == QLatin1String("screenBlack")) {
+        if (delay < tasks.first().delay)
+            return true;
+        if (delay == tasks.first().delay && tasks.last().name == QLatin1String("lock"))
+            return true;
+        return false;
+    }
+    return false;
+}
+
+inline int minTaskDelay(const QVector<PowerSavePlan::MetaTask> &tasks)
+{
+    int min = 0;
+    for (const auto &t : tasks)
+        if (t.delay < min || min == 0)
+            min = t.delay;
+    return min;
+}

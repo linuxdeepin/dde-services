@@ -11,6 +11,8 @@
 #include "lidswitchhandler.h"
 #include "sleepinhibitor.h"
 #include "sessiondbusproxy.h"
+#include "scheduledshutdown.h"
+#include "shortidlepolicy.h"
 #include "../powerconstants.h"
 
 #include <QDBusConnection>
@@ -769,17 +771,16 @@ bool PowerManager::canEnterShortIdle() const
             continue;
         const QString desktop = QFileInfo(
             properties.value(QStringLiteral("DesktopSourcePath")).toString()).fileName();
-        if (m_shortIdleBlacklistApplications.contains(desktop)) {
+        switch (shortIdleBlockReason(desktop, m_shortIdleBlacklistApplications,
+                                     m_systemApplications)) {
+        case ShortIdleBlock::Blacklist:
             qInfo(logPowerSession) << "Short idle blocked by blacklisted application:" << desktop;
             return false;
-        }
-        const QString lower = desktop.toLower();
-        if (!m_systemApplications.contains(desktop)
-            && !lower.contains(QStringLiteral("deepin"))
-            && !lower.contains(QStringLiteral("dde"))
-            && !lower.contains(QStringLiteral("uos"))) {
+        case ShortIdleBlock::ThirdParty:
             qInfo(logPowerSession) << "Short idle blocked by third-party application:" << desktop;
             return false;
+        case ShortIdleBlock::Allowed:
+            break;
         }
     }
 
@@ -1566,63 +1567,15 @@ bool PowerManager::isWorkday(const QDateTime &date) const
 
 bool PowerManager::isCustomDay(const QDateTime &date) const
 {
-    const int day = date.date().dayOfWeek();
-    // DConfig stores these as numeric byte values (the legacy daemon used []byte), not
-    // as the textual string "135"; the explicit conversion preserves that contract.
-    return std::any_of(m_customShutdownWeekDays.cbegin(),
-                       m_customShutdownWeekDays.cend(),
-                       [day](char configured) {
-                           const auto value = static_cast<quint8>(configured);
-                           return value == day || (day == Qt::Sunday && value == 0);
-                       });
+    return isCustomShutdownDay(date.date().dayOfWeek(), m_customShutdownWeekDays);
 }
 
 qint64 PowerManager::getNextShutdownTime(qint64 baseTime) const
 {
-    auto getNextTime = [this](qint64 bt) -> QDateTime {
-        QDateTime baseDate = QDateTime::fromSecsSinceEpoch(bt);
-        QDateTime now = QDateTime::currentDateTime();
-        QTime targetTime = QTime::fromString(m_shutdownTime, "hh:mm");
-        QDateTime target = QDateTime(now.date(), targetTime);
-
-        if (now.secsTo(target) / 60 < 0) { // 已经过去时间了
-            target = target.addDays(1);
-        }
-
-        if (baseDate.secsTo(target) / 60 <= 0) { // 
-            target = target.addDays(1);
-        }
-        return target;
-    };
-
-    QDateTime targetTime;
-    switch (m_shutdownRepetition) {
-    case RepOnce:
-    case RepEveryday:
-        targetTime = getNextTime(baseTime);
-        break;
-    case RepWorkdays: {
-        targetTime = getNextTime(baseTime);
-        for (int i = 0; i <= 366; ++i) {
-            if (i == 366) return 0;
-            if (isWorkday(targetTime)) break;
-            targetTime = targetTime.addDays(1);
-        }
-        break;
-    }
-    case RepCustom: {
-        targetTime = getNextTime(baseTime);
-        for (int i = 0; i <= 7; ++i) {
-            if (i == 7) return 0;
-            if (isCustomDay(targetTime)) break;
-            targetTime = targetTime.addDays(1);
-        }
-        break;
-    }
-    default:
-        targetTime = getNextTime(baseTime);
-        break;
-    }
-
-    return targetTime.toSecsSinceEpoch();
+    const QDateTime target = nextShutdownDateTime(
+        baseTime, QDateTime::currentDateTime(), m_shutdownTime,
+        static_cast<ShutdownRepetition>(m_shutdownRepetition),
+        m_customShutdownWeekDays,
+        [this](const QDateTime &d) { return isWorkday(d); });
+    return target.isValid() ? target.toSecsSinceEpoch() : 0;
 }

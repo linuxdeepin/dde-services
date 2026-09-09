@@ -4,6 +4,7 @@
 
 #include "lowpowermanager.h"
 #include "powermanager.h"
+#include "warnlevelpolicy.h"
 #include "../powerconstants.h"
 
 #include <QDBusInterface>
@@ -128,39 +129,17 @@ void LowPowerManager::applyConfigValue(const QString &key, const QVariant &value
 
 uint LowPowerManager::getWarnLevel(double percentage, quint64 timeToEmpty)
 {
-    if (!m_powerManager || !m_powerManager->onBattery())
-        return None;
-
-    if (m_usePercentageForPolicy) {
-        if (percentage == 0.0)
-            return None;
-
-        if (percentage <= m_lowPowerNotifyThreshold) {
-            if (m_percentageAction > 0 && percentage <= m_percentageAction)
-                return Action;
-            if (percentage <= 10.0)
-                return Critical;
-            if (percentage <= 15.0)
-                return Danger;
-            if (percentage <= 20.0)
-                return Low;
-            if (percentage <= 25.0)
-                return Remind;
-            return None;
-        }
-
-        return None;
-    } else {
-        if (timeToEmpty > m_timeToEmptyLow || timeToEmpty == 0)
-            return None;
-        if (timeToEmpty > m_timeToEmptyDanger)
-            return Low;
-        if (timeToEmpty > m_timeToEmptyCritical)
-            return Danger;
-        if (timeToEmpty > m_timeToEmptyAction)
-            return Critical;
-        return Action;
-    }
+    return static_cast<uint>(computeWarnLevel(
+        m_usePercentageForPolicy,
+        m_powerManager && m_powerManager->onBattery(),
+        m_lowPowerNotifyThreshold,
+        m_percentageAction,
+        m_timeToEmptyLow,
+        m_timeToEmptyDanger,
+        m_timeToEmptyCritical,
+        m_timeToEmptyAction,
+        percentage,
+        timeToEmpty));
 }
 
 void LowPowerManager::updateWarnLevel()
@@ -297,12 +276,9 @@ void LowPowerManager::scheduleValidation()
 
 bool LowPowerManager::configValid() const
 {
-    // Legacy dde-daemon only accepted 1%-9% action thresholds; 10% is the
-    // separate critical threshold, so equality would collapse two warning levels.
-    return m_timeToEmptyLow > m_timeToEmptyDanger
-        && m_timeToEmptyDanger > m_timeToEmptyCritical
-        && m_timeToEmptyCritical > m_timeToEmptyAction
-        && m_percentageAction < 10;
+    return warnLevelConfigValid(m_timeToEmptyLow, m_timeToEmptyDanger,
+                                m_timeToEmptyCritical, m_timeToEmptyAction,
+                                m_percentageAction);
 }
 
 void LowPowerManager::Reset()

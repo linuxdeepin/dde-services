@@ -29,29 +29,6 @@ using namespace PowerDBus;
 using namespace PowerDConfig;
 using namespace PowerFS;
 
-static bool canAdd(const QString &type, int delay,
-                   const QVector<PowerSavePlan::MetaTask> &tasks)
-{
-    if (tasks.isEmpty())
-        return true;
-    if (type == QLatin1String("sleep"))
-        return true;
-    if (type == QLatin1String("screenSaverStart")) {
-        int min = tasks.first().delay;
-        for (const auto &t : tasks)
-            if (t.delay < min) min = t.delay;
-        return delay <= min;
-    }
-    if (type == QLatin1String("screenBlack")) {
-        if (delay < tasks.first().delay)
-            return true;
-        if (delay == tasks.first().delay && tasks.last().name == QLatin1String("lock"))
-            return true;
-        return false;
-    }
-    return false;
-}
-
 PowerSavePlan::PowerSavePlan(PowerManager *powerManager, QObject *parent)
     : QObject(parent)
     , m_allowScreenSaver(powerManager ? powerManager->allowScreenSaver() : true)
@@ -123,13 +100,13 @@ void PowerSavePlan::Update(int screenSaverStartDelay, int lockDelay,
                        << " screenBlackDelay=" << screenBlackDelay
                        << " sleepDelay=" << sleepDelay;
 
-    if (sleepDelay > 0 && canAdd("sleep", sleepDelay, m_metaTasks)) {
+    if (sleepDelay > 0 && canAddTask("sleep", sleepDelay, m_metaTasks)) {
         m_metaTasks.append({sleepDelay, 0, "sleep", [this]{
             sleep();
         }});
     }
 
-    if (screenSaverStartDelay > 0 && canAdd("screenSaverStart", screenSaverStartDelay, m_metaTasks)) {
+    if (screenSaverStartDelay > 0 && canAddTask("screenSaverStart", screenSaverStartDelay, m_metaTasks)) {
         m_metaTasks.append({screenSaverStartDelay, 0, "screenSaverStart", [this]{
             startScreensaver();
         }});
@@ -154,12 +131,7 @@ void PowerSavePlan::Update(int screenSaverStartDelay, int lockDelay,
         }});
     }
 
-    int min = 0;
-    for (const auto &t : m_metaTasks) {
-        if (t.delay < min || min == 0)  {
-            min = t.delay;
-        }
-    }
+    const int min = minTaskDelay(m_metaTasks);
 
     const qint64 elapsed = m_isIdle && !resetFromNow && m_powerManager->idleWatcher()
         ? m_powerManager->idleWatcher()->idleTimeMs() : 0;

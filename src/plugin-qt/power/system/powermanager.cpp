@@ -6,6 +6,7 @@
 #include "batterymanager.h"
 #include "batterydevice.h"
 #include "systemdbusproxy.h"
+#include "powermodepolicy.h"
 #include "../powerconstants.h"
 
 #include <QDBusConnection>
@@ -831,29 +832,13 @@ void SystemPowerManager::persist(const char *key, const QVariant &value)
 
 QString SystemPowerManager::mappedDspcMode(const QString &mode) const
 {
-    // Parse on demand so runtime DConfig mapping changes take effect immediately; this
-    // path is used only when a power mode is applied.
-    const QJsonObject mapping = QJsonDocument::fromJson(m_powerMappingConfig.toUtf8()).object();
-    const QJsonObject entry = mapping.value(mode).toObject();
-    return entry.value(QStringLiteral("DSPCConfig")).toString();
+    return ::mappedDspcMode(mode, m_powerMappingConfig);
 }
 
 void SystemPowerManager::applyMode(const QString &mode)
 {
-    const QString logicalMode = m_batteryLow && mode == QLatin1String("powersave")
-        ? QStringLiteral("lowBattery") : mode;
-    QString dspc = mappedDspcMode(logicalMode);
-    if (dspc.isEmpty())
-        dspc = logicalMode == QLatin1String("lowBattery") ? QStringLiteral("lowbat")
-             : logicalMode == QLatin1String("powersave") ? QStringLiteral("saving")
-             : logicalMode;
-    if (dspc != QLatin1String("performance") && dspc != QLatin1String("balance")
-        && dspc != QLatin1String("saving") && dspc != QLatin1String("lowbat")) {
-        qWarning(logPowerSystem) << "Ignoring invalid DSPC mode mapping:" << dspc;
-        dspc = logicalMode == QLatin1String("lowBattery") ? QStringLiteral("lowbat")
-             : logicalMode == QLatin1String("powersave") ? QStringLiteral("saving")
-             : logicalMode;
-    }
+    const QString logicalMode = lowBatteryLogicalMode(m_batteryLow, mode);
+    const QString dspc = resolveDspcMode(logicalMode, m_powerMappingConfig);
     enqueuePowerControl({QStringLiteral("set"), dspc});
 }
 
@@ -1156,11 +1141,11 @@ bool SystemPowerManager::writeStateFile(const QString &path, bool state)
 
 void SystemPowerManager::recalcBatteryLow()
 {
-    bool old = m_batteryLow;
+    const bool old = m_batteryLow;
     // Legacy dde-daemon tracked low battery from capacity only. AC state gates the
     // general battery-power auto switch; the low-battery auto switch is independent.
-    m_batteryLow = m_hasBattery
-                   && m_batteryPercentage <= static_cast<double>(m_psmAutoPct);
+    m_batteryLow = isBatteryLow(m_hasBattery, m_batteryPercentage,
+                                static_cast<double>(m_psmAutoPct));
     qDebug(logPowerSystem) << "recalcBatteryLow:" << old << "→" << m_batteryLow
                              << "(HasBattery=" << m_hasBattery
                              << " pct=" << m_batteryPercentage
