@@ -517,7 +517,7 @@ void PowerManager::handleBeforeSleep(bool)
     m_sleepCycleHandled = true;
     m_prepareSuspendState = PS_Prepare;
     if (!m_screensaverStateCaptured) {
-        m_screensaverLockAtAwake = screensaverProperty("lockScreenAtAwake");
+        m_screensaverLockAtAwake = m_proxy->lockScreenAtAwake();
         m_screensaverStateCaptured = true;
     }
     setBlackScreenActive(true);
@@ -555,16 +555,6 @@ void PowerManager::handleWakeup()
     m_proxy->refreshMains();
     m_proxy->refreshBatteries();
 }
-bool PowerManager::screensaverProperty(const char *name) const
-{
-    QDBusInterface screensaver(QStringLiteral("com.deepin.ScreenSaver"),
-                               QStringLiteral("/com/deepin/ScreenSaver"),
-                               QStringLiteral("com.deepin.ScreenSaver"),
-                               QDBusConnection::sessionBus());
-    return screensaver.property(name).toBool();
-}
-
-
 void PowerManager::Reset()
 {
     if (!m_config)

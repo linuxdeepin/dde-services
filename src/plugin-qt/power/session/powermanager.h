@@ -299,7 +299,6 @@ private:
     void persist(const char *key, const QVariant &value);
     void resetConfig(const char *key);
     void initAmbientBrightness();
-    bool screensaverProperty(const char *name) const;
     bool isInConfigOrPowerButtonInhibitors(const QString &whatOnly,
                                            QString &who,
                                            bool blockOnly = true) const;

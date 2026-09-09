@@ -8,6 +8,8 @@
 #include <QDBusConnection>
 #include <QDBusArgument>
 #include <QDBusInterface>
+#include <QDBusPendingCallWatcher>
+#include <QDBusPendingReply>
 #include <QDBusReply>
 #include <QDBusVariant>
 #include <QDBusUnixFileDescriptor>
@@ -61,8 +63,28 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
     , m_ambientBrightnessInter(new DDBusInterface(
           kAmbientBrightnessService, kAmbientBrightnessPath, kAmbientBrightnessInterface,
           QDBusConnection::sessionBus(), this))
+    , m_screensaverInter(new DDBusInterface(
+          kScreensaver, kScreensaverPath, kScreensaver,
+          QDBusConnection::sessionBus(), this))
 {
     m_displayInter->setParent(this);
+
+    // Cache com.deepin.ScreenSaver properties from PropertiesChanged notifications and
+    // seed them asynchronously, so no blocking D-Bus read happens on this path.
+    connect(this, &SessionDBusProxy::lockScreenAtAwakeChanged, this,
+            [this](bool value) { m_lockScreenAtAwake = value; });
+    connect(this, &SessionDBusProxy::isRunningChanged, this,
+            [this](bool value) { m_screensaverRunning = value; });
+    connect(m_screensaverInter, &DDBusInterface::serviceValidChanged, this, [this](bool valid) {
+        if (!valid) {
+            // Service gone: nothing can be running.
+            setScreensaverRunning(false);
+            return;
+        }
+        refreshScreensaverProperties();
+    });
+    refreshScreensaverProperties();
+
     QDBusConnection::sessionBus().connect(
         m_notificationsInter->service(), m_notificationsInter->path(),
         m_notificationsInter->interface(),
@@ -190,6 +212,54 @@ bool SessionDBusProxy::sessionActive() const
 bool SessionDBusProxy::sessionLocked() const
 {
     return m_sessionManagerInter->property("Locked").toBool();
+}
+
+bool SessionDBusProxy::lockScreenAtAwake() const
+{
+    return m_lockScreenAtAwake;
+}
+
+bool SessionDBusProxy::screensaverRunning() const
+{
+    return m_screensaverRunning;
+}
+
+void SessionDBusProxy::setScreensaverRunning(bool running)
+{
+    if (m_screensaverRunning == running)
+        return;
+    m_screensaverRunning = running;
+    Q_EMIT isRunningChanged(running);
+}
+
+void SessionDBusProxy::refreshScreensaverProperties()
+{
+    QDBusMessage msg = QDBusMessage::createMethodCall(
+        m_screensaverInter->service(), m_screensaverInter->path(),
+        QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("GetAll"));
+    msg.setArguments({QLatin1String(kScreensaver)});
+
+    auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg), this);
+    connect(watcher, &QDBusPendingCallWatcher::finished, this,
+            [this](QDBusPendingCallWatcher *finishedWatcher) {
+        const QDBusPendingReply<QVariantMap> reply = *finishedWatcher;
+        finishedWatcher->deleteLater();
+        if (reply.isError())
+            return;
+        const QVariantMap props = reply.value();
+        m_lockScreenAtAwake = props.value(QStringLiteral("lockScreenAtAwake")).toBool();
+        setScreensaverRunning(props.value(QStringLiteral("isRunning")).toBool());
+    });
+}
+
+void SessionDBusProxy::startScreenSaver()
+{
+    m_screensaverInter->asyncCall(QStringLiteral("Start"));
+}
+
+void SessionDBusProxy::stopScreenSaver()
+{
+    m_screensaverInter->asyncCall(QStringLiteral("Stop"));
 }
 
 void SessionDBusProxy::requestSuspend()
