@@ -9,7 +9,6 @@
 #include "sessiondbusproxy.h"
 #include "../powerconstants.h"
 
-#include <QDBusInterface>
 #include <QDBusMessage>
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
@@ -61,6 +60,10 @@ PowerSavePlan::PowerSavePlan(PowerManager *powerManager, QObject *parent)
 
 void PowerSavePlan::Start()
 {
+    if (m_powerManager && m_powerManager->m_proxy) {
+        connect(m_powerManager->m_proxy, &SessionDBusProxy::isRunningChanged, this,
+                [this](bool running) { m_screensaverRunning = running; });
+    }
     Reset();
     initializePowerSavingBrightness();
 }
@@ -306,9 +309,7 @@ void PowerSavePlan::startScreensaver()
     if (qEnvironmentVariable("DESKTOP_CAN_SCREENSAVER") == "N" || !m_allowScreenSaver)
         return;
 
-    QDBusInterface iface(kScreensaver, kScreensaverPath, kScreensaver,
-                         QDBusConnection::sessionBus());
-    iface.call("Start");
+    m_powerManager->m_proxy->startScreenSaver();
     m_screensaverRunning = true;
 }
 
@@ -324,15 +325,14 @@ void PowerSavePlan::sleep()
 
     if (!m_powerManager->m_screensaverStateCaptured) {
         m_powerManager->m_screensaverLockAtAwake =
-            m_powerManager->screensaverProperty("lockScreenAtAwake");
+            m_powerManager->m_proxy->lockScreenAtAwake();
         m_powerManager->m_screensaverStateCaptured = true;
     }
+    // Cached from isRunning notifications; the local flag covers the start race.
     m_powerManager->m_screensaverWasRunning =
-        m_powerManager->screensaverProperty("isRunning");
+        m_screensaverRunning || m_powerManager->m_proxy->screensaverRunning();
     if (m_powerManager->m_screensaverWasRunning) {
-        QDBusInterface screensaver(kScreensaver, kScreensaverPath, kScreensaver,
-                                   QDBusConnection::sessionBus());
-        screensaver.asyncCall(QStringLiteral("Stop"));
+        m_powerManager->m_proxy->stopScreenSaver();
         m_screensaverRunning = false;
     }
     m_powerManager->doSuspendByFront();
@@ -342,9 +342,7 @@ void PowerSavePlan::stopScreensaver()
 {
     if (!m_screensaverRunning)
         return;
-    QDBusInterface iface(kScreensaver, kScreensaverPath, kScreensaver,
-                          QDBusConnection::sessionBus());
-    iface.call("Stop");
+    m_powerManager->m_proxy->stopScreenSaver();
     m_screensaverRunning = false;
 }
 
@@ -385,9 +383,7 @@ void PowerSavePlan::screenBlack()
             m_powerManager->m_screensaverWasRunning = reply.value().variant().toBool();
             if (!m_powerManager->m_screensaverWasRunning)
                 return;
-            QDBusInterface screensaver(kScreensaver, kScreensaverPath, kScreensaver,
-                                       QDBusConnection::sessionBus());
-            screensaver.asyncCall(QStringLiteral("Stop"));
+            m_powerManager->m_proxy->stopScreenSaver();
             m_screensaverRunning = false;
         });
         if (adjustBrightness) {
