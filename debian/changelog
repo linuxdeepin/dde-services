@@ -1,3 +1,25 @@
+dde-services (1.0.42) unstable; urgency=medium
+
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#159)
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#160)
+  * feat(power): migrate power services
+  * build(power): add libudev build dependency
+  * fix(power): fix scheduled shutdown notifications
+  * i18n: Translate plugin-power-session_en.ts in zh_HK
+  * i18n: Translate plugin-power-session_en.ts in zh_CN
+  * i18n: Translate plugin-power-session_en.ts in zh_TW
+  * fix(power): respect shutdown inhibitors
+  * feat: switch camera hotkey to daemon hardware privacy switch
+  * fix(power): unify screen-off handling in session
+  * i18n: [Transifex] Updates for project Deepin Desktop Environment
+    (#165)
+  * fix: scheduled shutdown countdown missing after switching users
+  * fix(power): avoid blocking screensaver dbus reads
+
+ -- zhangkun <zhangkun2@uniontech.com>  Thu, 10 Sep 2026 20:28:41 +0800
+
 dde-services (1.0.41) unstable; urgency=medium
 
   * fix: change default ambient brightness to off
