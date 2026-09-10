@@ -55,7 +55,7 @@ public:
 
     void refreshMains();
     // ── SessionWatcher ──
-    Q_PROPERTY(bool SessionActive READ sessionActive NOTIFY SessionActiveChanged)
+    Q_PROPERTY(bool IsActive READ sessionActive NOTIFY IsActiveChanged)
     bool sessionActive() const;
     bool sessionLocked() const;
 
@@ -116,7 +116,7 @@ signals:
     void PowerSavingModeEnabledChanged(bool value);
     void PowerSavingModeBrightnessDropPercentChanged(uint value);
     void PowerSavingModeBrightnessDataChanged(const QString &value);
-    void SessionActiveChanged(bool value);
+    void IsActiveChanged(bool value);
 
     void notifyActionInvoked(uint id, const QString &actionKey);
     void timeUpdate();

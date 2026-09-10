@@ -429,7 +429,7 @@ void PowerSavePlan::initializePowerSavingBrightness()
         if (!m_powerManager->isSessionActive())
             loadPowerSavingBrightness(data);
     });
-    connect(proxy, &SessionDBusProxy::SessionActiveChanged, this, [this](bool active) {
+    connect(proxy, &SessionDBusProxy::IsActiveChanged, this, [this](bool active) {
         if (active)
             m_sessionActiveGrace.restart();
     });
