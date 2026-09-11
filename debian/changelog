@@ -1,3 +1,9 @@
+dde-services (1.0.43) unstable; urgency=medium
+
+  * fix(power): start countdown from the configured value
+
+ -- zhangkun <zhangkun2@uniontech.com>  Fri, 11 Sep 2026 17:27:57 +0800
+
 dde-services (1.0.42) unstable; urgency=medium
 
   * i18n: [Transifex] Updates for project Deepin Desktop Environment
