@@ -1466,13 +1466,7 @@ void PowerManager::scheduledShutdown(int state)
     }
     case SchedCountdowning: {
         m_shutdownStatus = SchedCountdowning;
-        // 用实际剩余时间做倒计时起点，避免切换会话重新调度后从头倒数
-        qint64 secsLeft = now.secsTo(next);
-        if (secsLeft < 1)
-            secsLeft = 1;
-        else if (secsLeft > m_shutdownCountdown)
-            secsLeft = m_shutdownCountdown;
-        int remaining = static_cast<int>(secsLeft);
+        int remaining = qMax(1, m_shutdownCountdown);
         shutdownCountdownNotify(remaining, true);
 
         // Use member m_countdownTimer (matching Go: m.shutdownTimer in countdown goroutine)
