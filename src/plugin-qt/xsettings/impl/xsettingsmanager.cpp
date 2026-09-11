@@ -203,6 +203,8 @@ void XSettingsManager::setScreenScaleFactors(const ScaleFactors &factors, bool e
     }
 
     setScreenScaleFactorsForQt(factors);
+
+    updateDPI();
 }
 
 void XSettingsManager::setString(const QString &prop, const QString &v)
@@ -391,15 +393,11 @@ void XSettingsManager::updateDPI()
         int tempXftDpi = m_settingDconfig->value(dcKeyXftDpi).toInt(&bOk);
         if (bOk) {
             scaledDpi = static_cast<int>((DPI_FALLBACK * 1024) * scale);
-            if (tempXftDpi != scaledDpi) {
+            const auto update = makeXftDpiUpdate(tempXftDpi, scaledDpi);
+            if (update.needsPersist) {
                 m_settingDconfig->setValue(dcKeyXftDpi, scaledDpi);
-                XsSetting setting;
-                setting.prop = "Xft/DPI";
-                setting.value = scaledDpi;
-                setting.type = HeadTypeInteger;
-
-                xsSettngVec.push_back(setting);
             }
+            xsSettngVec.push_back(update.setting);
         }
 
         bOk = false;
