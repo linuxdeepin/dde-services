@@ -12,6 +12,7 @@ After=treeland-sd.service
 [Service]
 Type=dbus
 BusName=org.deepin.dde.XSettings1
+ExecStartPre=-/usr/libexec/dde-thp-disable
 ExecStart=/usr/bin/deepin-service-manager -n org.deepin.dde.XSettings1
 Restart=on-failure
 RestartSec=3
