@@ -65,3 +65,6 @@ install(FILES
     ${MISC_DIR}/deepin-service-plugin@org.deepin.dde.WallpaperCache.service.d/override.conf
     DESTINATION lib/systemd/system/deepin-service-plugin@org.deepin.dde.WallpaperCache.service.d/
 )
+# Pre-generate blur cache for default wallpaper at boot (avoid first-boot cold-start delay)
+install(PROGRAMS ${MISC_DIR}/wallpaper-cache-preheat.sh DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
+install(FILES ${MISC_DIR}/dde-wallpaper-cache-preheat.service DESTINATION lib/systemd/system/)
