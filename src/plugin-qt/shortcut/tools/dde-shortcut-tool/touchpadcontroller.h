@@ -9,14 +9,12 @@
 
 #include <QMap>
 
-class QDBusInterface;
-
 class TouchPadController : public BaseController 
 {
     Q_OBJECT
 public:
     explicit TouchPadController(QObject *parent = nullptr);
-    ~TouchPadController() override;
+    ~TouchPadController() override = default;
 
     static QString commandName() { return "touchpad"; }
     static QStringList commandActions();
@@ -32,8 +30,6 @@ private:
     bool toggle();
     bool setEnabled(bool enabled);
     void showOSD(const QString &signal);
-    
-    QDBusInterface *m_touchpadInterface;
 };
 
 #endif
