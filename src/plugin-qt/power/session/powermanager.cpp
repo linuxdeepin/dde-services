@@ -56,6 +56,16 @@ static QStringList desktopFileNames(QStringList applications)
     return applications;
 }
 
+static void playSystemSound(const QString &soundEvent)
+{
+    QDBusInterface iface(QStringLiteral("org.deepin.dde.SoundEffect1"),
+                         QStringLiteral("/org/deepin/dde/SoundEffect1"),
+                         QStringLiteral("org.deepin.dde.SoundEffect1"),
+                         QDBusConnection::sessionBus());
+    if (iface.isValid())
+        iface.asyncCall(QStringLiteral("PlaySound"), soundEvent);
+}
+
 
 Q_DECLARE_METATYPE(ObjectInterfaceMap)
 Q_DECLARE_METATYPE(ObjectMap)
@@ -170,7 +180,12 @@ bool PowerManager::initialize()
         connect(m_idleWatcher, &IdleWatcher::resumed, m_powerSavePlan, &PowerSavePlan::HandleIdleOff);
     }
     connect(this, &PowerManager::onBatteryChanged, this,
-            [this] { m_powerSavePlan->ResetFromNow(); });
+            [this] {
+                m_powerSavePlan->ResetFromNow();
+                if (m_batteryInited)
+                    playSystemSound(m_onBattery ? QStringLiteral("power-unplug")
+                                                : QStringLiteral("power-plug"));
+            });
 
     connect(this, &PowerManager::linePowerScreensaverDelayChanged, this, &PowerManager::onLinePowerDelayChanged);
     connect(this, &PowerManager::linePowerScreenBlackDelayChanged, this, &PowerManager::onLinePowerDelayChanged);
@@ -250,7 +265,10 @@ void PowerManager::initBatteryWatcher()
                 m_proxy->powerSavingModeBrightnessDropPercent());
     };
     syncState();
-    QTimer::singleShot(1000, this, syncState);
+    QTimer::singleShot(1000, this, [this, syncState]() {
+        syncState();
+        m_batteryInited = true;
+    });
 }
 
 void PowerManager::initSleepWatcher()
@@ -534,6 +552,8 @@ void PowerManager::handleWakeup()
     m_sleepCycleHandled = false;
     m_prepareSuspendState = PS_Resume;
     m_screensaverStateCaptured = false;
+
+    playSystemSound(QStringLiteral("suspend-resume"));
     if (m_useWayland && m_idleWatcher)
         m_idleWatcher->simulateActivity();
     if (m_scheduledShutdownState)
