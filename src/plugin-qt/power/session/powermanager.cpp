@@ -546,6 +546,8 @@ void PowerManager::handleWakeup()
         if (m_screensaverWasRunning && m_screensaverLockAtAwake)
             doLock(true);
         m_screensaverWasRunning = false;
+        if (!QProcess::startDetached("paplay", {"/usr/share/sounds/deepin/stereo/suspend-resume.wav"}))
+            qWarning(logPowerSession) << "Failed to play wakeup sound";
         setBlackScreenActive(false);
     });
     if (m_powerSavePlan)
