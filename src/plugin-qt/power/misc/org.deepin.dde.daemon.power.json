@@ -830,7 +830,11 @@
                 "iio-sensor-proxy.service",
                 "avahi-daemon.service",
                 "ddm.service",
-                "treeland.service"
+                "treeland.service",
+                "rtkit-daemon.service",
+                "systemd-resolved.service",
+                "strongswan.service",
+                "xl2tpd.service"
             ],
             "serial": 0,
             "flags": [
