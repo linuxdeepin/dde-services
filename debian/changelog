@@ -1,3 +1,14 @@
+dde-services (1.0.44) unstable; urgency=medium
+
+  * build(debian): remove deepin-screensaver dependency
+  * fix: touchpad FN key only shows OSD, no double toggle
+  * fix: use setter for short idle state initialization
+  * fix: update power daemon service whitelist
+  * fix(power): play sound effect on battery plug/unplug and suspend
+    resume
+
+ -- zhangkun <zhangkun2@uniontech.com>  Tue, 22 Sep 2026 20:44:39 +0800
+
 dde-services (1.0.43) unstable; urgency=medium
 
   * fix(power): start countdown from the configured value
