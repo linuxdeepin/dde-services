@@ -22,7 +22,7 @@ class AmbientBrightnessModel : public QObject
 public:
     explicit AmbientBrightnessModel(std::unique_ptr<AmbientBrightnessPolicy> policy,
                                     QObject *parent = nullptr);
-
+    /// 本机是否具备环境光传感器（硬件能力）。与开关是否开启、当前是否在采样无关。
     bool supported() const { return m_supported; }
 
     QString state() const { return m_state; }
@@ -40,13 +40,16 @@ public:
     void tick(double monotonicTimestampMs);
     void setPolicy(std::unique_ptr<AmbientBrightnessPolicy> policy);
 
+    /// 由 Service 依据能力探测结果写入。关闭开关或暂停采样不得清掉它；
+    /// 只有确认本机没有可用传感器时才置为 false。
+    void setSupported(bool value);
+
 Q_SIGNALS:
     void supportedChanged(bool value);
     void stateChanged(const QString &value);
     void recommendedBrightnessChanged(double value);
 
 private:
-    void setSupported(bool value);
     void setState(const QString &value);
 
     std::unique_ptr<AmbientBrightnessPolicy> m_policy;
