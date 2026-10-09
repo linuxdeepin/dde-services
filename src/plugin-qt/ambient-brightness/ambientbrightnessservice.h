@@ -52,6 +52,12 @@ Q_SIGNALS:
     void enabledChanged(bool value);
     void recommendedBrightnessChanged(double value);
 
+public Q_SLOTS:
+    /// 启动运行时逻辑。与 initialize() 分开，便于测试在没有系统总线时构造服务。
+    void start();
+    /// 异步能力探测的回调入口。
+    void handleSensorPresentChanged(bool present);
+
 private Q_SLOTS:
     void onSensorServiceRegistered();
     void onSensorServiceUnregistered();
@@ -68,7 +74,9 @@ private Q_SLOTS:
                              const QStringList &invalidated);
 
 private:
+    void stopSampling();
     void connectSensor();
+    void refreshSensorCapability();
     void disconnectSensor();
     void initRuntimeControl();
     void initLogin1Session();
@@ -84,6 +92,9 @@ private:
     void onEvaluationTimerElapsed();
     void initAlgorithmConfig();
     void rebuildCurrentPolicy();
+
+    /// 最近一次异步能力探测的结果。只在 handleSensorPresentChanged() 里写入。
+    bool m_present = false;
 
     QDBusConnection m_connection;
     QDBusInterface *m_sensor = nullptr;

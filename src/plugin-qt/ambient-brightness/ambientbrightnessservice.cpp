@@ -10,6 +10,8 @@
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
 #include <QDBusMessage>
+#include <QDBusPendingCallWatcher>
+#include <QDBusPendingReply>
 #include <QDBusReply>
 #include <QDBusServiceWatcher>
 #include <QVariantMap>
@@ -51,6 +53,22 @@ bool variantToValidLux(const QVariant &value, double *lux)
     if (!ok || !std::isfinite(converted) || converted < 0.0)
         return false;
     *lux = converted;
+    return true;
+}
+
+/// 判定 LookupAmbientLightSensor 的异步回复是否代表"本机有可用光感"。
+bool sensorLookupSucceeded(const QDBusPendingReply<QDBusObjectPath> &reply)
+{
+    if (!reply.isError())
+        return !reply.value().path().isEmpty();
+
+    // 服务不存在（未注册）时视为不支持；方法缺失等其它错误回退为支持，
+    // 由 connectSensor() 的 HasAmbientLight / 单位校验做最终判定。
+    const QString errorName = reply.error().name();
+    if (errorName == QLatin1String("org.freedesktop.DBus.Error.ServiceUnknown")
+        || errorName == QLatin1String("org.freedesktop.DBus.Error.NameHasNoOwner")) {
+        return false;
+    }
     return true;
 }
 
@@ -105,19 +123,25 @@ bool AmbientBrightnessService::initialize()
     connect(m_watcher, &QDBusServiceWatcher::serviceUnregistered,
             this, &AmbientBrightnessService::onSensorServiceUnregistered);
 
-    m_runtimeReady = true;
-    refreshSensorConnection();
+    start();
     return true;
+}
+
+void AmbientBrightnessService::start()
+{
+    m_runtimeReady = true;
+    refreshSensorCapability();
 }
 
 void AmbientBrightnessService::onSensorServiceRegistered()
 {
-    refreshSensorConnection();
+    refreshSensorCapability();
 }
 
 void AmbientBrightnessService::onSensorServiceUnregistered()
 {
-    disconnectSensor();
+    // 传感器服务退出后需要重新探测：Supported 必须随之变为 false 并对外广播。
+    refreshSensorCapability();
 }
 
 void AmbientBrightnessService::onLidClosed()
@@ -194,18 +218,10 @@ void AmbientBrightnessService::onAutomaticBrightnessEnabledChanged(bool enabled)
     m_lifecycle.enabled = enabled;
     Q_EMIT enabledChanged(enabled);
     publishPropertyChange(QStringLiteral("Enabled"), enabled);
-    if (!enabled) {
-        stopInitialSampleWait();
-        if (m_evaluationTimer)
-            m_evaluationTimer->stop();
-        if (m_sensor && m_claimed)
-            m_sensor->call(QStringLiteral("ReleaseLight"));
-        m_claimed = false;
-        m_haveSample = false;
-        m_model.setDisabled();
-    } else {
-        refreshSensorConnection();
-    }
+    if (!enabled)
+        stopSampling();
+    else
+        refreshSensorCapability();
 }
 
 void AmbientBrightnessService::Enable(bool active)
@@ -218,17 +234,9 @@ void AmbientBrightnessService::Enable(bool active)
         m_config->setValue(QString::fromLatin1(kAmbientLightAdjustBrightnessKey), active);
 
     if (!active) {
-        // 关闭：释放传感器但保留 Supported=true，状态变为 Disabled
-        stopInitialSampleWait();
-        if (m_evaluationTimer)
-            m_evaluationTimer->stop();
-        if (m_sensor && m_claimed)
-            m_sensor->call(QStringLiteral("ReleaseLight"));
-        m_claimed = false;
-        m_haveSample = false;
-        m_model.setDisabled();
+        stopSampling();
     } else {
-        refreshSensorConnection();
+        refreshSensorCapability();
     }
 }
 
@@ -271,16 +279,18 @@ void AmbientBrightnessService::connectSensor()
         qCWarning(logAmbientBrightness) << "sensor interface invalid";
         delete m_sensor;
         m_sensor = nullptr;
-        m_model.makeUnavailable();
+        m_model.setSupported(false);
         return;
     }
 
     const bool hasAmbientLight = m_sensor->property("HasAmbientLight").toBool();
     const QString unit = m_sensor->property("LightLevelUnit").toString();
     if (!hasAmbientLight || (!unit.isEmpty() && unit != QLatin1String("lux"))) {
+        qCWarning(logAmbientBrightness) << "sensor not suitable: hasAmbientLight=" << hasAmbientLight
+                                        << "unit=" << unit;
         delete m_sensor;
         m_sensor = nullptr;
-        m_model.makeUnavailable();
+        m_model.setSupported(false);
         return;
     }
 
@@ -350,7 +360,7 @@ void AmbientBrightnessService::disconnectSensor()
     if (m_evaluationTimer)
         m_evaluationTimer->stop();
     m_haveSample = false;
-    m_model.makeUnavailable();
+    // 采样状态由 Supported 与 State 分别表达，这里只负责断开信号与释放 Claim。
 }
 
 void AmbientBrightnessService::initRuntimeControl()
@@ -449,32 +459,83 @@ void AmbientBrightnessService::onSessionPropertiesChanged(
     onSessionActiveChanged(it->toBool());
 }
 
+void AmbientBrightnessService::refreshSensorCapability()
+{
+    // 能力探测完全异步：refreshSensorConnection() 会在合盖、休眠、会话切换、
+    // 开关切换等热路径上被调用，任何同步 D-Bus 往返都可能卡住主线程。
+    QDBusPendingCall call = QDBusConnection::systemBus().asyncCall(
+        QDBusMessage::createMethodCall(QString::fromLatin1(kSensorService),
+                                       QString::fromLatin1(kSensorPath),
+                                       QString::fromLatin1(kSensorInterface),
+                                       QStringLiteral("LookupAmbientLightSensor")));
+    auto *watcher = new QDBusPendingCallWatcher(call, this);
+    connect(watcher, &QDBusPendingCallWatcher::finished, this,
+            [this](QDBusPendingCallWatcher *self) {
+                self->deleteLater();
+                handleSensorPresentChanged(sensorLookupSucceeded(*self));
+            });
+}
+
+void AmbientBrightnessService::handleSensorPresentChanged(bool present)
+{
+    m_present = present;
+    m_model.setSupported(present);
+
+    if (!present) {
+        if (m_sensor || m_claimed)
+            disconnectSensor();
+        m_model.makeUnavailable();
+        return;
+    }
+    if (!m_lifecycle.shouldRun()) {
+        // 硬件存在但不该采样：Supported 保持 true，只同步 State。
+        if (m_sensor || m_claimed)
+            disconnectSensor();
+        m_model.setDisabled();
+        return;
+    }
+    // 直接启动，不经 refreshSensorConnection()，避免探测→刷新→探测的自我循环。
+    if (!m_claimed)
+        connectSensor();
+}
+
+void AmbientBrightnessService::stopSampling()
+{
+    // 只停采样并同步 State；Supported 仅由能力探测改写，关闭开关不得把它清成 false。
+    disconnectSensor();
+    if (m_model.supported())
+        m_model.setDisabled();
+    else
+        m_model.makeUnavailable();
+}
+
 void AmbientBrightnessService::refreshSensorConnection()
 {
     if (!m_runtimeReady)
         return;
 
+    // 只读缓存的能力结论；探测由 initialize/服务上下线/开关切换触发，
+    // 这里绝不同步访问 D-Bus，也不会再次触发探测（否则会自激）。
+
+    if (!m_present) {
+        if (m_sensor || m_claimed)
+            disconnectSensor();
+        m_model.makeUnavailable();
+        return;
+    }
+
+    // 硬件存在但不该采样（用户关闭、合盖、休眠、会话非前台）：Supported 保持 true。
     if (!m_lifecycle.shouldRun()) {
         if (m_sensor || m_claimed)
             disconnectSensor();
-        else
-            m_model.makeUnavailable();
+        m_model.setDisabled();
         return;
     }
 
     if (m_claimed)
         return;
 
-    auto *interface = QDBusConnection::systemBus().interface();
-    if (!interface) {
-        m_model.makeUnavailable();
-        return;
-    }
-    const auto registered = interface->isServiceRegistered(QString::fromLatin1(kSensorService));
-    if (registered.isValid() && registered.value())
-        connectSensor();
-    else
-        m_model.makeUnavailable();
+    connectSensor();
 }
 
 void AmbientBrightnessService::startInitialSampleTimeout()
@@ -578,11 +639,15 @@ void AmbientBrightnessService::initAlgorithmConfig()
         return;
     }
 
-    // 读取光感开关初始值
+    // 冷启动时开关状态只从 DConfig 读出，必须与运行中切换一样对外广播一次。
     const QVariant enabled = m_config->value(
         QString::fromLatin1(kAmbientLightAdjustBrightnessKey));
-    if (enabled.isValid() && enabled.canConvert<bool>())
+    if (enabled.isValid() && enabled.canConvert<bool>()
+        && m_lifecycle.enabled != enabled.toBool()) {
         m_lifecycle.enabled = enabled.toBool();
+        Q_EMIT enabledChanged(m_lifecycle.enabled);
+        publishPropertyChange(QStringLiteral("Enabled"), m_lifecycle.enabled);
+    }
 
     rebuildCurrentPolicy();
     connect(m_config, &Dtk::Core::DConfig::valueChanged, this, [this](const QString &key) {

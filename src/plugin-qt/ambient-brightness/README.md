@@ -44,9 +44,21 @@
 
 | 属性 | 类型 | 含义 |
 | --- | --- | --- |
-| `Supported` | `bool` | 当前是否已连接并成功声明环境光传感器 |
-| `State` | `string` | 当前状态：`Unavailable`、`Disabled`、`WaitingForSample` 或 `Active` |
+| `Supported` | `bool` | 本机是否具备可用的环境光传感器（硬件能力事实）。与开关是否开启、上盖是否合上、系统是否休眠、会话是否前台都无关 |
+| `State` | `string` | 当前运行状态：`Unavailable`（无可用传感器）、`Disabled`（有传感器但未采样）、`WaitingForSample`、`Active` |
 | `RecommendedBrightness` | `double` | 推荐亮度，范围 `[0.0, 1.0]` |
+
+`Supported` 由 Service 通过一次**无副作用、完全异步**的能力探测得出：调用
+`net.hadess.SensorProxy.LookupAmbientLightSensor()`，返回非空对象路径即视为本机具备光感。
+探测不调用 `ClaimLight`，因此关闭开关时不会向传感器发起任何采样调用；探测全程使用
+`QDBusPendingCallWatcher`，在合盖、休眠、会话切换、开关切换等热路径上都不会产生同步
+D-Bus 往返。探测结果先写入 `Supported`，随后才由 `HasAmbientLight` 与 `LightLevelUnit`
+（`lux` 或未设置）做最终校验——校验失败会撤销本次 `Supported=true`。
+
+只有探测结果能改写 `Supported`；关闭开关、合盖、休眠、会话切后台等"不采样"的原因一律
+只影响 `State`，不得把 `Supported` 清成 `false`。探测在以下时机触发：服务初始化、
+传感器服务注册/注销、自动亮度开关切换。传感器服务退出后重探测会得到"不支持"，
+`Supported` 随之变为 `false` 并对外广播。
 
 属性变化通过标准 `PropertiesChanged` 信号发布。
 
@@ -107,7 +119,11 @@ flowchart LR
 
 初始化光感时，Service 创建 `QDBusInterface` 并校验 ALS 能力和 lux 单位。随后先订阅 `PropertiesChanged`，再调用 `ClaimLight`，以免漏掉驱动在 Claim 调用期间同步上报的样本。Claim 成功后，首个有效 `LightLevel` 信号作为初始样本；若 2 秒内没有收到信号，则读取一次此时的 `LightLevel` 属性兜底，以覆盖真实首帧等于代理缓存值、重复 Claim 或已有其他客户端占用时不产生变化信号的情况。策略已经被 stop 流程重置，因此首个有效样本会立即生成推荐亮度。
 
-任一运行条件失效，或传感器服务注销时，Service 停止评估定时器、调用 `ReleaseLight`、清空最近样本，并让 Model 进入 `Unavailable`。
+能力探测（`Supported`）与是否采样（`State`）是两件事：探测只读属性、不调用 `ClaimLight`，
+在生命周期闸门之前进行；闸门只决定是否 Claim 采样。任一运行条件失效（关闭自动亮度、合盖、
+休眠、会话切后台）时，Service 停止采样——断开信号、调用 `ReleaseLight`、清空最近样本，
+`State` 回到 `Disabled`，`Supported` 保持能力事实不变。只有传感器服务注销或能力探测判定
+无可用传感器时才进入 `Unavailable` 并把 `Supported` 置为 `false`。
 
 ### 3. 样本处理
 
@@ -141,9 +157,9 @@ DConfig 发生变化时，Service 会：
 
 | 事件 | 动作 |
 | --- | --- |
-| 用户关闭自动亮度 | stop：`ReleaseLight`，停止定时器并重置策略 |
+| 用户关闭自动亮度 | stop：`ReleaseLight`，停止定时器并重置策略；`State=Disabled`，`Supported` 不变 |
 | 用户重新开启自动亮度 | init：若上盖打开且系统已唤醒，则先监听再 `ClaimLight`，等待首个有效 `LightLevel`；2 秒无信号时延迟读取属性兜底 |
-| 合盖 | stop |
+| 合盖 | stop，`State=Disabled` |
 | 开盖 | init；仍处于休眠或自动亮度关闭时保持停止 |
 | 进入待机、休眠 | stop |
 | 待机、休眠唤醒 | init；上盖仍关闭、会话非前台或自动亮度关闭时保持停止 |
@@ -157,11 +173,16 @@ DConfig 发生变化时，Service 会：
 ```mermaid
 stateDiagram-v2
     [*] --> Unavailable
-    Unavailable --> WaitingForSample: 运行条件满足并 ClaimLight 成功
+    Unavailable --> Disabled: 能力探测发现可用传感器（未采样）
+    Disabled --> WaitingForSample: 运行条件满足并 ClaimLight 成功
+    Unavailable --> WaitingForSample: 能力探测通过且运行条件满足，ClaimLight 成功
     WaitingForSample --> Active: Claim 后首个有效 LightLevel（或超时兜底值）产生 Recommendation
     Active --> WaitingForSample: 算法配置更新并重建策略
-    WaitingForSample --> Unavailable: 关闭自动亮度、合盖、休眠、会话非前台或传感器断开
-    Active --> Unavailable: 关闭自动亮度、合盖、休眠、会话非前台或传感器断开
+    WaitingForSample --> Disabled: 关闭自动亮度、合盖、休眠、会话非前台
+    Active --> Disabled: 关闭自动亮度、合盖、休眠、会话非前台
+    Disabled --> WaitingForSample: 运行条件恢复
+    Disabled --> Unavailable: 传感器服务注销或能力探测判定不可用
+    Active --> Unavailable: 传感器服务注销或能力探测判定不可用
 ```
 
 无效样本会被策略拒绝，不会使 `WaitingForSample` 错误进入 `Active`。
@@ -171,9 +192,9 @@ stateDiagram-v2
 | 类、结构或入口 | 文件 | 职责 |
 | --- | --- | --- |
 | `DSMRegister` / `DSMUnRegister` | `plugin.cpp` | 插件 ABI 入口。创建、初始化和销毁全局 `AmbientBrightnessService` 实例，处理重复注册和初始化失败。 |
-| `AmbientBrightnessService` | `ambientbrightnessservice.h/cpp` | 模块编排层。导出 D-Bus 属性；按自动亮度开关、盖子和休眠状态执行光感 stop/init；声明和释放传感器；监听服务上下线及 `LightLevel`；管理定时器、DConfig、策略重建和属性发布。它不实现亮度算法。 |
-| `AmbientLightLifecycleState` | `ambientlightlifecyclestate.h` | 保存自动亮度开关、盖子、休眠和会话前台四个独立条件；仅在开关开启、上盖打开、系统唤醒且会话前台时允许 Claim ALS。 |
-| `AmbientBrightnessModel` | `ambientbrightnessmodel.h/cpp` | Qt 状态适配层。独占一个 `AmbientBrightnessPolicy`；把 `submitSample()`、`tick()` 转发给策略；维护 `Supported`、`State` 和推荐亮度；将策略结果转换为 Qt 信号。它不访问 D-Bus 或 DConfig。 |
+| `AmbientBrightnessService` | `ambientbrightnessservice.h/cpp` | 模块编排层。导出 D-Bus 属性；执行无副作用的能力探测并独占写入 `Supported`；按自动亮度开关、盖子和休眠状态执行光感 stop/init；声明和释放传感器；监听服务上下线及 `LightLevel`；管理定时器、DConfig、策略重建和属性发布。它不实现亮度算法。 |
+| `AmbientLightLifecycleState` | `ambientlightlifecyclestate.h` | 保存自动亮度开关、盖子、休眠和会话前台四个独立条件；仅在开关开启、上盖打开、系统唤醒且会话前台时允许 Claim ALS。它不参与能力判定。 |
+| `AmbientBrightnessModel` | `ambientbrightnessmodel.h/cpp` | Qt 状态适配层。独占一个 `AmbientBrightnessPolicy`；把 `submitSample()`、`tick()` 转发给策略；维护 `Supported`（由 Service 探测结果写入，状态转换不得改写）、`State` 和推荐亮度；将策略结果转换为 Qt 信号。它不访问 D-Bus 或 DConfig。 |
 | `AmbientBrightnessPolicy` | `ambientbrightnesspolicy.h` | 与 Qt、D-Bus 无关的算法抽象接口，定义 `update()`、`tick()`、`reset()` 和 `nextEvaluationDelayMs()`，使 Model 不依赖具体算法。 |
 | `SensorSample` | `ambientbrightnesspolicy.h` | 策略输入，包含 lux、单调时间戳和样本来源。 |
 | `Recommendation` | `ambientbrightnesspolicy.h` | 策略输出，包含 raw、fast、slow、stable lux 和最终亮度，便于状态更新、日志及调试。 |
