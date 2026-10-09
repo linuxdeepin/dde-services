@@ -11,6 +11,7 @@
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 #include <QDBusReply>
+#include <QDBusServiceWatcher>
 #include <QDBusVariant>
 #include <QDBusUnixFileDescriptor>
 
@@ -63,20 +64,30 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
     , m_ambientBrightnessInter(new DDBusInterface(
           kAmbientBrightnessService, kAmbientBrightnessPath, kAmbientBrightnessInterface,
           QDBusConnection::sessionBus(), this))
-    , m_screensaverInter(new DDBusInterface(
-          kScreensaver, kScreensaverPath, kScreensaver,
-          QDBusConnection::sessionBus(), this))
 {
     m_displayInter->setParent(this);
 
-    // Cache com.deepin.ScreenSaver properties from PropertiesChanged notifications and
-    // seed them asynchronously, so no blocking D-Bus read happens on this path.
+    // DDBusInterface introspects synchronously when the service appears. The
+    // screensaver reads Power1 during startup, so that would make both wait.
+    // Subscribe explicitly and use raw asynchronous calls on this path.
     connect(this, &SessionDBusProxy::lockScreenAtAwakeChanged, this,
             [this](bool value) { m_lockScreenAtAwake = value; });
     connect(this, &SessionDBusProxy::isRunningChanged, this,
             [this](bool value) { m_screensaverRunning = value; });
-    connect(m_screensaverInter, &DDBusInterface::serviceValidChanged, this, [this](bool valid) {
-        if (!valid) {
+    auto bus = QDBusConnection::sessionBus();
+    bus.connect(kScreensaver, kScreensaverPath,
+                QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("PropertiesChanged"),
+                this, SLOT(handleScreensaverPropertiesChanged(QString,QVariantMap,QStringList)));
+    bus.connect(kScreensaver, kScreensaverPath, kScreensaver, QStringLiteral("lockScreenAtAwakeChanged"),
+                this, SIGNAL(lockScreenAtAwakeChanged(bool)));
+    bus.connect(kScreensaver, kScreensaverPath, kScreensaver, QStringLiteral("isRunningChanged"),
+                this, SIGNAL(isRunningChanged(bool)));
+    auto *screensaverWatcher = new QDBusServiceWatcher(kScreensaver, bus,
+        QDBusServiceWatcher::WatchForOwnerChange, this);
+    connect(screensaverWatcher, &QDBusServiceWatcher::serviceOwnerChanged, this,
+            [this](const QString &, const QString &, const QString &newOwner) {
+        ++m_screensaverGeneration;
+        if (newOwner.isEmpty()) {
             // Service gone: nothing can be running.
             setScreensaverRunning(false);
             return;
@@ -235,31 +246,51 @@ void SessionDBusProxy::setScreensaverRunning(bool running)
 void SessionDBusProxy::refreshScreensaverProperties()
 {
     QDBusMessage msg = QDBusMessage::createMethodCall(
-        m_screensaverInter->service(), m_screensaverInter->path(),
+        kScreensaver, kScreensaverPath,
         QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("GetAll"));
     msg.setArguments({QLatin1String(kScreensaver)});
 
     auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(msg), this);
     connect(watcher, &QDBusPendingCallWatcher::finished, this,
-            [this](QDBusPendingCallWatcher *finishedWatcher) {
+            [this, generation = m_screensaverGeneration](QDBusPendingCallWatcher *finishedWatcher) {
         const QDBusPendingReply<QVariantMap> reply = *finishedWatcher;
         finishedWatcher->deleteLater();
-        if (reply.isError())
+        if (reply.isError() || generation != m_screensaverGeneration)
             return;
-        const QVariantMap props = reply.value();
-        m_lockScreenAtAwake = props.value(QStringLiteral("lockScreenAtAwake")).toBool();
-        setScreensaverRunning(props.value(QStringLiteral("isRunning")).toBool());
+        handleScreensaverPropertiesChanged(QLatin1String(kScreensaver), reply.value(), {});
     });
+}
+
+void SessionDBusProxy::handleScreensaverPropertiesChanged(const QString &interface,
+                                                         const QVariantMap &changed,
+                                                         const QStringList &invalidated)
+{
+    if (interface != QLatin1String(kScreensaver))
+        return;
+    if (changed.contains(QStringLiteral("lockScreenAtAwake"))) {
+        const bool value = changed.value(QStringLiteral("lockScreenAtAwake")).toBool();
+        if (m_lockScreenAtAwake != value) {
+            m_lockScreenAtAwake = value;
+            Q_EMIT lockScreenAtAwakeChanged(value);
+        }
+    }
+    if (changed.contains(QStringLiteral("isRunning")))
+        setScreensaverRunning(changed.value(QStringLiteral("isRunning")).toBool());
+    if (invalidated.contains(QStringLiteral("lockScreenAtAwake"))
+        || invalidated.contains(QStringLiteral("isRunning")))
+        refreshScreensaverProperties();
 }
 
 void SessionDBusProxy::startScreenSaver()
 {
-    m_screensaverInter->asyncCall(QStringLiteral("Start"));
+    QDBusConnection::sessionBus().asyncCall(QDBusMessage::createMethodCall(
+        kScreensaver, kScreensaverPath, kScreensaver, QStringLiteral("Start")));
 }
 
 void SessionDBusProxy::stopScreenSaver()
 {
-    m_screensaverInter->asyncCall(QStringLiteral("Stop"));
+    QDBusConnection::sessionBus().asyncCall(QDBusMessage::createMethodCall(
+        kScreensaver, kScreensaverPath, kScreensaver, QStringLiteral("Stop")));
 }
 
 void SessionDBusProxy::requestSuspend()

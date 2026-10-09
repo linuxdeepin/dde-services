@@ -141,6 +141,9 @@ private Q_SLOTS:
     void handleDisplayPropertiesChanged(const QString &interface,
                                         const QVariantMap &changed,
                                         const QStringList &invalidated);
+    void handleScreensaverPropertiesChanged(const QString &interface,
+                                           const QVariantMap &changed,
+                                           const QStringList &invalidated);
 
 private:
     void refreshScreensaverProperties();
@@ -159,8 +162,7 @@ private:
     DDBusInterface *m_timedateInter;
     DDBusInterface *m_freedesktopDBusInter;
     DDBusInterface *m_ambientBrightnessInter;
-    DDBusInterface *m_screensaverInter;
-
+    quint64 m_screensaverGeneration = 0;
     bool m_lockScreenAtAwake = false;
     bool m_screensaverRunning = false;
 };

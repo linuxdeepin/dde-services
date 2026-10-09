@@ -104,3 +104,7 @@ DESTINATION ${CMAKE_INSTALL_DATADIR}/dbus-1/services/
 install(FILES ${QM_FILES} 
 DESTINATION ${CMAKE_INSTALL_DATADIR}/${BIN_NAME}/translations
 )
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
