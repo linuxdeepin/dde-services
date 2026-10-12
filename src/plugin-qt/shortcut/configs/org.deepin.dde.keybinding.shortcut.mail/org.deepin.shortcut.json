@@ -46,9 +46,12 @@
         },
         "triggerValue": {
             "value": [
-                "xdg-email"
+                "/usr/bin/dde-shortcut-tool",
+                "launch",
+                "mime",
+                "x-scheme-handler/mailto"
             ],
-            "serial": 0,
+            "serial": 1,
             "flags": [],
             "name": "triggerValue",
             "name[zh_CN]": "快捷键触发动作",
