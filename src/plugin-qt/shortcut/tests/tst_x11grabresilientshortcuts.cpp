@@ -4,12 +4,22 @@
 
 #include "backend/x11/x11keyhandler.h"
 
+#include <QFile>
+#include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QScopeGuard>
 #include <QSignalSpy>
 #include <QTest>
 
+#include <X11/XF86keysym.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XTest.h>
 #include <X11/keysym.h>
+
+#include <algorithm>
+#include <memory>
+#include <vector>
 
 namespace {
 
@@ -72,6 +82,8 @@ private slots:
     void activeCaptureRejectsReplacement();
     void captureReportsTimeout();
     void explicitEndCaptureDoesNotReportResult();
+    void sleepVariantsRegisterIndependently_data();
+    void sleepVariantsRegisterIndependently();
 };
 
 void TestX11GrabResilientShortcuts::legacyShortcutsActivateExactlyOnce()
@@ -256,6 +268,118 @@ void TestX11GrabResilientShortcuts::explicitEndCaptureDoesNotReportResult()
     QVERIFY(handler.endCapture(QStringLiteral("test-owner")));
     QTest::qWait(50);
     QCOMPARE(resultSpy.size(), 0);
+}
+
+void TestX11GrabResilientShortcuts::sleepVariantsRegisterIndependently_data()
+{
+    QTest::addColumn<bool>("hasSleep");
+    QTest::addColumn<bool>("hasSuspend");
+
+    QTest::newRow("sleep-only") << true << false;
+    QTest::newRow("suspend-only") << false << true;
+    QTest::newRow("both") << true << true;
+    QTest::newRow("neither") << false << false;
+}
+
+void TestX11GrabResilientShortcuts::sleepVariantsRegisterIndependently()
+{
+    QFETCH(bool, hasSleep);
+    QFETCH(bool, hasSuspend);
+
+    const std::unique_ptr<Display, decltype(&XCloseDisplay)> display(XOpenDisplay(nullptr),
+                                                                  &XCloseDisplay);
+    if (!display)
+        QSKIP("No X server is available");
+
+    int firstKeycode = 0;
+    int lastKeycode = 0;
+    XDisplayKeycodes(display.get(), &firstKeycode, &lastKeycode);
+    const int keycodeCount = lastKeycode - firstKeycode + 1;
+    int keysymsPerKeycode = 0;
+    const std::unique_ptr<KeySym, decltype(&XFree)> original(
+            XGetKeyboardMapping(display.get(), firstKeycode, keycodeCount, &keysymsPerKeycode),
+            &XFree);
+    QVERIFY(original);
+    QVERIFY(keycodeCount >= 2);
+    QVERIFY(keysymsPerKeycode > 0);
+
+    // CTest runs this executable under Xvfb. Restore its map even if an assertion fails.
+    const auto restoreKeymap = qScopeGuard([&] {
+        XChangeKeyboardMapping(display.get(), firstKeycode, keysymsPerKeycode, original.get(),
+                               keycodeCount);
+        XSync(display.get(), False);
+    });
+    std::vector<KeySym> keymap(original.get(),
+                              original.get() + keycodeCount * keysymsPerKeycode);
+    std::replace(keymap.begin(), keymap.end(), KeySym(XF86XK_Sleep), KeySym(NoSymbol));
+    std::replace(keymap.begin(), keymap.end(), KeySym(XF86XK_Suspend), KeySym(NoSymbol));
+    const KeyCode sleepKeycode = lastKeycode - 1;
+    const KeyCode suspendKeycode = lastKeycode;
+    const int sleepOffset = (sleepKeycode - firstKeycode) * keysymsPerKeycode;
+    const int suspendOffset = (suspendKeycode - firstKeycode) * keysymsPerKeycode;
+    std::fill(keymap.begin() + sleepOffset, keymap.end(), NoSymbol);
+    keymap[sleepOffset] = hasSleep ? XF86XK_Sleep : NoSymbol;
+    keymap[suspendOffset] = hasSuspend ? XF86XK_Suspend : NoSymbol;
+    XChangeKeyboardMapping(display.get(), firstKeycode, keysymsPerKeycode, keymap.data(),
+                           keycodeCount);
+    XSync(display.get(), False);
+
+    X11KeyHandler handler;
+    QVERIFY(handler.isAvailable());
+    QSignalSpy activationSpy(&handler, &X11KeyHandler::keyActivated);
+    QVERIFY(activationSpy.isValid());
+    const QString unrelatedId = QStringLiteral("test.unrelated");
+    QVERIFY(handler.registerKey(shortcut(unrelatedId, QStringLiteral("Ctrl+Alt+B"))));
+
+    // Read the shipped configs so combining the variants again reproduces the failure.
+    const QString iniPath = QFINDTESTDATA("../configs/org.deepin.dde.keybinding.ini");
+    QVERIFY(!iniPath.isEmpty());
+    const QString configDir = QFileInfo(iniPath).absolutePath();
+    const QString prefix = QStringLiteral("org.deepin.dde.keybinding.shortcut.");
+    const QStringList names{QStringLiteral("sleep"), QStringLiteral("suspend")};
+    for (const QString &name : names) {
+        QFile file(configDir + QLatin1Char('/') + prefix + name
+                   + QStringLiteral("/org.deepin.shortcut.json"));
+        QVERIFY(file.open(QIODevice::ReadOnly));
+        QJsonParseError error;
+        const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &error);
+        QCOMPARE(error.error, QJsonParseError::NoError);
+        const QJsonObject contents = document.object().value("contents").toObject();
+        const auto value = [&contents](const QString &key) {
+            return contents.value(key).toObject().value("value").toVariant();
+        };
+        KeyConfig config = shortcut(prefix + name, QString());
+        config.hotkeys = value("hotkeys").toStringList();
+        config.triggerType = value("triggerType").toInt();
+        config.triggerValue = value("triggerValue").toStringList();
+        QCOMPARE(config.triggerType, static_cast<int>(TriggerType::Command));
+        QCOMPARE(config.triggerValue, (QStringList{QStringLiteral("/usr/bin/dde-shortcut-tool"),
+                                                  QStringLiteral("power"),
+                                                  QStringLiteral("suspend")}));
+        QCOMPARE(handler.registerKey(config),
+                 name == QLatin1String("sleep") ? hasSleep : hasSuspend);
+    }
+
+    // Observe backend activation only; no executor is connected, so the test never suspends.
+    if (hasSleep) {
+        XTestFakeKeyEvent(display.get(), sleepKeycode, True, CurrentTime);
+        XTestFakeKeyEvent(display.get(), sleepKeycode, False, CurrentTime);
+        XFlush(display.get());
+        QTRY_COMPARE_WITH_TIMEOUT(activationSpy.size(), 1, 2000);
+        QCOMPARE(activationSpy.takeFirst().constFirst().toString(),
+                 prefix + QStringLiteral("sleep"));
+    }
+    if (hasSuspend) {
+        XTestFakeKeyEvent(display.get(), suspendKeycode, True, CurrentTime);
+        XTestFakeKeyEvent(display.get(), suspendKeycode, False, CurrentTime);
+        XFlush(display.get());
+        QTRY_COMPARE_WITH_TIMEOUT(activationSpy.size(), 1, 2000);
+        QCOMPARE(activationSpy.takeFirst().constFirst().toString(),
+                 prefix + QStringLiteral("suspend"));
+    }
+    sendTestChord(display.get());
+    QTRY_COMPARE_WITH_TIMEOUT(activationSpy.size(), 1, 2000);
+    QCOMPARE(activationSpy.constFirst().constFirst().toString(), unrelatedId);
 }
 
 QTEST_MAIN(TestX11GrabResilientShortcuts)
