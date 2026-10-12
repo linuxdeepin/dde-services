@@ -837,21 +837,22 @@ bool PowerManager::canEnterShortIdle() const
     return allowed;
 }
 
+// Polkit-gated (allow_inactive=auth_admin): skip while inactive, the wakeup path re-sends it.
 void PowerManager::setShortIdleState(bool state)
 {
-    if (m_shortIdleEnabled && m_proxy)
+    if (m_shortIdleEnabled && m_proxy && isSessionActive())
         m_proxy->setShortIdleState(state);
 }
 
 void PowerManager::setKernelIdleState(bool state)
 {
-    if (m_proxy)
+    if (m_proxy && isSessionActive())
         m_proxy->setIdleState(state);
 }
 
 void PowerManager::setScreenIdleState(bool state)
 {
-    if (m_proxy)
+    if (m_proxy && isSessionActive())
         m_proxy->setScreenState(state);
 }
 
