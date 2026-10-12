@@ -49,7 +49,7 @@ PowerController::~PowerController() = default;
 
 QStringList PowerController::commandActions()
 {
-    return QStringList{ "button", "switch-mode", "system-away", "show-ui" };
+    return QStringList{ "button", "switch-mode", "system-away", "show-ui", "suspend" };
 }
 
 QMap<QString, QString> PowerController::commandActionHelp()
@@ -58,7 +58,8 @@ QMap<QString, QString> PowerController::commandActionHelp()
         {"button", "Handle power button press event"},
         {"switch-mode", "Switch power performance mode"},
         {"system-away", "Lock the system"},
-        {"show-ui", "Show shutdown interface"}
+        {"show-ui", "Show shutdown interface"},
+        {"suspend", "Suspend the system"}
     };
 }
 
@@ -82,6 +83,9 @@ bool PowerController::execute(const QString &action, const QStringList &args)
         return true;
     } else if (action == "show-ui") {
         showShutdownUI();
+        return true;
+    } else if (action == "suspend") {
+        handleSystemSuspend();
         return true;
     }
 
@@ -120,6 +124,13 @@ void PowerController::handlePowerButton()
 
 void PowerController::handleSystemSuspend()
 {
+    // Check availability before locking: otherwise Sleep would lock the
+    // session (and stall 500 ms for the lock UI) on machines where suspend
+    // is unavailable, while systemSuspend() bails out right afterwards.
+    if (!canSuspend()) {
+        qInfo() << "PowerController: suspend not available";
+        return;
+    }
     DConfig *config = createPowerConfig(this);
     if (shouldLockOnSleep(config)) {
         doLock(true);

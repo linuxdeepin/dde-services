@@ -44,6 +44,15 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
 {
     if (!m_wrapper) return false;
 
+    // Treeland rejects bare Qt::Key_Sleep and rolls back the entire commit.
+    // Reject it before queuing any bindings. Remove this compatibility guard
+    // once the supported Treeland versions accept Sleep.
+    if (config.hotkeys.contains(QStringLiteral("Sleep"))) {
+        qCInfo(logShortcut) << "WaylandKeyHandler: Sleep is not supported by Treeland:"
+                           << config.getId();
+        return false;
+    }
+
     if (m_idToNames.contains(config.getId())) {
         unregisterKey(config.getId());
     }

@@ -246,7 +246,10 @@ bool QKeySequenceConverter::isMultimediaKey(Qt::Key key)
 {
     return (key >= Qt::Key_Back && key <= Qt::Key_Calculator) ||
            (key >= Qt::Key_AudioRewind && key <= Qt::Key_MediaLast) ||
-           (key >= Qt::Key_KeyboardLightOnOff && key <= Qt::Key_KeyboardBrightnessUp);
+           (key >= Qt::Key_KeyboardLightOnOff && key <= Qt::Key_KeyboardBrightnessUp) ||
+           // Qt places Key_Sleep outside the multimedia ranges (0x01020004),
+           // but hardware sleep keys (XF86Sleep) must still validate as hotkeys.
+           key == Qt::Key_Sleep;
 }
 
 QString QKeySequenceConverter::multimediaKeyToQKeySequenceName(Qt::Key key)
