@@ -49,6 +49,7 @@ private Q_SLOTS:
     void probeAbsentReportsUnavailable();
     void supportedTracksHardwareGoingOffline();
     void staysUnavailableAfterSamplingStop();
+    void unresponsiveSensorKeepsSupported();
 };
 
 void AmbientBrightnessCapabilityTest::initTestCase()
@@ -161,6 +162,20 @@ void AmbientBrightnessCapabilityTest::staysUnavailableAfterSamplingStop()
     QVERIFY(!service.supported());
     QCOMPARE(service.state(), QStringLiteral("Unavailable"));
     QCOMPARE(supportedSpy.count(), 0);
+}
+
+// 传感器不应答（总线不可达）时，采样路径只能改 State：Supported 归能力探测独占，
+// 不能因为"连不上传感器"就被清成 false，否则开关一开一关就会误报"本机没有光感"。
+void AmbientBrightnessCapabilityTest::unresponsiveSensorKeepsSupported()
+{
+    AmbientBrightnessService service(offlineConnection());
+    QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
+
+    service.handleSensorPresentChanged(true); // shouldRun() 为真 → 同步尝试连接传感器
+
+    QVERIFY(service.supported());
+    QCOMPARE(service.state(), QStringLiteral("Unavailable"));
+    QCOMPARE(supportedSpy.count(), 1); // 只被探测改写这一次
 }
 
 QTEST_GUILESS_MAIN(AmbientBrightnessCapabilityTest)
