@@ -45,6 +45,9 @@ constexpr auto kBrightenDebounceMsKey = "brightenDebounceMs";
 constexpr auto kDarkenDebounceMsKey = "darkenDebounceMs";
 constexpr int kInitialSampleTimeoutMs = 2000;
 constexpr int kRuntimeRecoveryRefreshDelayMs = 1000;
+/// 与 iio-sensor-proxy 之间单次同步调用的上限。对端正常时是百微秒级，这个值只为兜住
+/// "进程还在但不回消息"这一种情况：不让主线程落到 Qt 默认的 25 秒超时上。
+constexpr int kSensorCallTimeoutMs = 3000;
 
 bool variantToValidLux(const QVariant &value, double *lux)
 {
@@ -271,10 +274,28 @@ void AmbientBrightnessService::connectSensor()
 {
     disconnectSensor();
     auto systemBus = QDBusConnection::systemBus();
+
+    // QDBusInterface 构造时会同步内省远端，而且 setTimeout() 管不到那一步：对端卡死会落回
+    // 默认 25 秒。先用带显式超时的属性读取当闸门，确认对端会应答再构造接口。
+    // 读不通只改 State（Supported 由能力探测改写），下一次生命周期刷新会自动重试。
+    QDBusMessage gateRequest = QDBusMessage::createMethodCall(
+        QString::fromLatin1(kSensorService), QString::fromLatin1(kSensorPath),
+        QString::fromLatin1(kPropertiesInterface), QStringLiteral("Get"));
+    gateRequest << QString::fromLatin1(kSensorInterface) << QStringLiteral("HasAmbientLight");
+    const QDBusMessage gateReply = systemBus.call(gateRequest, QDBus::Block, kSensorCallTimeoutMs);
+    if (gateReply.type() != QDBusMessage::ReplyMessage) {
+        qCWarning(logAmbientBrightness) << "sensor not responding:" << gateReply.errorName()
+                                        << gateReply.errorMessage();
+        m_model.makeUnavailable();
+        return;
+    }
+
     m_sensor = new QDBusInterface(QString::fromLatin1(kSensorService),
                                   QString::fromLatin1(kSensorPath),
                                   QString::fromLatin1(kSensorInterface),
                                   systemBus, this);
+    // 这个接口上的属性读取与 ClaimLight 同样封顶。
+    m_sensor->setTimeout(kSensorCallTimeoutMs);
     if (!m_sensor->isValid()) {
         qCWarning(logAmbientBrightness) << "sensor interface invalid";
         delete m_sensor;
@@ -343,15 +364,30 @@ void AmbientBrightnessService::connectSensor()
 
 void AmbientBrightnessService::disconnectSensor()
 {
+    auto systemBus = QDBusConnection::systemBus();
     if (m_sensor || m_claimed)
         qCDebug(logAmbientBrightness) << "disconnecting sensor: claimed=" << m_claimed;
-    QDBusConnection::systemBus().disconnect(QString::fromLatin1(kSensorService),
-                                            QString::fromLatin1(kSensorPath),
-                                            QString::fromLatin1(kPropertiesInterface),
-                                            QStringLiteral("PropertiesChanged"), this,
-                                            SLOT(onPropertiesChanged(QString,QVariantMap,QStringList)));
-    if (m_sensor && m_claimed)
-        m_sensor->call(QStringLiteral("ReleaseLight"));
+    systemBus.disconnect(QString::fromLatin1(kSensorService),
+                         QString::fromLatin1(kSensorPath),
+                         QString::fromLatin1(kPropertiesInterface),
+                         QStringLiteral("PropertiesChanged"), this,
+                         SLOT(onPropertiesChanged(QString,QVariantMap,QStringList)));
+    if (m_sensor && m_claimed) {
+        // 释放不需要结果（下面本来就直接把 m_claimed 置 false），所以异步发出即可：
+        // 停止采样路径不再等对端回话。走连接而不是 m_sensor，也不受接口生命周期影响。
+        auto *watcher = new QDBusPendingCallWatcher(
+            systemBus.asyncCall(QDBusMessage::createMethodCall(
+                QString::fromLatin1(kSensorService), QString::fromLatin1(kSensorPath),
+                QString::fromLatin1(kSensorInterface), QStringLiteral("ReleaseLight"))),
+            this);
+        connect(watcher, &QDBusPendingCallWatcher::finished, watcher,
+                [](QDBusPendingCallWatcher *self) {
+                    if (self->isError())
+                        qCWarning(logAmbientBrightness)
+                            << "ReleaseLight failed" << self->error().message();
+                    self->deleteLater();
+                });
+    }
     m_claimed = false;
     m_claimInProgress = false;
     stopInitialSampleWait();
