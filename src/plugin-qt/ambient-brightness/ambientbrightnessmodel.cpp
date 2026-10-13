@@ -19,7 +19,6 @@ void AmbientBrightnessModel::waitForSample()
 {
     m_policy->reset();
     m_haveRecommendation = false;
-    setSupported(true);
     setState(QStringLiteral("WaitingForSample"));
 }
 
@@ -27,7 +26,6 @@ void AmbientBrightnessModel::makeUnavailable()
 {
     m_policy->reset();
     m_haveRecommendation = false;
-    setSupported(false);
     setState(QStringLiteral("Unavailable"));
 }
 
@@ -35,7 +33,6 @@ void AmbientBrightnessModel::setDisabled()
 {
     m_policy->reset();
     m_haveRecommendation = false;
-    setSupported(true);
     setState(QStringLiteral("Disabled"));
 }
 
@@ -88,7 +85,11 @@ void AmbientBrightnessModel::setPolicy(std::unique_ptr<AmbientBrightnessPolicy> 
     m_policy = std::move(policy);
     m_policy->reset();
     m_haveRecommendation = false;
-    setState(m_supported ? QStringLiteral("WaitingForSample") : QStringLiteral("Unavailable"));
+    // 重建策略只影响采样阶段的状态，不能把 Disabled/Unavailable 顶成 WaitingForSample。
+    if (m_state == QLatin1String("Disabled") || m_state == QLatin1String("Unavailable"))
+        return;
+    setState(m_supported ? QStringLiteral("WaitingForSample")
+                         : QStringLiteral("Unavailable"));
 }
 
 void AmbientBrightnessModel::setSupported(bool value)

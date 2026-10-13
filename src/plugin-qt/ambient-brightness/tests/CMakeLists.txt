@@ -23,3 +23,24 @@ target_link_libraries(tst-ambientbrightnesspolicy PRIVATE
 )
 
 add_test(NAME ambient-brightness-policy COMMAND tst-ambientbrightnesspolicy)
+
+add_executable(tst-ambientbrightnesscapability
+    tst_ambientbrightnesscapability.cpp
+    ../ambientbrightnessservice.cpp
+    ../ambientbrightnesspolicyfactory.cpp
+    ../ambientbrightnessmodel.cpp
+    ../ambientbrightnesslogging.cpp
+    ../brightnesscurve.cpp
+    ../continuous/continuousambientlightpolicy.cpp
+)
+
+target_include_directories(tst-ambientbrightnesscapability PRIVATE ..)
+
+target_link_libraries(tst-ambientbrightnesscapability PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Dtk6::Core
+    Qt6::Test
+)
+
+add_test(NAME ambient-brightness-capability COMMAND tst-ambientbrightnesscapability)
