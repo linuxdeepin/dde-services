@@ -1,3 +1,9 @@
+dde-services (1.0.30.3) unstable; urgency=medium
+
+  * test: capability test needs no dbus-daemon
+
+ -- fuleyi <fuleyi@uniontech.com>  Tue, 13 Oct 2026 13:57:24 +0800
+
 dde-services (1.0.30.2) unstable; urgency=medium
 
   * fix: ambient Supported reports hardware, not sampling
