@@ -2,88 +2,38 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 //
 // Supported 是"本机是否具备环境光传感器"的能力事实，与开关、盖子、休眠、
-// 会话状态无关。本用例自建一条私有 D-Bus 充当 system bus，并模拟
-// iio-sensor-proxy，验证该不变量。
+// 会话状态无关。
+//
+// 本用例不启动 D-Bus 守护进程，也不访问宿主机真实总线：服务状态机由
+// handleSensorPresentChanged() 等公开入口直接驱动，能力结论等价于异步探测
+// 回调的结果；私有连接与进程级 DBUS_SYSTEM_BUS_ADDRESS 都指向一个不可达
+// 地址。因此构建沙箱里没有 dbus-daemon 也能由 ctest 运行。
+//
+// 不覆盖（需要真实总线，属集成范畴）：LookupAmbientLightSensor 的回复解析、
+// ClaimLight/ReleaseLight 调用、LightLevelUnit 单位校验、WaitingForSample→Active。
 
 #include "ambientbrightnessservice.h"
 
 #include <QDBusConnection>
-#include <QDBusObjectPath>
-#include <QProcess>
 #include <QSignalSpy>
 
-#include <signal.h>
 #include <QTest>
 
 using namespace dde::ambient_brightness;
 
 namespace {
 
-constexpr auto kSensorService = "net.hadess.SensorProxy";
-constexpr auto kSensorPath = "/net/hadess/SensorProxy";
-constexpr auto kSensorInterface = "net.hadess.SensorProxy";
-constexpr auto kSensorObjectPath = "/net/hadess/SensorProxy/ambient_light";
+/// 本用例全程使用这个不可达地址：私有连接指向它，进程级 DBUS_SYSTEM_BUS_ADDRESS
+/// 也指向它，因此连析构路径里的静态 systemBus() 也不会去连宿主机真实总线。
+constexpr auto kOfflineBusAddress = "unix:path=/tmp/tst-ambient-brightness-offline";
 
-// 模拟 iio-sensor-proxy。作为 service name owner 注册，
-// 并提供 LookupAmbientLightSensor 供异步能力探测使用。
-class StubSensorProxy : public QObject
+/// 服务构造函数需要一个 QDBusConnection；本用例不依赖总线，给一个连接不上的
+/// 地址即可，任何意外的总线访问都只会失败。
+QDBusConnection offlineConnection()
 {
-    Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "net.hadess.SensorProxy")
-    Q_PROPERTY(bool HasAmbientLight READ hasAmbientLight)
-    Q_PROPERTY(QString LightLevelUnit READ lightLevelUnit)
-    Q_PROPERTY(double LightLevel READ lightLevel)
-
-public:
-    StubSensorProxy(bool hasAmbientLight, QString unit, QObject *parent = nullptr)
-        : QObject(parent)
-        , m_hasAmbientLight(hasAmbientLight)
-        , m_unit(std::move(unit))
-    {
-    }
-
-    ~StubSensorProxy() override
-    {
-        if (m_published) {
-            m_bus.unregisterObject(QString::fromLatin1(kSensorPath));
-            m_bus.unregisterService(QString::fromLatin1(kSensorService));
-        }
-    }
-
-    bool hasAmbientLight() const { return m_hasAmbientLight; }
-    QString lightLevelUnit() const { return m_unit; }
-    double lightLevel() const { return 42.0; }
-
-    bool publish(QDBusConnection bus)
-    {
-        if (!bus.registerService(QString::fromLatin1(kSensorService)))
-            return false;
-        if (!bus.registerObject(QString::fromLatin1(kSensorPath), this,
-                                QDBusConnection::ExportAllProperties
-                                    | QDBusConnection::ExportAllSlots))
-            return false;
-        m_bus = bus;
-        m_published = true;
-        return true;
-    }
-
-    int claimCount() const { return m_claimCount; }
-
-public Q_SLOTS:
-    QDBusObjectPath LookupAmbientLightSensor()
-    {
-        return QDBusObjectPath(QString::fromLatin1(kSensorObjectPath));
-    }
-    void ClaimLight() { ++m_claimCount; }
-    void ReleaseLight() {}
-
-private:
-    QDBusConnection m_bus = QDBusConnection::systemBus();
-    bool m_published = false;
-    bool m_hasAmbientLight = false;
-    QString m_unit;
-    int m_claimCount = 0;
-};
+    return QDBusConnection::connectToBus(QString::fromLatin1(kOfflineBusAddress),
+                                         QStringLiteral("tst-ambient-brightness"));
+}
 
 } // namespace
 
@@ -93,131 +43,124 @@ class AmbientBrightnessCapabilityTest : public QObject
 
 private Q_SLOTS:
     void initTestCase();
-    void cleanupTestCase();
     void supportedFollowsHardwareNotSwitch();
-    void supportedStaysTrueWhileRunning();
-    void supportedFalseWhenSensorAbsent();
-    void supportedFalseWhenUnitNotLux();
-    void supportedNotWrittenBySamplingStop();
-
-private:
-    QProcess *m_busDaemon = nullptr;
-    qint64 m_busDaemonPid = 0;
+    void supportedTrueWhileLidClosedKeepsSwitchOn();
+    void stopSamplingKeepsSupported();
+    void probeAbsentReportsUnavailable();
+    void supportedTracksHardwareGoingOffline();
+    void staysUnavailableAfterSamplingStop();
 };
 
-// 自建私有总线并伪装成 system bus：测试因此不依赖宿主机是否运行
-// iio-sensor-proxy，也不需要手工导出环境变量即可由 ctest 运行。
 void AmbientBrightnessCapabilityTest::initTestCase()
 {
     QLoggingCategory::setFilterRules(QStringLiteral("dde.ambientbrightness=false"));
-
-    m_busDaemon = new QProcess(this);
-    m_busDaemon->start(QStringLiteral("dbus-daemon"),
-                       { QStringLiteral("--session"), QStringLiteral("--print-address=1"),
-                         QStringLiteral("--print-pid=1"), QStringLiteral("--fork") });
-    QVERIFY(m_busDaemon->waitForFinished(5000));
-    const QString output = QString::fromUtf8(m_busDaemon->readAllStandardOutput());
-    const QString address = output.section(QLatin1Char('\n'), 0, 0).trimmed();
-    m_busDaemonPid = output.section(QLatin1Char('\n'), 1, 1).trimmed().toLongLong();
-    QVERIFY(!address.isEmpty());
-    qputenv("DBUS_SYSTEM_BUS_ADDRESS", address.toUtf8());
-    QVERIFY(QDBusConnection::systemBus().isConnected());
+    // 必须在第一次 QDBusConnection::systemBus() 之前设置（Qt 会缓存该连接）：
+    // 否则服务析构路径里的静态 systemBus().disconnect() 会连上宿主机真实总线。
+    qputenv("DBUS_SYSTEM_BUS_ADDRESS", kOfflineBusAddress);
+    // 前提断言：未探测时能力为"未知"（Supported=false、State=Unavailable），
+    // 且开关默认开启；本文件多个用例依赖这两个前提。
+    AmbientBrightnessService service(offlineConnection());
+    QVERIFY(!service.supported());
+    QCOMPARE(service.state(), QStringLiteral("Unavailable"));
+    QVERIFY(service.enabled());
 }
 
-void AmbientBrightnessCapabilityTest::cleanupTestCase()
-{
-    if (m_busDaemonPid > 0)
-        ::kill(static_cast<pid_t>(m_busDaemonPid), SIGTERM);
-}
-
+// 冷启动前就把开关置为关闭，随后探测到硬件：Supported 必须为 true —— 这正是
+// 原先 Supported 被误报为 false 的场景。
 void AmbientBrightnessCapabilityTest::supportedFollowsHardwareNotSwitch()
 {
-    StubSensorProxy proxy(true, QStringLiteral("lux"));
-    QVERIFY(proxy.publish(QDBusConnection::systemBus()));
-
-    AmbientBrightnessService service(QDBusConnection::systemBus());
+    AmbientBrightnessService service(offlineConnection());
     QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
-    // 冷启动前就把开关置为关闭：这正是原先 Supported 被误报为 false 的场景。
     QVERIFY(QMetaObject::invokeMethod(&service, "onAutomaticBrightnessEnabledChanged",
                                       Qt::DirectConnection, Q_ARG(bool, false)));
-    QVERIFY(service.initialize());
+    QVERIFY(!service.enabled());
 
-    // 异步探测返回"硬件存在"后，Supported 必须为 true。
-    QTRY_COMPARE_WITH_TIMEOUT(supportedSpy.count(), 1, 5000);
+    service.handleSensorPresentChanged(true);
+
+    QCOMPARE(supportedSpy.count(), 1);
     QVERIFY(service.supported());
     QVERIFY(!service.enabled());
     QCOMPARE(service.state(), QStringLiteral("Disabled"));
-    QCOMPARE(proxy.claimCount(), 0);
 }
 
-void AmbientBrightnessCapabilityTest::supportedStaysTrueWhileRunning()
+// 开关保持开启、盖子合上（硬件存在但不该采样）：Supported 依然为 true，
+// 证明它来自硬件探测而不是开关状态。
+void AmbientBrightnessCapabilityTest::supportedTrueWhileLidClosedKeepsSwitchOn()
 {
-    StubSensorProxy proxy(true, QStringLiteral("lux"));
-    QVERIFY(proxy.publish(QDBusConnection::systemBus()));
-
-    AmbientBrightnessService service(QDBusConnection::systemBus());
+    AmbientBrightnessService service(offlineConnection());
     QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
-    QVERIFY(service.initialize());
+    QVERIFY(QMetaObject::invokeMethod(&service, "onLidClosed", Qt::DirectConnection));
 
-    QTRY_COMPARE_WITH_TIMEOUT(supportedSpy.count(), 1, 5000);
+    service.handleSensorPresentChanged(true);
+
+    QCOMPARE(supportedSpy.count(), 1);
     QVERIFY(service.supported());
-    // 开关默认开启：探测通过后应真实 Claim 传感器。
-    QTRY_COMPARE_WITH_TIMEOUT(proxy.claimCount(), 1, 5000);
-    QCOMPARE(service.state(), QStringLiteral("WaitingForSample"));
+    QVERIFY(service.enabled());
+    QCOMPARE(service.state(), QStringLiteral("Disabled"));
+}
 
-    // 运行中关闭开关：释放 Claim，但能力事实不变。
-    QVERIFY(QMetaObject::invokeMethod(&service, "onAutomaticBrightnessEnabledChanged",
-                                      Qt::DirectConnection, Q_ARG(bool, false)));
+// 运行中关闭开关（→ stopSampling）：只停止采样，Supported 不得被改写。
+void AmbientBrightnessCapabilityTest::stopSamplingKeepsSupported()
+{
+    AmbientBrightnessService service(offlineConnection());
+    QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
+    QVERIFY(QMetaObject::invokeMethod(&service, "onLidClosed", Qt::DirectConnection));
+    service.handleSensorPresentChanged(true);
+    QVERIFY(service.supported());
+
+    service.Enable(false);
+
+    QVERIFY(!service.enabled());
     QVERIFY(service.supported());
     QCOMPARE(service.state(), QStringLiteral("Disabled"));
     QCOMPARE(supportedSpy.count(), 1);
 }
 
-void AmbientBrightnessCapabilityTest::supportedFalseWhenSensorAbsent()
+void AmbientBrightnessCapabilityTest::probeAbsentReportsUnavailable()
 {
-    // 没有 iio-sensor-proxy：能力探测应判定为不支持。
-    AmbientBrightnessService service(QDBusConnection::systemBus());
+    AmbientBrightnessService service(offlineConnection());
     QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
-    QVERIFY(service.initialize());
 
-    QTRY_COMPARE_WITH_TIMEOUT(service.state(), QStringLiteral("Unavailable"), 5000);
+    service.handleSensorPresentChanged(false);
+
     QVERIFY(!service.supported());
+    QCOMPARE(service.state(), QStringLiteral("Unavailable"));
+    // 本来就是 false：不得发出多余的 supportedChanged。
     QCOMPARE(supportedSpy.count(), 0);
 }
 
-void AmbientBrightnessCapabilityTest::supportedFalseWhenUnitNotLux()
+void AmbientBrightnessCapabilityTest::supportedTracksHardwareGoingOffline()
 {
-    StubSensorProxy proxy(true, QStringLiteral("counts"));
-    QVERIFY(proxy.publish(QDBusConnection::systemBus()));
-
-    AmbientBrightnessService service(QDBusConnection::systemBus());
+    AmbientBrightnessService service(offlineConnection());
     QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
-    QVERIFY(service.initialize());
+    QVERIFY(QMetaObject::invokeMethod(&service, "onLidClosed", Qt::DirectConnection));
 
-    // 探测先报 true（服务在且提供光感对象），随后单位校验否定 → true 再 false。
-    QTRY_COMPARE_WITH_TIMEOUT(supportedSpy.count(), 2, 5000);
+    service.handleSensorPresentChanged(true);
+    QVERIFY(service.supported());
+    QCOMPARE(supportedSpy.count(), 1);
+
+    // 传感器服务退出：Supported 随之变 false 并对外广播。
+    service.handleSensorPresentChanged(false);
+
+    QCOMPARE(supportedSpy.count(), 2);
+    QCOMPARE(supportedSpy.at(1).at(0).toBool(), false);
     QVERIFY(!service.supported());
     QCOMPARE(service.state(), QStringLiteral("Unavailable"));
-    QCOMPARE(proxy.claimCount(), 0);
 }
 
-void AmbientBrightnessCapabilityTest::supportedNotWrittenBySamplingStop()
+void AmbientBrightnessCapabilityTest::staysUnavailableAfterSamplingStop()
 {
-    StubSensorProxy proxy(true, QStringLiteral("lux"));
-    QVERIFY(proxy.publish(QDBusConnection::systemBus()));
-
-    AmbientBrightnessService service(QDBusConnection::systemBus());
+    AmbientBrightnessService service(offlineConnection());
     QSignalSpy supportedSpy(&service, &AmbientBrightnessService::supportedChanged);
-    QVERIFY(service.initialize());
+    service.handleSensorPresentChanged(false);
+    QVERIFY(!service.supported());
 
-    QTRY_COMPARE_WITH_TIMEOUT(proxy.claimCount(), 1, 5000);
-    QVERIFY(service.supported());
+    service.Enable(false);
 
-    // 合盖只应停止采样；Supported 是能力事实，不得被采样停止改写。
-    QVERIFY(QMetaObject::invokeMethod(&service, "onLidClosed", Qt::DirectConnection));
-    QVERIFY(service.supported());
-    QCOMPARE(service.state(), QStringLiteral("Disabled"));
-    QCOMPARE(supportedSpy.count(), 1);
+    QVERIFY(!service.enabled());
+    QVERIFY(!service.supported());
+    QCOMPARE(service.state(), QStringLiteral("Unavailable"));
+    QCOMPARE(supportedSpy.count(), 0);
 }
 
 QTEST_GUILESS_MAIN(AmbientBrightnessCapabilityTest)
