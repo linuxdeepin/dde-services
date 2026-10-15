@@ -82,13 +82,15 @@ static bool processHasGroup(uint pid, gid_t gid)
     if (!file.open(QIODevice::ReadOnly))
         return false;
 
-    while (!file.atEnd()) {
-        const QString line = QString::fromLatin1(file.readLine());
-        if (!line.startsWith(QLatin1String("Gid:")) && !line.startsWith(QLatin1String("Groups:")))
+    // procfs reports size zero, so atEnd() is true even before the first read.
+    for (QByteArray data = file.readLine(); !data.isEmpty(); data = file.readLine()) {
+        if (!data.startsWith("Gid:") && !data.startsWith("Groups:"))
             continue;
-        const QStringList values = line.section(QLatin1Char(':'), 1).split(QChar::Space, Qt::SkipEmptyParts);
+        const QString line = QString::fromLatin1(data);
+        const QStringList values = line.section(QLatin1Char(':'), 1).simplified().split(QChar::Space, Qt::SkipEmptyParts);
         for (const QString &value : values) {
-            if (value.toUInt() == gid)
+            bool ok = false;
+            if (value.toUInt(&ok) == gid && ok)
                 return true;
         }
     }
@@ -101,10 +103,10 @@ static bool readParentPid(uint pid, uint &parent)
     if (!file.open(QIODevice::ReadOnly))
         return false;
 
-    while (!file.atEnd()) {
-        const QString line = QString::fromLatin1(file.readLine());
-        if (!line.startsWith(QLatin1String("PPid:")))
+    for (QByteArray data = file.readLine(); !data.isEmpty(); data = file.readLine()) {
+        if (!data.startsWith("PPid:"))
             continue;
+        const QString line = QString::fromLatin1(data);
         bool ok = false;
         parent = line.section(QLatin1Char(':'), 1).trimmed().toUInt(&ok);
         return ok;
