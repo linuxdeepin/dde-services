@@ -12,7 +12,10 @@
 #include <QMutex>
 
 // Shared cache path constants
-inline const QString kWallpaperCacheDir = QStringLiteral("/var/cache/dde-wallpaper-cache");
+#ifndef WALLPAPER_CACHE_DIR
+#define WALLPAPER_CACHE_DIR "/var/cache/dde-wallpaper-cache"
+#endif
+inline const QString kWallpaperCacheDir = QStringLiteral(WALLPAPER_CACHE_DIR);
 inline const QString kBlurCacheDir = kWallpaperCacheDir + QStringLiteral("/blur");
 
 class CachedWallpaper : public QObject
@@ -29,6 +32,7 @@ signals:
 public:
     static CachedWallpaper *instance();
     QStringList getCachedImagePaths(const QString &originalPath, const QList<QSize> &sizes, bool isMd5Path = false);
+    QStringList findCachedImagePaths(const QString &pathMd5, const QList<QSize> &sizes) const;
     void cacheImage(const QString &originalPathMd5, const QString &size, const QString &processedPath);
 
     // Blur wallpaper interfaces
