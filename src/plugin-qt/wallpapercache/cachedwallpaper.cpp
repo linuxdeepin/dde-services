@@ -37,18 +37,13 @@ QStringList CachedWallpaper::getCachedImagePaths(const QString &originalPath, co
 
     QString pathMd5 = ScaleImageThread::pathMd5(originalPath, isMd5Path);
 
-    if (m_cachedImages.contains(pathMd5)) {
-        const QMap<QString, QString> &map = m_cachedImages[pathMd5];
-        for (const QSize &size : sizes) {
-            QString strSize = ScaleImageThread::sizeToString(size);
-            if (map.contains(strSize)) {
-                results.append(map[strSize]);
-            } else {
-                noCachedSizes.append(size);
-            }
+    for (const QSize &size : sizes) {
+        const QStringList cached = findCachedImagePaths(pathMd5, {size});
+        if (cached.isEmpty()) {
+            noCachedSizes.append(size);
+        } else {
+            results.append(cached);
         }
-    } else {
-        noCachedSizes = sizes;
     }
 
     if (!noCachedSizes.isEmpty()) {
@@ -56,6 +51,23 @@ QStringList CachedWallpaper::getCachedImagePaths(const QString &originalPath, co
         Q_EMIT needHandleImage(originalPath, noCachedSizes, isMd5Path);
     }
 
+    return results;
+}
+
+QStringList CachedWallpaper::findCachedImagePaths(const QString &pathMd5, const QList<QSize> &sizes) const
+{
+    QStringList results;
+    const auto it = m_cachedImages.constFind(pathMd5);
+    if (it == m_cachedImages.constEnd())
+        return results;
+
+    for (const QSize &size : sizes) {
+        const QString path = it->value(ScaleImageThread::sizeToString(size));
+        const QFileInfo info(path);
+        if (path.isEmpty() || !info.isFile() || !info.isReadable() || info.size() == 0)
+            return {};
+        results.append(path);
+    }
     return results;
 }
 

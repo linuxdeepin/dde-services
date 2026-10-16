@@ -11,6 +11,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QImageReader>
+#include <QDir>
+#include <QRegularExpression>
+#include <QTemporaryFile>
+
+#include <cerrno>
+#include <cstdio>
 
 #include <unistd.h>
 
@@ -23,6 +29,10 @@ QList<QSize> WallpaperCacheService::parseSizeArray(const QVariantList &sizeArray
 {
     QList<QSize> sizes;
     for (const QVariant &variant : sizeArray) {
+        if (variant.canConvert<QSize>()) {
+            sizes.append(variant.toSize());
+            continue;
+        }
         auto arg = variant.value<QDBusArgument>();
         QSize size;
         arg >> size;
@@ -50,13 +60,20 @@ QStringList WallpaperCacheService::GetProcessedImagePaths(const QString &origina
 
 QStringList WallpaperCacheService::GetProcessedImagePathByFd(const QDBusUnixFileDescriptor &fd, const QString &imagePathMd5, const QVariantList &sizeArray)
 {
+    const QList<QSize> sizes = parseSizeArray(sizeArray);
+    if (fd.fileDescriptor() < 0)
+        return {};
+
+    const QStringList cached = CachedWallpaper::instance()->findCachedImagePaths(imagePathMd5, sizes);
+    if (!sizes.isEmpty() && cached.size() == sizes.size())
+        return cached;
+
     QString destinationPath = saveImageFromFd(fd, imagePathMd5);
     if (destinationPath.isEmpty()) {
         return QStringList();
     }
 
     qDebug() << "get processed image from origin path:" << destinationPath;
-    QList<QSize> sizes = parseSizeArray(sizeArray);
 
     QStringList results = CachedWallpaper::instance()->getCachedImagePaths(destinationPath, sizes, true);
     if (results.isEmpty()) {
@@ -89,6 +106,9 @@ QStringList WallpaperCacheService::GetProcessedImageWithBlur(const QString &orig
 
 QStringList WallpaperCacheService::GetProcessedImagePathByFdWithBlur(const QDBusUnixFileDescriptor &fd, const QString &imagePathMd5, const QVariantList &sizeArray, bool needBlur)
 {
+    if (!needBlur)
+        return GetProcessedImagePathByFd(fd, imagePathMd5, sizeArray);
+
     QString destinationPath = saveImageFromFd(fd, imagePathMd5);
     if (destinationPath.isEmpty()) {
         return QStringList();
@@ -97,15 +117,7 @@ QStringList WallpaperCacheService::GetProcessedImagePathByFdWithBlur(const QDBus
     qDebug() << "get processed image from origin path:" << destinationPath;
     QList<QSize> sizes = parseSizeArray(sizeArray);
 
-    if (needBlur) {
-        return CachedWallpaper::instance()->getProcessedImageWithBlur(destinationPath, sizes, needBlur);
-    } else {
-        QStringList results = CachedWallpaper::instance()->getCachedImagePaths(destinationPath, sizes, true);
-        if (results.isEmpty()) {
-            results << destinationPath;
-        }
-        return results;
-    }
+    return CachedWallpaper::instance()->getProcessedImageWithBlur(destinationPath, sizes, true);
 }
 
 QStringList WallpaperCacheService::GetWallpaperListForScreen(const QString &originalPath, const QVariantList &sizeArray, bool needBlur)
@@ -174,46 +186,57 @@ void WallpaperCacheService::ClearEffectCache(const QString &effect)
 
 QString WallpaperCacheService::saveImageFromFd(const QDBusUnixFileDescriptor &fd, const QString &imagePathMd5)
 {
-    int fdi = fd.fileDescriptor();
-    if (fdi <= 0) {
-        return QString();
-    }
+    const int fdi = fd.fileDescriptor();
+    static const QRegularExpression md5Pattern(QStringLiteral("\\A[0-9a-fA-F]{32}\\z"));
+    if (fdi < 0 || !md5Pattern.match(imagePathMd5).hasMatch())
+        return {};
 
-    QString originPath = kWallpaperCacheDir + "/" + imagePathMd5;
-    QFile originFile(originPath);
-    if (!originFile.open(QIODevice::ReadWrite)) {
-        qWarning() << "Failed to open destination file for writing:" << originPath;
-        return QString();
-    }
+    if (!QDir().mkpath(kWallpaperCacheDir))
+        return {};
 
-    char buffer[4096];
-    ssize_t bytesRead;
-    while ((bytesRead = read(fdi, buffer, sizeof(buffer))) > 0) {
-        if (originFile.write(buffer, bytesRead) != bytesRead) {
-            qWarning() << "Failed to write data to destination file.";
+    // Import privately: failed or concurrent copies must never expose a partial
+    // image under the shared source name.
+    QTemporaryFile originFile(kWallpaperCacheDir + "/.fd-import-XXXXXX");
+    if (!originFile.open()) {
+        qWarning() << "Failed to create imported image:" << originFile.errorString();
+        return {};
+    }
+    // Imported sources are returned over D-Bus and read by other clients.
+    if (!originFile.setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther))
+        return {};
+
+    char buffer[64 * 1024];
+    for (;;) {
+        const ssize_t bytesRead = read(fdi, buffer, sizeof(buffer));
+        if (bytesRead < 0) {
+            if (errno == EINTR)
+                continue;
+            qWarning() << "Error reading image descriptor:" << errno;
+            return {};
+        }
+        if (bytesRead == 0)
             break;
+        if (originFile.write(buffer, bytesRead) != bytesRead) {
+            qWarning() << "Failed to write imported image:" << originFile.errorString();
+            return {};
         }
     }
-    if (bytesRead < 0) {
-        qWarning() << "Error reading from file descriptor.";
-        originFile.close();
-        return QString();
-    }
-    originFile.close();
+    if (!originFile.flush())
+        return {};
 
-    // Detect format using static method to avoid loading entire image
-    QByteArray format = QImageReader::imageFormat(originPath);
+    const QByteArray format = QImageReader::imageFormat(originFile.fileName());
     if (format.isEmpty()) {
-        qWarning() << "Failed to detect image format:" << originPath;
-        QFile::remove(originPath);
-        return QString();
+        qWarning() << "Failed to detect imported image format";
+        return {};
     }
-    QString destinationPath = originPath + QString(".%1").arg(QString::fromLatin1(format));
-    QFile file(originPath);
-    if (!file.rename(destinationPath)) {
-        qWarning() << "originPath rename failed";
-        return QString();
+    const QString destinationPath = kWallpaperCacheDir + "/" + imagePathMd5 + "." + QString::fromLatin1(format);
+    // POSIX rename atomically replaces an earlier import, including a longer
+    // image. Existing readers retain their opened file until they finish.
+    if (::rename(QFile::encodeName(originFile.fileName()).constData(),
+                 QFile::encodeName(destinationPath).constData()) != 0) {
+        qWarning() << "Failed to publish imported image:" << errno;
+        return {};
     }
-
+    originFile.setAutoRemove(false);
     return destinationPath;
 }

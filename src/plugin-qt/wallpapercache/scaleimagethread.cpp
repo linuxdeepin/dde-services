@@ -97,12 +97,14 @@ bool ScaleImageThread::isIdle()
 
 void ScaleImageThread::run()
 {
-    while (!m_stop) {
+    for (;;) {
         QMutexLocker locker(&m_mutex);
 
-        if (m_tasks.isEmpty()) {
+        while (m_tasks.isEmpty() && !m_stop) {
             m_waitCondition.wait(&m_mutex);
         }
+        if (m_stop)
+            return;
 
         if (!m_tasks.isEmpty()) {
             TaskData task = m_tasks.head();
@@ -128,15 +130,10 @@ void ScaleImageThread::executeTask(const TaskData &task)
     QString originalPathMd5 = pathMd5(task.originalPath, task.isMd5Path);
     QString cachedFilePath = cacheImageToDisk(pixmap, task, originalPathMd5);
 
+    // Keep the imported source as a cache entry. Other queued sizes and
+    // clients receiving it as the immediate fallback may still need it.
     if (!cachedFilePath.isEmpty()) {
         Q_EMIT imageScaled(originalPathMd5, sizeToString(task.targetSize), cachedFilePath);
-
-        if (task.isMd5Path) {
-            QFile file(task.originalPath);
-            if (file.exists()) {
-                file.remove();
-            }
-        }
     }
 }
 

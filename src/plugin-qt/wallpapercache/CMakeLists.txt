@@ -13,6 +13,7 @@ set(CMAKE_AUTORCC ON)
 
 include(GNUInstallDirs)
 file(GLOB_RECURSE SRCS "*.h" "*.cpp")
+list(FILTER SRCS EXCLUDE REGEX "/tests/")
 
 find_package(PkgConfig REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui DBus)
