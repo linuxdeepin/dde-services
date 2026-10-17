@@ -1,0 +1,16 @@
+[Unit]
+Description=Pre-generate wallpaper blur cache for default wallpaper
+Documentation=https://pms.uniontech.com/bug-view-335593.html
+After=dbus.service
+Before=display-manager.service
+ConditionPathExists=/usr/share/backgrounds/default_background.jpg
+ConditionPathExists=!/var/cache/dde-wallpaper-cache/blur
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/deepin-service-manager/wallpaper-cache-preheat.sh
+TimeoutStartSec=60
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target
