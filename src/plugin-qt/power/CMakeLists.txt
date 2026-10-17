@@ -5,6 +5,10 @@
 add_subdirectory(session)
 add_subdirectory(system)
 
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.dde.daemon.power.json
     DESTINATION ${CMAKE_INSTALL_DATADIR}/dsg/configs/org.deepin.dde.daemon/
 )
