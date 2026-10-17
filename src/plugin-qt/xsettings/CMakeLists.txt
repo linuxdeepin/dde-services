@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+# SPDX-FileCopyrightText: 2023 - 2026 UnionTech Software Technology Co., Ltd.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 set(BIN_NAME "plugin-dde-xsettings")
@@ -11,6 +11,7 @@ set(CMAKE_AUTORCC ON)
 
 include(GNUInstallDirs)
 file(GLOB_RECURSE SRCS "*.h" "*.cpp")
+list(FILTER SRCS EXCLUDE REGEX "/tests/")
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus)
 find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Gui Core)
@@ -45,3 +46,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/org.deepin.dde.XSettings1.service
     RENAME org.deepin.dde.XSettings1.service
 )
 install_user_symlink(org.deepin.dde.XSettings1.service dde-session-pre.target.wants)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
