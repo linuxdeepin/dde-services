@@ -1,3 +1,11 @@
+dde-services (1.0.47) unstable; urgency=medium
+
+  * fix: preserve wallpaper FD imports and reuse valid cached images
+  * fix(power): deny inactive authorization without prompting
+  * refactor: improve thememanager logging and date handling
+
+ -- zhangkun <zhangkun2@uniontech.com>  Tue, 20 Oct 2026 21:31:05 +0800
+
 dde-services (1.0.46) unstable; urgency=medium
 
   * fix(power): avoid polkit prompt on resume
