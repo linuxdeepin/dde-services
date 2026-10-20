@@ -310,6 +310,9 @@ bool SystemPowerManager::authorizePowerAction()
         return false;
     }
     if (result != PolkitQt1::Authority::Yes) {
+        qWarning(logPowerSystem) << "Polkit authorization denied: action=" << kPowerAction
+                                 << "sender=" << sender << "interface=" << message().interface()
+                                 << "member=" << message().member();
         sendErrorReply(QDBusError::AccessDenied, QStringLiteral("Authentication failed"));
         return false;
     }
