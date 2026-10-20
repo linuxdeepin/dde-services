@@ -1,0 +1,14 @@
+{
+    "name": "org.deepin.dde.Audio1",
+    "pluginPath": "libplugin_rust_audio.so",
+    "group": "audio",
+    "pluginType": "rust",
+    "version": "1.0",
+    "startType": "Resident",
+    "policy": [
+        {
+            "path": "/org/deepin/dde/Audio1",
+            "pathhide": false
+        }
+    ]
+}
