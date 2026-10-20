@@ -1,10 +1,9 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "sunrisesunset.h"
 
-#include <QDebug>
 #include <QtMath>
 #include <QTime>
 
@@ -96,8 +95,9 @@ bool SunriseSunset::getSunriseSunset(double latitude, double longitude, double u
     if (sunsetUT <= -100) // 长昼 返回的sunrise-sunset区间用于判断当前是否为白天
         sunsetUT = 100;
 
-    sunrise = date.startOfDay().addMSecs(static_cast<int>(sunriseUT * 3600 * 1000));
-    sunset = date.startOfDay().addMSecs(static_cast<int>(sunsetUT * 3600 * 1000));
-    qInfo() << __FUNCTION__ << date << latitude << longitude << sunriseUT << sunrise << sunsetUT << sunset;
+    const QDateTime startOfDay = date.startOfDay();
+    sunrise = startOfDay.addMSecs(static_cast<int>(sunriseUT * 3600 * 1000));
+    sunset = startOfDay.addMSecs(static_cast<int>(sunsetUT * 3600 * 1000));
+
     return true;
 }

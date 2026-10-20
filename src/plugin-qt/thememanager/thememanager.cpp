@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
@@ -158,6 +158,16 @@ void ThemeManager::autoSetTheme(double latitude, double longitude)
     }
 
     if (m_curThemeType != themeType) {
+        qInfo().noquote().nospace()
+            << "[thememanager] Auto theme change requested: from="
+            << (m_curThemeType.isEmpty() ? QStringLiteral("unset") : m_curThemeType)
+            << ", to=" << themeType
+            << ", current_time=" << curr.toString(Qt::ISODate)
+            << ", latitude=" << latitude
+            << ", longitude=" << longitude
+            << ", utc_offset_hours=" << utcOffset
+            << ", sunrise=" << sunrise.toString(Qt::ISODate)
+            << ", sunset=" << sunset.toString(Qt::ISODate);
         m_curThemeType = themeType;
         doSetGlobalTheme(themeType);
     }
