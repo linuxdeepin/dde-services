@@ -12,6 +12,7 @@ set(CMAKE_AUTORCC ON)
 
 include(GNUInstallDirs)
 file(GLOB_RECURSE SRCS "*.h" "*.cpp")
+list(FILTER SRCS EXCLUDE REGEX "/tests/")
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core DBus)
 find_package(Dtk${DTK_VERSION_MAJOR} REQUIRED COMPONENTS Gui Core)
@@ -34,3 +35,7 @@ target_link_libraries(${BIN_NAME} PRIVATE
 
 install(TARGETS ${BIN_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-service-manager/)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plugin-qt-thememanager.json DESTINATION share/deepin-service-manager/user/)
+
+if(BUILD_TESTING)
+    add_subdirectory("tests")
+endif()
