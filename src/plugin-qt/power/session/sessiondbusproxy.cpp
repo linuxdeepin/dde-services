@@ -8,6 +8,7 @@
 #include <QDBusConnection>
 #include <QDBusArgument>
 #include <QDBusInterface>
+#include <QDBusMessage>
 #include <QDBusPendingCallWatcher>
 #include <QDBusPendingReply>
 #include <QDBusReply>
@@ -21,6 +22,12 @@ namespace {
 constexpr auto kAmbientBrightnessService = "org.deepin.dde.AmbientBrightness1";
 constexpr auto kAmbientBrightnessPath = "/org/deepin/dde/AmbientBrightness1";
 constexpr auto kAmbientBrightnessInterface = "org.deepin.dde.AmbientBrightness1";
+
+void asyncShutdownFrontCall(const QString &method)
+{
+    QDBusConnection::sessionBus().asyncCall(QDBusMessage::createMethodCall(
+        kShutdownFront, kShutdownPath, kShutdownFront, method));
+}
 }
 
 SessionDBusProxy::SessionDBusProxy(QObject *parent)
@@ -31,18 +38,9 @@ SessionDBusProxy::SessionDBusProxy(QObject *parent)
     , m_sessionManagerInter(new DDBusInterface(
           kSessionManager, kSessionPath, kSessionManager,
           QDBusConnection::sessionBus(), this))
-    , m_shutdownFrontInter(new DDBusInterface(
-          kShutdownFront, kShutdownPath, kShutdownFront,
-          QDBusConnection::sessionBus(), this))
     , m_login1Inter(new DDBusInterface(
           kLogin1Service, kLogin1Path, kLogin1Manager,
           QDBusConnection::systemBus(), this))
-    , m_lockFrontInter(new DDBusInterface(
-          kLockFront, kLockFrontPath, kLockFront,
-          QDBusConnection::sessionBus(), this))
-    , m_blackScreenInter(new DDBusInterface(
-          kBlackScreen, kBlackScreenPath, kBlackScreen,
-          QDBusConnection::sessionBus(), this))
     , m_displayInter(new DDBusInterface(
           kDisplay, kDisplayPath, kDisplay,
           QDBusConnection::sessionBus(), nullptr))
@@ -322,22 +320,31 @@ bool SessionDBusProxy::canHibernate()
 
 void SessionDBusProxy::requestSuspendByFront()
 {
-    m_shutdownFrontInter->asyncCall("Suspend");
+    // Raw messages only: a DDBusInterface call resolves the remote meta object
+    // with a blocking Introspect, which deadlocks while the front-end is busy.
+    asyncShutdownFrontCall(QStringLiteral("Suspend"));
 }
 
 void SessionDBusProxy::requestHibernateByFront()
 {
-    m_shutdownFrontInter->asyncCall("Hibernate");
+    asyncShutdownFrontCall(QStringLiteral("Hibernate"));
 }
 
 void SessionDBusProxy::requestShutdownByFront()
 {
-    m_shutdownFrontInter->asyncCall("Shutdown");
+    asyncShutdownFrontCall(QStringLiteral("Shutdown"));
 }
 
 void SessionDBusProxy::showLockAuth(bool autoStart)
 {
-    m_lockFrontInter->call("ShowAuth", autoStart);
+    // Keep the synchronous barrier, but never wait for the front-end's own
+    // blocking call to finish: one second is enough to deliver ShowAuth.
+    QDBusMessage msg = QDBusMessage::createMethodCall(
+        kLockFront, kLockFrontPath, kLockFront, QStringLiteral("ShowAuth"));
+    msg << autoStart;
+    const QDBusMessage reply = QDBusConnection::sessionBus().call(msg, QDBus::Block, 1000);
+    if (reply.type() == QDBusMessage::ErrorMessage)
+        qWarning("[Proxy] ShowAuth(%d) failed: %s", autoStart, qPrintable(reply.errorMessage()));
 }
 
 void SessionDBusProxy::lockSession(const QString &sessionId)
@@ -369,7 +376,8 @@ QDBusMessage SessionDBusProxy::listSessions() const
 
 void SessionDBusProxy::setBlackScreenActive(bool active)
 {
-    m_blackScreenInter->asyncCall("setActive", active);
+    QDBusConnection::sessionBus().asyncCall(QDBusMessage::createMethodCall(
+        kBlackScreen, kBlackScreenPath, kBlackScreen, QStringLiteral("setActive")) << active);
     QDBusInterface kwin(QStringLiteral("org.kde.KWin"), QStringLiteral("/BlackScreen"),
                         QStringLiteral("org.kde.kwin.BlackScreen"),
                         QDBusConnection::sessionBus());
