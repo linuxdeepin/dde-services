@@ -52,6 +52,7 @@ set(_src_headers
     lowpowermanager.h
     powermanager.h
     sessiondbusproxy.h
+    soundeffectutil.h
 )
 
 file(GLOB TS_FILES translations/*.ts)
