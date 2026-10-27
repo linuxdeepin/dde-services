@@ -6,6 +6,8 @@
 
 #include "backend/abstractgesturehandler.h"
 
+#include <QMap>
+
 class TreelandShortcutWrapper;
 
 class WaylandGestureHandler : public AbstractGestureHandler
@@ -22,9 +24,11 @@ public:
 
 private slots:
     void onActivated(const QString &name, uint32_t flags);
+    void onBindFailed(const QString &name, uint32_t error);
 
 private:
     TreelandShortcutWrapper *m_wrapper = nullptr;
 
-    QStringList m_bindings; // List of binding names
+    QMap<QString, QString> m_bindings; // Config id -> unique wire name
+    quint64 m_bindingSerial = 0;
 };

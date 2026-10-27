@@ -31,6 +31,8 @@ void TestGestureActionCatalog::swipeActionsFollowFingerClassification()
     const QList<GestureActionId> treelandThreeFinger = {
         GestureActionId::MaximizeWindow,
         GestureActionId::RestoreWindow,
+        GestureActionId::SplitWindowLeft,
+        GestureActionId::SplitWindowRight,
         GestureActionId::Disable,
     };
     const QList<GestureActionId> x11FourFinger = {
@@ -149,9 +151,9 @@ void TestGestureActionCatalog::hidesUnsupportedTreelandActions()
     threeFingerSwipe.gestureType = int(GestureType::Swipe);
     threeFingerSwipe.fingerCount = 3;
 
-    QVERIFY(!GestureActionCatalog::find(
+    QVERIFY(GestureActionCatalog::find(
             threeFingerSwipe, GestureActionId::SplitWindowLeft, GestureBackend::Treeland));
-    QVERIFY(!GestureActionCatalog::find(
+    QVERIFY(GestureActionCatalog::find(
             threeFingerSwipe, GestureActionId::SplitWindowRight, GestureBackend::Treeland));
     QVERIFY(!GestureActionCatalog::find(
             threeFingerSwipe, GestureActionId::ToggleLauncher, GestureBackend::Treeland));

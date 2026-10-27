@@ -82,10 +82,12 @@ private slots:
     void onGestureConfigChanged(const GestureConfig &config);
     void onGestureConfigRemoved(const QString &id);
     void onGestureActivated(const QString &gestureId);
+    void onGestureRegistrationFailed(const QString &id);
     void onHandlerAvailabilityChanged(bool available);
 
 private:
     bool registerGesture(const GestureConfig &config);
+    void restoreGesture(const GestureConfig &config, bool wasActive);
     void setGestureActive(const GestureConfig &config);
     bool setGestureInactive(const QString &id);
     QString LookupConflictGesture(int gestureType, int fingerCount, int direction);

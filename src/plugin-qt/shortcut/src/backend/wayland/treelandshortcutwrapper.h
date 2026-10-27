@@ -5,12 +5,13 @@
 #pragma once
 
 #include <QObject>
+#include <QSet>
 #include <QWaylandClientExtension>
 
-#include "qwayland-treeland-shortcut-manager-v2.h"
+#include "qwayland-treeland-shortcut-manager-unstable-v3.h"
 
 class TreelandShortcutWrapper : public QWaylandClientExtensionTemplate<TreelandShortcutWrapper>,
-                        public QtWayland::treeland_shortcut_manager_v2
+                        public QtWayland::treeland_shortcut_manager_v3
 {
     Q_OBJECT
 public:
@@ -21,13 +22,13 @@ public:
     bool bindSwipeGesture(const QString &name, int finger, int direction, int action);
     bool bindHoldGesture(const QString &name, int finger, int action);
     bool unbind(const QString &name);
-    void commit();
-    bool commitAndWait(int timeoutMs = 1000);
+    void flush();
+    bool syncAndWait(int timeoutMs = 1000);
 
-    // Async commit. Multiple calls in the same event-loop tick fold into a
-    // single wire commit at the next iteration. Use commitAndWait when the
-    // caller needs to know if the compositor accepted it.
-    void commitDeferred();
+    // Coalesce outgoing flushes. V3 applies requests individually and has no
+    // commit or success event. syncAndWait checks failures up to a display sync;
+    // inactive sessions may still report a deferred bind failure afterwards.
+    void flushDeferred();
 
     /**
      * @brief Initialize protocol binding (deferred initialization)
@@ -39,14 +40,17 @@ signals:
     void ready();              // Protocol ready, can start registering shortcuts
     void protocolInactive();   // Protocol disconnected, need to clear state
     void activated(const QString &name, uint32_t flags);
-    void commitStatus(bool success);
+    void bindFailed(const QString &name, uint32_t error);
 
 protected:
-    void treeland_shortcut_manager_v2_activated(const QString &name, uint32_t flags) override;
-    void treeland_shortcut_manager_v2_commit_success() override;
-    void treeland_shortcut_manager_v2_commit_failure(const QString &name, uint32_t error) override;
+    void treeland_shortcut_manager_v3_activated(const QString &name, uint32_t flags) override;
+    void treeland_shortcut_manager_v3_bind_failure(const QString &name, uint32_t error) override;
 
 private:
-    struct ::treeland_shortcut_manager_v2 *m_boundObject = nullptr;  // Track bound object for session recovery
-    bool m_commitPending = false;
+    struct PendingSync;
+    struct ::treeland_shortcut_manager_v3 *m_boundObject = nullptr;
+    QSet<QString> m_pendingBindings;
+    QList<PendingSync *> m_syncs;
+    bool m_pendingBindFailed = false;
+    bool m_flushPending = false;
 };

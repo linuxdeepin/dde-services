@@ -146,11 +146,12 @@ void ShortcutManager::registerAll()
     }
 
     if (m_isWayland) {
-        bool success = m_treelandShortcutWrapper->commitAndWait();
+        bool success = m_treelandShortcutWrapper->syncAndWait();
         if (success) {
-            qCInfo(logShortcut) << "ShortcutManager: All shortcuts and gestures registered successfully";
+            qCInfo(logShortcut) << "ShortcutManager: Shortcut and gesture requests processed;"
+                               << "inactive-session bindings may be deferred";
         } else {
-            qCWarning(logShortcut) << "ShortcutManager: Commit failed";
+            qCWarning(logShortcut) << "ShortcutManager: Some bindings failed or synchronization did not complete";
         }
     }
 }

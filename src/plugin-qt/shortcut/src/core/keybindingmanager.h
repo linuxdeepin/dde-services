@@ -101,9 +101,9 @@ public slots:
     Q_SCRIPTABLE bool BeginCapture(quint64 captureId, uint timeoutMs);
     Q_SCRIPTABLE void EndCapture();
 
-    // Atomically swap the hotkeys of two shortcuts in a single compositor commit.
+    // Swap both shortcuts, restoring their old bindings if registration fails.
     Q_SCRIPTABLE bool SwapHotkeys(const QString &id1, const QString &id2);
-    // Remove newHotkey from conflictId and assign it to targetId in one commit.
+    // Reassign a conflicting hotkey, compensating runtime/persistence failures.
     Q_SCRIPTABLE bool ReplaceHotkey(const QString &targetId, const QString &newHotkey, const QString &conflictId);
     Q_SCRIPTABLE void ReloadConfigs();
     Q_SCRIPTABLE void Reset();
@@ -131,6 +131,7 @@ private slots:
     void onKeyConfigChanged(const KeyConfig &config);
     void onConfigRemoved(const QString &id);
     void onKeyActivated(const QString &shortcutId);
+    void onKeyRegistrationFailed(const QString &shortcutId);
     void onSpecialKeyActivated(const QString &shortcutId);
     void onCaptureKeyEvent(bool pressed, const QString &keystroke);
     void onCaptureResult(quint64 captureId, uint result, const QString &keystroke);
