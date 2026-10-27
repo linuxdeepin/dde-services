@@ -4,6 +4,7 @@
 
 #include "lowpowermanager.h"
 #include "powermanager.h"
+#include "soundeffectutil.h"
 #include "../powerconstants.h"
 
 #include <QDBusInterface>
@@ -264,8 +265,7 @@ void LowPowerManager::lockWaitShow(int timeoutMs, bool autoStartAuth)
 
 void LowPowerManager::playBatterySound()
 {
-    if (!QProcess::startDetached("paplay", {"/usr/share/sounds/deepin/stereo/battery-low.ogg"}))
-        qWarning(logPowerSession) << "Failed to play battery sound";
+    SoundEffect::playSystemSound(QStringLiteral("power-unplug-battery-low"));
 }
 
 void LowPowerManager::disableTicker()

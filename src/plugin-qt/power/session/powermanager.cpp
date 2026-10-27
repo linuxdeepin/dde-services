@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include "powermanager.h"
+#include "soundeffectutil.h"
 #include "idle/idlewatcher.h"
 #include "idle/idlewatcher_wl.h"
 #include "screen/screencontroller.h"
@@ -54,16 +55,6 @@ static QStringList desktopFileNames(QStringList applications)
     for (QString &application : applications)
         application = QFileInfo(application).fileName();
     return applications;
-}
-
-static void playSystemSound(const QString &soundEvent)
-{
-    QDBusInterface iface(QStringLiteral("org.deepin.dde.SoundEffect1"),
-                         QStringLiteral("/org/deepin/dde/SoundEffect1"),
-                         QStringLiteral("org.deepin.dde.SoundEffect1"),
-                         QDBusConnection::sessionBus());
-    if (iface.isValid())
-        iface.asyncCall(QStringLiteral("PlaySound"), soundEvent);
 }
 
 
@@ -183,7 +174,7 @@ bool PowerManager::initialize()
             [this] {
                 m_powerSavePlan->ResetFromNow();
                 if (m_batteryInited)
-                    playSystemSound(m_onBattery ? QStringLiteral("power-unplug")
+                    SoundEffect::playSystemSound(m_onBattery ? QStringLiteral("power-unplug")
                                                 : QStringLiteral("power-plug"));
             });
 
@@ -553,7 +544,7 @@ void PowerManager::handleWakeup()
     m_prepareSuspendState = PS_Resume;
     m_screensaverStateCaptured = false;
 
-    playSystemSound(QStringLiteral("suspend-resume"));
+    SoundEffect::playSystemSound(QStringLiteral("suspend-resume"));
     if (m_useWayland && m_idleWatcher)
         m_idleWatcher->simulateActivity();
     if (m_scheduledShutdownState)
