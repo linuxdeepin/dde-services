@@ -35,10 +35,12 @@ public:
 
 private slots:
     void onActivated(const QString &name, uint32_t flags);
+    void onBindFailed(const QString &name, uint32_t error);
 
 private:
     TreelandShortcutWrapper *m_wrapper = nullptr;
 
     QMap<QString, QString> m_nameToId; // Map binding name -> id
     QMap<QString, QStringList> m_idToNames; // Map id -> list of binding names
+    quint64 m_bindingSerial = 0;
 };

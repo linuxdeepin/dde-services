@@ -32,10 +32,11 @@ Build-Depends:  debhelper (>= 11),
  libxcb-xtest0-dev,
  libxtst-dev,
  dbus-daemon <!nocheck>,
+ qt6-wayland <!nocheck>,
  xauth <!nocheck>,
  xvfb <!nocheck>,
  libwayland-dev,
- treeland-protocols (>> 0.5.7),
+ treeland-protocols (>= 0.6.0),
  python3,
 Standards-Version: 4.1.3
 Homepage: https://github.com/linuxdeepin

@@ -27,10 +27,10 @@ public:
     virtual bool unregisterKey(const QString &shortcutId) = 0;
     virtual bool isAvailable() const { return true; }
 
-    // commit(): async; backend may debounce. Returns true on scheduling, not
-    //   on compositor ack. X11 backend is a no-op (XGrabKey is immediate).
-    // commitSync(): synchronous; returns whether the compositor accepted the
-    //   pending changes. Use when you need to roll back on failure.
+    // commit() flushes queued requests; commitSync() waits for their processing
+    // and reports binding failures. Neither provides an atomic transaction.
+    // Treeland may defer inactive-session requests past the sync, reporting
+    // registrationFailed later. X11 is immediate and these are no-ops.
     virtual bool commit() { return true; }
     virtual bool commitSync() { return commit(); }
 
@@ -55,6 +55,7 @@ public:
 
 signals:
     void keyActivated(const QString &shortcutId);
+    void registrationFailed(const QString &shortcutId);
     void numLockStateChanged(bool on);
     void capsLockStateChanged(bool on);
     void captureStarted();

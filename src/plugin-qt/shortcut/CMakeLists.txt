@@ -14,7 +14,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui WaylandClient)
 find_package(Dtk6 REQUIRED COMPONENTS Core DConfig Gui)
 find_package(PkgConfig REQUIRED)
-find_package(TreelandProtocols REQUIRED)
+find_package(TreelandProtocols 0.6.0 REQUIRED)
 
 pkg_check_modules(XCB REQUIRED xcb xcb-keysyms)
 pkg_check_modules(XCB_XINPUT REQUIRED xcb-xinput)
@@ -84,12 +84,12 @@ add_library(${PLUGIN_NAME} SHARED ${PLUGIN_SOURCES})
 qt6_generate_wayland_protocol_client_sources(
     ${PLUGIN_NAME}
     FILES
-        ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-shortcut-manager-v2.xml
+        ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-shortcut-manager-unstable-v3.xml
 )
 
 # Add generated protocol files
 target_sources(${PLUGIN_NAME} PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/wayland-treeland-shortcut-manager-v2-protocol.c
+    ${CMAKE_CURRENT_BINARY_DIR}/wayland-treeland-shortcut-manager-unstable-v3-protocol.c
 )
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE
@@ -224,8 +224,8 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         ${SHORTCUT_SRC_DIR}/main.cpp
         ${SHORTCUT_COMMON_SOURCES}
         # Reuse Wayland protocol files generated for plugin
-        ${CMAKE_CURRENT_BINARY_DIR}/wayland-treeland-shortcut-manager-v2-protocol.c
-        ${CMAKE_CURRENT_BINARY_DIR}/qwayland-treeland-shortcut-manager-v2.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/wayland-treeland-shortcut-manager-unstable-v3-protocol.c
+        ${CMAKE_CURRENT_BINARY_DIR}/qwayland-treeland-shortcut-manager-unstable-v3.cpp
     )
     
     # Enable AUTOMOC for debug binary

@@ -19,11 +19,13 @@ public:
     virtual bool unregisterGesture(const QString &appId) = 0;
     virtual bool isAvailable() const { return true; }
 
-    // commit() async (may be debounced); commitSync() returns compositor ack.
+    // Flush requests / wait for processing, without transaction guarantees.
+    // Inactive Treeland sessions can report registrationFailed after the sync.
     virtual bool commit() { return true; }
     virtual bool commitSync() { return commit(); }
 
 signals:
     void activated(const QString &name);
+    void registrationFailed(const QString &id);
     void availabilityChanged(bool available);
 };

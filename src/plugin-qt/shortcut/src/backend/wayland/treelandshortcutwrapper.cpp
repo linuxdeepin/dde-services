@@ -9,36 +9,33 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QGuiApplication>
+#include <QPointer>
 #include <QTimer>
 #include <QtCore/qnativeinterface.h>
 
-extern "C" {
-#include <wayland-client-core.h>
-}
+#include <utility>
+#include <wayland-client.h>
 
 namespace {
-// commit() only queues the bind/unbind/commit messages into libwayland's
-// internal outgoing buffer. With no other wayland traffic on this client
-// (dde-services has no window), the buffer can sit unflushed for minutes
-// until some D-Bus call wakes the Qt event loop. Force the flush so the
-// compositor sees the change as soon as the caller intended.
-inline void flushWaylandDisplay()
+wl_display *waylandDisplay()
 {
-    if (auto *wlApp = qGuiApp->nativeInterface<QNativeInterface::QWaylandApplication>()) {
-        wl_display_flush(wlApp->display());
+    if (qGuiApp) {
+        if (auto *wlApp = qGuiApp->nativeInterface<QNativeInterface::QWaylandApplication>())
+            return wlApp->display();
     }
+    return nullptr;
 }
 
 const char *bindErrorName(uint32_t error)
 {
     switch (error) {
-    case 1:
+    case QtWayland::treeland_shortcut_manager_v3::bind_error_name_conflict:
         return "name_conflict";
-    case 2:
+    case QtWayland::treeland_shortcut_manager_v3::bind_error_duplicate_binding:
         return "duplicate_binding";
-    case 3:
+    case QtWayland::treeland_shortcut_manager_v3::bind_error_invalid_argument:
         return "invalid_argument";
-    case 4:
+    case QtWayland::treeland_shortcut_manager_v3::bind_error_internal_error:
         return "internal_error";
     default:
         return "unknown";
@@ -46,9 +43,16 @@ const char *bindErrorName(uint32_t error)
 }
 }  // namespace
 
+struct TreelandShortcutWrapper::PendingSync {
+    QEventLoop loop;
+    QSet<QString> bindings;
+    bool failed = false;
+    bool done = false;
+};
+
 TreelandShortcutWrapper::TreelandShortcutWrapper(QObject *parent)
-    : QWaylandClientExtensionTemplate<TreelandShortcutWrapper>(2)
-    , QtWayland::treeland_shortcut_manager_v2()
+    : QWaylandClientExtensionTemplate<TreelandShortcutWrapper>(1)
+    , QtWayland::treeland_shortcut_manager_v3()
 {
     setParent(parent);
 
@@ -61,6 +65,8 @@ TreelandShortcutWrapper::TreelandShortcutWrapper(QObject *parent)
         } else {
             qCWarning(logShortcut) << "TreelandShortcutManager protocol is now inactive!";
             m_boundObject = nullptr;
+            m_pendingBindings.clear();
+            m_pendingBindFailed = false;
             emit protocolInactive();
         }
     });
@@ -86,6 +92,7 @@ bool TreelandShortcutWrapper::bindKey(const QString &name, const QString &key, u
         return false;
     }
 
+    m_pendingBindings.insert(name);
     bind_key(name, key, flags, action);
     return true;
 }
@@ -96,6 +103,7 @@ bool TreelandShortcutWrapper::bindSwipeGesture(const QString &name, int finger, 
         return false;
     }
 
+    m_pendingBindings.insert(name);
     bind_swipe_gesture(name, finger, direction, action);
     return true;
 }
@@ -106,6 +114,7 @@ bool TreelandShortcutWrapper::bindHoldGesture(const QString &name, int finger, i
         return false;
     }
 
+    m_pendingBindings.insert(name);
     bind_hold_gesture(name, finger, action);
     return true;
 }
@@ -122,82 +131,96 @@ bool TreelandShortcutWrapper::unbind(const QString &name)
         return false;
     }
 
-    QtWayland::treeland_shortcut_manager_v2::unbind(name);
+    QtWayland::treeland_shortcut_manager_v3::unbind(name);
     return true;
 }
 
-void TreelandShortcutWrapper::commit()
+void TreelandShortcutWrapper::flush()
 {
     if (!isActive()) {
         return;
     }
 
-    QtWayland::treeland_shortcut_manager_v2::commit();
-    flushWaylandDisplay();
+    // The service has no window traffic to flush queued Wayland requests.
+    if (auto *display = waylandDisplay())
+        wl_display_flush(display);
 }
 
-void TreelandShortcutWrapper::commitDeferred()
+void TreelandShortcutWrapper::flushDeferred()
 {
-    // Subsequent calls in this tick are folded into the queued one —
-    // their bind/unbind ops already sit in the same wire-protocol queue.
-    if (m_commitPending) {
+    if (m_flushPending) {
         return;
     }
-    m_commitPending = true;
+    m_flushPending = true;
     QTimer::singleShot(0, this, [this]() {
-        m_commitPending = false;
-        if (!isActive()) {
-            return;
-        }
-        QtWayland::treeland_shortcut_manager_v2::commit();
-        flushWaylandDisplay();
+        m_flushPending = false;
+        flush();
     });
 }
 
-bool TreelandShortcutWrapper::commitAndWait(int timeoutMs)
+bool TreelandShortcutWrapper::syncAndWait(int timeoutMs)
 {
-    if (!isActive()) {
+    auto *display = waylandDisplay();
+    if (!isActive() || !display) {
         return false;
     }
 
-    QEventLoop loop;
-    bool success = false;
-    bool responded = false;
+    auto *callback = wl_display_sync(display);
+    if (!callback)
+        return false;
 
-    connect(this, &TreelandShortcutWrapper::commitStatus, &loop, [&](bool status) {
-        loop.quit();
-        success = status;
-        responded = true;
-        qCDebug(logShortcut) << "TreelandShortcutWrapper::commitAndWait response:" << status;
-    }, Qt::SingleShotConnection);
+    PendingSync sync;
+    sync.bindings = std::exchange(m_pendingBindings, {});
+    sync.failed = std::exchange(m_pendingBindFailed, false);
+    m_syncs.append(&sync);
 
-    QTimer::singleShot(timeoutMs, &loop, [&]() {
-        if (!responded) {
-            qCWarning(logShortcut) << "TreelandShortcutWrapper::commitAndWait timeout after" << timeoutMs << "ms";
-            loop.quit();
+    static const wl_callback_listener listener = {
+        [](void *data, wl_callback *, uint32_t) {
+            auto *pending = static_cast<PendingSync *>(data);
+            pending->done = true;
+            pending->loop.quit();
         }
-    });
+    };
+    wl_callback_add_listener(callback, &listener, &sync);
 
-    QtWayland::treeland_shortcut_manager_v2::commit();
-    flushWaylandDisplay();
-    loop.exec();
-    return success;
+    QPointer<TreelandShortcutWrapper> guard(this);
+    const auto *boundObject = object();
+    connect(this, &TreelandShortcutWrapper::protocolInactive, &sync.loop, &QEventLoop::quit);
+    connect(this, &QObject::destroyed, &sync.loop, &QEventLoop::quit);
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer, &QTimer::timeout, &sync.loop, &QEventLoop::quit);
+    timer.start(timeoutMs);
+    flush();
+    sync.loop.exec();
+    wl_callback_destroy(callback);
+
+    if (!guard)
+        return false;
+    m_syncs.removeOne(&sync);
+    if (!sync.done)
+        qCWarning(logShortcut) << "Treeland shortcut sync did not complete within" << timeoutMs << "ms";
+    return sync.done && !sync.failed && isActive() && object() == boundObject;
 }
 
-void TreelandShortcutWrapper::treeland_shortcut_manager_v2_activated(const QString &name, uint32_t flags)
+void TreelandShortcutWrapper::treeland_shortcut_manager_v3_activated(const QString &name, uint32_t flags)
 {
     qCDebug(logShortcut) << "Treeland Shortcut Manager Activated:" << name << "flags:" << flags;
     emit activated(name, flags);
 }
 
-void TreelandShortcutWrapper::treeland_shortcut_manager_v2_commit_success()
+void TreelandShortcutWrapper::treeland_shortcut_manager_v3_bind_failure(const QString &name, uint32_t error)
 {
-    emit commitStatus(true);
-}
-
-void TreelandShortcutWrapper::treeland_shortcut_manager_v2_commit_failure(const QString &name, uint32_t error)
-{
-    qCWarning(logShortcut) << "Treeland Shortcut Manager Commit Failed:" << name
+    qCWarning(logShortcut) << "Treeland shortcut binding failed:" << name
                << "Error:" << error << bindErrorName(error);
-    emit commitStatus(false);
+    // Keep failures received before syncAndWait as well as those received while
+    // waiting. A late failure from an inactive session must not fail a later,
+    // unrelated batch, but it must still invalidate the affected binding.
+    if (m_pendingBindings.contains(name))
+        m_pendingBindFailed = true;
+    for (PendingSync *sync : std::as_const(m_syncs)) {
+        if (sync->bindings.contains(name))
+            sync->failed = true;
+    }
+    emit bindFailed(name, error);
 }
