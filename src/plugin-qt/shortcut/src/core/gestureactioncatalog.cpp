@@ -61,6 +61,8 @@ QList<GestureActionId> treelandActionIds(const GestureConfig &config)
     static const QList<GestureActionId> ThreeFingerActions = {
         GestureActionId::MaximizeWindow,
         GestureActionId::RestoreWindow,
+        GestureActionId::SplitWindowLeft,
+        GestureActionId::SplitWindowRight,
         GestureActionId::Disable,
     };
     static const QList<GestureActionId> FourFingerActions = {
@@ -94,9 +96,6 @@ QList<GestureActionId> treelandActionIds(const GestureConfig &config)
     else if (config.fingerCount == 4)
         result = FourFingerActions;
 
-    // TODO: expose SplitWindowLeft and SplitWindowRight after Treeland
-    // provides native compositor actions for them. Until then they must
-    // remain unregistered and absent from the control-center choices.
     return result;
 }
 

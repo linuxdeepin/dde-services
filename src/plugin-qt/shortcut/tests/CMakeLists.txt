@@ -47,7 +47,10 @@ add_executable(tst-triggeractioncatalog
 
 target_include_directories(tst-triggeractioncatalog PRIVATE
     ../src
+    ${CMAKE_CURRENT_BINARY_DIR}/..
 )
+
+add_dependencies(tst-triggeractioncatalog plugin-dde-shortcut)
 
 target_link_libraries(tst-triggeractioncatalog PRIVATE
     Qt6::Core
@@ -64,7 +67,10 @@ add_executable(tst-gestureactioncatalog
 
 target_include_directories(tst-gestureactioncatalog PRIVATE
     ../src
+    ${CMAKE_CURRENT_BINARY_DIR}/..
 )
+
+add_dependencies(tst-gestureactioncatalog plugin-dde-shortcut)
 
 target_link_libraries(tst-gestureactioncatalog PRIVATE
     Qt6::Core
@@ -72,6 +78,57 @@ target_link_libraries(tst-gestureactioncatalog PRIVATE
 )
 
 add_test(NAME shortcut-gestureactioncatalog COMMAND tst-gestureactioncatalog)
+
+pkg_check_modules(WAYLAND_SERVER REQUIRED IMPORTED_TARGET wayland-server)
+find_program(WAYLAND_SCANNER_EXECUTABLE NAMES wayland-scanner REQUIRED)
+set(SHORTCUT_PROTOCOL_XML ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-shortcut-manager-unstable-v3.xml)
+set(SHORTCUT_SERVER_HEADER ${CMAKE_CURRENT_BINARY_DIR}/wayland-treeland-shortcut-manager-v3-server-protocol.h)
+set(SHORTCUT_TEST_PROTOCOL_CODE ${CMAKE_CURRENT_BINARY_DIR}/wayland-shortcut-test-protocol.c)
+pkg_get_variable(WAYLAND_PROTOCOLS_DATA_DIR wayland-protocols pkgdatadir)
+set(SHORTCUT_TEST_XDG_XML ${WAYLAND_PROTOCOLS_DATA_DIR}/stable/xdg-shell/xdg-shell.xml)
+set(SHORTCUT_TEST_XDG_HEADER ${CMAKE_CURRENT_BINARY_DIR}/wayland-shortcut-test-xdg-shell-server-protocol.h)
+set(SHORTCUT_TEST_XDG_CODE ${CMAKE_CURRENT_BINARY_DIR}/wayland-shortcut-test-xdg-shell-protocol.c)
+add_custom_command(
+    OUTPUT ${SHORTCUT_SERVER_HEADER} ${SHORTCUT_TEST_PROTOCOL_CODE}
+    COMMAND ${WAYLAND_SCANNER_EXECUTABLE} server-header ${SHORTCUT_PROTOCOL_XML} ${SHORTCUT_SERVER_HEADER}
+    COMMAND ${WAYLAND_SCANNER_EXECUTABLE} private-code ${SHORTCUT_PROTOCOL_XML} ${SHORTCUT_TEST_PROTOCOL_CODE}
+    DEPENDS ${SHORTCUT_PROTOCOL_XML}
+    VERBATIM
+)
+add_custom_command(
+    OUTPUT ${SHORTCUT_TEST_XDG_HEADER} ${SHORTCUT_TEST_XDG_CODE}
+    COMMAND ${WAYLAND_SCANNER_EXECUTABLE} server-header ${SHORTCUT_TEST_XDG_XML} ${SHORTCUT_TEST_XDG_HEADER}
+    COMMAND ${WAYLAND_SCANNER_EXECUTABLE} private-code ${SHORTCUT_TEST_XDG_XML} ${SHORTCUT_TEST_XDG_CODE}
+    DEPENDS ${SHORTCUT_TEST_XDG_XML}
+    VERBATIM
+)
+add_executable(tst-waylandshortcuts
+    tst_waylandshortcuts.cpp
+    ${SHORTCUT_SERVER_HEADER}
+    ${SHORTCUT_TEST_PROTOCOL_CODE}
+    ${SHORTCUT_TEST_XDG_HEADER}
+    ${SHORTCUT_TEST_XDG_CODE}
+)
+target_include_directories(tst-waylandshortcuts PRIVATE
+    ../src
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/..
+)
+target_link_libraries(tst-waylandshortcuts PRIVATE
+    plugin-dde-shortcut
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Test
+    Qt6::DBus
+    Qt6::WaylandClient
+    Dtk6::Core
+    PkgConfig::WAYLAND_SERVER
+)
+find_program(DBUS_RUN_SESSION_EXECUTABLE NAMES dbus-run-session REQUIRED)
+add_test(NAME shortcut-waylandshortcuts
+    COMMAND ${DBUS_RUN_SESSION_EXECUTABLE} -- $<TARGET_FILE:tst-waylandshortcuts>
+)
+set_tests_properties(shortcut-waylandshortcuts PROPERTIES TIMEOUT 30)
 
 add_executable(tst-qkeysequenceconverter
     tst_qkeysequenceconverter.cpp
