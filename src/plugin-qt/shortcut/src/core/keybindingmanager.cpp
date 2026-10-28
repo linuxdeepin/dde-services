@@ -326,6 +326,8 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
 
     // Connect signals from key handler
     connect(m_keyHandler, &AbstractKeyHandler::keyActivated, this, &KeybindingManager::onKeyActivated);
+    connect(m_keyHandler, &AbstractKeyHandler::registrationFailed,
+            this, &KeybindingManager::onKeyRegistrationFailed);
     connect(m_keyHandler, &AbstractKeyHandler::capsLockStateChanged,
             this, &KeybindingManager::updateCapsLockState);
     m_lastCapsLockState = GetCapsLockState();
@@ -591,10 +593,11 @@ bool KeybindingManager::ModifyHotkeys(const QString &id, const QStringList &newH
         }
     }
 
-    // Save old state for X11 rollback or persistence recovery.
+    // Keep the old bindings for compensation: Treeland v3 applies each request
+    // immediately, so a rejected replacement does not restore the old state.
     const QStringList oldHotkeys = config.hotkeys;
 
-    // Phase 1: queue unbind + rebind
+    // Phase 1: unbind + rebind
     unregisterShortcut(id);
     config.hotkeys = normalized;
 
@@ -606,7 +609,7 @@ bool KeybindingManager::ModifyHotkeys(const QString &id, const QStringList &newH
         return false;
     }
 
-    // Phase 2: commit to compositor (sync — must know whether to roll back).
+    // Phase 2: wait for processing and check whether compensation is needed.
     if (!m_keyHandler->commitSync()) {
         qCWarning(logShortcut) << "Shortcut commit failed for ModifyHotkeys:" << id;
         unregisterShortcut(id);
@@ -1520,6 +1523,14 @@ void KeybindingManager::unregisterShortcut(const QString &id)
     m_specialKeyHandler->unregisterKey(id);
     m_crossChannelActivationGuard.clear(id);
     m_activeShortcutIds.remove(id);
+}
+
+void KeybindingManager::onKeyRegistrationFailed(const QString &id)
+{
+    // Failure can arrive after a sync when an inactive session becomes active.
+    // Preserve the configured value, but remove all runtime channels for it.
+    unregisterShortcut(id);
+    qCWarning(logShortcut) << "KeybindingManager: shortcut registration failed:" << id;
 }
 
 QString KeybindingManager::lookupRuntimeConflict(const QString &hotkey,

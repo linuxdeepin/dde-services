@@ -8,9 +8,8 @@
 
 #include <optional>
 
-// IDs used by action-triggered shortcut configurations.  The numeric values
-// are part of the public configuration format; values above the Treeland
-// protocol range are service/X11 extensions.
+// Stable IDs used by shortcut/gesture configurations and D-Bus. These values
+// must not follow protocol enum renumbering; translate them at the backend.
 enum class TriggerActionId {
     Invalid = -1,
     Disable = 0,
@@ -71,8 +70,8 @@ public:
     // X11.  An empty result means that the action is not a KWin shortcut.
     static QString x11WmShortcutId(TriggerActionId actionId);
 
-    // Returns the action value accepted by treeland-shortcut-manager-v2.
-    // Unsupported actions intentionally return no value: their configuration
-    // remains visible, but no invalid protocol request is sent.
+    // Returns the v3 wire value for actions implemented by Treeland. Disabled,
+    // removed and unimplemented actions return no value. In particular, the
+    // protocol's notify = 0 must not be confused with the configuration's Disable.
     static std::optional<int> treelandActionId(TriggerActionId actionId);
 };

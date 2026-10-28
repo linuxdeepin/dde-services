@@ -20,6 +20,7 @@ WaylandKeyHandler::WaylandKeyHandler(TreelandShortcutWrapper *wrapper, QObject *
     , m_wrapper(wrapper)
 {
     connect(m_wrapper, &TreelandShortcutWrapper::activated, this, &WaylandKeyHandler::onActivated);
+    connect(m_wrapper, &TreelandShortcutWrapper::bindFailed, this, &WaylandKeyHandler::onBindFailed);
     connect(m_wrapper, &TreelandShortcutWrapper::protocolInactive, this, [this]() {
         qCWarning(logShortcut) << "WaylandKeyHandler: Protocol inactive, clearing all bindings";
         m_nameToId.clear();
@@ -31,9 +32,8 @@ WaylandKeyHandler::~WaylandKeyHandler()
 {
 }
 
-// Lock keys (NumLock, CapsLock) are rejected by Treeland at commit time.
-// Skip bindKey() for these so the bulk commit does not fail; the config
-// remains visible on D-Bus and the physical keys keep working.
+// Lock keys are handled by the compositor rather than registered shortcuts.
+// Keep their configuration visible while leaving the physical keys to it.
 static bool isLockKey(const QString &hotkey)
 {
     static const QSet<QString> lockKeys = { "NumLock", "CapsLock", "Num_Lock", "Caps_Lock" };
@@ -44,9 +44,8 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
 {
     if (!m_wrapper) return false;
 
-    // Treeland rejects bare Qt::Key_Sleep and rolls back the entire commit.
-    // Reject it before queuing any bindings. Remove this compatibility guard
-    // once the supported Treeland versions accept Sleep.
+    // Bare Sleep is still rejected by Treeland. Return failure before queuing
+    // bindings so fixed hardware shortcuts can use their raw-keycode fallback.
     if (config.hotkeys.contains(QStringLiteral("Sleep"))) {
         qCInfo(logShortcut) << "WaylandKeyHandler: Sleep is not supported by Treeland:"
                            << config.getId();
@@ -57,7 +56,7 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
         unregisterKey(config.getId());
     }
 
-    int action = QtWayland::treeland_shortcut_manager_v2::action_notify;
+    int action = QtWayland::treeland_shortcut_manager_v3::action_notify;
     if (config.triggerType == static_cast<int>(TriggerType::Action)) {
         const TriggerActionId actionId = config.triggerValue.isEmpty()
                 ? TriggerActionId::Invalid
@@ -83,7 +82,10 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
             continue;
         }
 
-        QString name = config.getId() + "_" + hotkey;
+        // A deferred failure from an older registration must not invalidate a
+        // replacement for the same config/hotkey after a session switch.
+        const QString name = config.getId() + "_" + hotkey
+                + "#" + QString::number(++m_bindingSerial);
         
         // Use keyEventFlags from config, default to key_release (0x2)
         int flags = config.keyEventFlags;
@@ -119,13 +121,13 @@ bool WaylandKeyHandler::unregisterKey(const QString &id)
 
 bool WaylandKeyHandler::commit()
 {
-    m_wrapper->commitDeferred();
+    m_wrapper->flushDeferred();
     return true;
 }
 
 bool WaylandKeyHandler::commitSync()
 {
-    bool success = m_wrapper->commitAndWait();
+    bool success = m_wrapper->syncAndWait();
     if (!success) {
         qCWarning(logShortcut) << "WaylandKeyHandler::commitSync failed";
     }
@@ -144,6 +146,20 @@ void WaylandKeyHandler::onActivated(const QString &name, uint32_t flags)
         
         emit keyActivated(id);
     }
+}
+
+void WaylandKeyHandler::onBindFailed(const QString &name, uint32_t error)
+{
+    Q_UNUSED(error);
+    const QString id = m_nameToId.value(name);
+    if (id.isEmpty())
+        return;
+
+    // A multi-hotkey config is registered as a unit by the service. V3 keeps
+    // its other successful binds, so explicitly remove those on failure.
+    unregisterKey(id);
+    m_wrapper->flushDeferred();
+    emit registrationFailed(id);
 }
 
 // Wayland does not expose CapsLock / NumLock state to regular clients, and

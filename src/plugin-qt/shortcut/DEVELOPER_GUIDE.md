@@ -45,9 +45,17 @@ Deepin 快捷键服务是一个基于 DConfig 的动态快捷键管理框架，�
 和本地化由公共管理层处理，输入后端按桌面环境选择：
 
 - X11 使用 `X11KeyHandler` 抓取按键，并通过 system bus 手势采集服务接收触控板事件。
-- Wayland 使用 Treeland shortcut 协议注册按键和手势。
+- Wayland 使用 `treeland-shortcut-manager-unstable-v3`（接口版本 1）注册按键和手势，
+  构建依赖 `treeland-protocols >= 0.6.0`。
 
 应用使用相同的 DConfig 格式和 D-Bus 接口，不应自行维护 X11/Wayland 两套配置。
+
+Treeland v3 的 bind/unbind 请求逐条生效，没有协议 `commit` 或成功事件。
+后端的 `commit()` 负责 flush，`commitSync()` 用 `wl_display.sync` 等待处理并汇总
+`bind_failure`，不提供原子提交。修改失败时服务显式删除部分成功的新绑定并恢复旧绑定。
+非活动会话的绑定会延后应用，失败可能在 sync 返回后通知；服务收到后将对应配置的
+运行时绑定移除，保存的配置仍可查询。每次注册使用独立的协议名称，避免迟到失败影响
+已经替换的绑定。
 
 ## 2. 配置文件编写
 
@@ -1326,8 +1334,9 @@ dbus-monitor --system "interface='org.deepin.dde.KeyEvent1'"
 
 #### 问题 6：单 modifier 键（Meta / Ctrl 等）作为 hotkey 行为不确定
 
-**说明**: X11 和 Treeland 后端都接受单 modifier 配置，但它与 `Meta+X` 等组合键
-同时存在时依赖后端的按下/释放派发语义，应用不能只验证单按场景。
+**说明**: Treeland 只接受单独的 `Meta`，不接受单独的 Ctrl、Alt、Shift 等修饰键。
+X11 的支持范围不同。单独 `Meta` 与 `Meta+X` 同时存在时，应用还需验证组合键的
+按下/释放场景。
 
 **适配建议**:
 - 优先用 modifier + 非 modifier 实键的组合（如 `Ctrl+Alt+T`、`Meta+E`）
@@ -1338,11 +1347,15 @@ dbus-monitor --system "interface='org.deepin.dde.KeyEvent1'"
 
 **症状**: 安装/卸载带快捷键配置的包后,`ReloadConfigs` 被调,journal 里能看到 `Config added` / `Parsed KeyConfig`,但用户按对应快捷键长时间无响应,直到某次 D-Bus 调用（d-feet、控制中心打开等）介入后才突然生效。
 
-**根因**: `TreelandShortcutWrapper::commit / commitDeferred` 调用底层 wayland commit 后没有 `wl_display_flush`,wayland 协议消息卡在 libwayland 客户端 outgoing 缓冲。dde-services 是非 GUI 进程,与 compositor 之间没有常规 wayland 往来,缓冲要等到 Qt event loop 因为其它原因（D-Bus 调用等）跑一轮才被 Qt wayland 平台插件附带 flush。这之前 Treeland 根本没收到 bind/commit,binding 自然不生效。
+**根因**: 注册请求只写入 libwayland 客户端的 outgoing 缓冲。快捷键服务没有窗口，
+不能依靠窗口的常规 Wayland 往来及时发送这些请求。
 
-**修复（2026-05-25 已合入）**: `commit / commitDeferred` 调底层 commit 后通过 `QNativeInterface::QWaylandApplication::display()` 拿 `wl_display*` 并显式 `wl_display_flush`,确保协议消息立即送达。
+**处理**: `TreelandShortcutWrapper::flush / flushDeferred` 通过
+`QNativeInterface::QWaylandApplication::display()` 获取连接，显式调用
+`wl_display_flush`。需要同步结果时，`syncAndWait` 发送 display sync 并 flush，
+等待此前绑定的失败事件和 sync 回调；v3 不再发送协议 commit。
 
-**对应代码**: `src/backend/wayland/treelandshortcutwrapper.cpp`(`commit`、`commitDeferred`、`flushWaylandDisplay`)
+**对应代码**: `src/backend/wayland/treelandshortcutwrapper.cpp`。
 
 ### 6.5 调试工具
 
@@ -1404,8 +1417,14 @@ Qt 没有定义的硬件键可以使用十进制或十六进制 Linux input keyc
 `triggerValue` 保存数字 action ID：
 
 - `0` 表示禁用。
-- `1-99` 与 Treeland shortcut 协议枚举保持一致。
-- `100+` 是 dde-services 的 X11 扩展动作。
+- 其余已定义的 ID 是稳定的业务编号，与 Treeland v3 协议编号分开维护；升级协议不改
+  JSON、用户已保存的 `triggerValue` 或 D-Bus 返回的动作 ID。
+- 后端通过 `TriggerActionCatalog::treelandActionId()` 转换。例如配置 `10`（显示桌面）
+  对应 v3 的 `24`，配置 `100/101`（左右平铺）对应 `32/33`，配置 `1`（Notify）对应
+  协议 `0`；禁用动作不发送为 Notify。
+- Treeland 支持左右平铺、最小化和窗口移到前后工作区。调整窗口大小和屏幕缩放虽已在
+  v3 XML 定义，当前合成器尚未实现，服务继续将其视为不支持；旧 Quit/TaskSwitchEnter
+  也不再映射为协议动作。
 
 动作 ID、名称和后端支持状态的权威定义在
 `src/core/triggeractioncatalog.h`、`src/core/triggeractioncatalog.cpp` 和

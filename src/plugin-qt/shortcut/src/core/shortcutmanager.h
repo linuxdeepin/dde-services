@@ -24,7 +24,7 @@ class SessionActiveMonitor;
  * Responsibilities:
  * 1. Create and manage all sub-components
  * 2. Handle platform differences (Wayland/X11)
- * 3. Coordinate protocol lifecycle, unified commit
+ * 3. Coordinate protocol lifecycle and request synchronization
  * 4. Register DBus services
  */
 class ShortcutManager : public QObject

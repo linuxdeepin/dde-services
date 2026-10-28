@@ -55,6 +55,8 @@ GestureManager::GestureManager(ConfigLoader *loader, ActionExecutor *executor,
     if (m_gestureHandler) {
         connect(m_gestureHandler, &AbstractGestureHandler::activated,
                 this, &GestureManager::onGestureActivated);
+        connect(m_gestureHandler, &AbstractGestureHandler::registrationFailed,
+                this, &GestureManager::onGestureRegistrationFailed);
         connect(m_gestureHandler, &AbstractGestureHandler::availabilityChanged,
                 this, &GestureManager::onHandlerAvailabilityChanged);
     }
@@ -190,12 +192,11 @@ bool GestureManager::ModifyGesture(const QString &id, const QStringList &action)
     if (registered && !disabled)
         setGestureActive(newConfig);
     if (!registered) {
-        if (oldWasActive && registerGesture(oldConfig))
-            setGestureActive(oldConfig);
-        m_gestureHandler->commitSync();
+        restoreGesture(oldConfig, oldWasActive);
         return false;
     }
     if (!m_gestureHandler->commitSync()) {
+        restoreGesture(oldConfig, oldWasActive);
         return false;
     }
 
@@ -204,16 +205,34 @@ bool GestureManager::ModifyGesture(const QString &id, const QStringList &action)
     if (!m_loader->updateValue(id, QStringLiteral("triggerValue"),
                                QVariantList{int(newActionId)})) {
         m_configuredGestures.insert(id, oldConfig);
-        m_gestureHandler->unregisterGesture(id);
-        setGestureInactive(id);
-        if (oldWasActive && registerGesture(oldConfig))
-            setGestureActive(oldConfig);
-        m_gestureHandler->commitSync();
+        restoreGesture(oldConfig, oldWasActive);
         return false;
     }
 
     emit GestureInfosChanged();
     return true;
+}
+
+void GestureManager::restoreGesture(const GestureConfig &config, bool wasActive)
+{
+    const QString id = config.getId();
+    m_gestureHandler->unregisterGesture(id);
+    setGestureInactive(id);
+    if (wasActive && registerGesture(config))
+        setGestureActive(config);
+    if (!m_gestureHandler->commitSync()) {
+        m_gestureHandler->unregisterGesture(id);
+        setGestureInactive(id);
+        m_gestureHandler->commit();
+        qCWarning(logShortcut) << "GestureManager: failed to restore gesture:" << id;
+    }
+}
+
+void GestureManager::onGestureRegistrationFailed(const QString &id)
+{
+    setGestureInactive(id);
+    qCWarning(logShortcut) << "GestureManager: gesture registration failed:" << id;
+    emit GestureInfosChanged();
 }
 
 void GestureManager::onGestureConfigAdded(const GestureConfig &config)
