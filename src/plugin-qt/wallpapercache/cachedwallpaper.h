@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QSize>
 #include <QMutex>
+#include <QDateTime>
 
 // Shared cache path constants
 #ifndef WALLPAPER_CACHE_DIR
@@ -31,8 +32,10 @@ signals:
 
 public:
     static CachedWallpaper *instance();
-    QStringList getCachedImagePaths(const QString &originalPath, const QList<QSize> &sizes, bool isMd5Path = false);
-    QStringList findCachedImagePaths(const QString &pathMd5, const QList<QSize> &sizes) const;
+    QStringList getCachedImagePaths(const QString &originalPath, const QList<QSize> &sizes,
+                                    bool isMd5Path = false, const QDateTime &sourceChangeTime = {});
+    QStringList findCachedImagePaths(const QString &pathMd5, const QList<QSize> &sizes,
+                                     const QDateTime &sourceChangeTime) const;
     void cacheImage(const QString &originalPathMd5, const QString &size, const QString &processedPath);
 
     // Blur wallpaper interfaces
