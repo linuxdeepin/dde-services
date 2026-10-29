@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QFile>
 #include <QImage>
+#include <QSaveFile>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
@@ -181,6 +182,62 @@ private slots:
         QCOMPARE(QImage(scaled.last().at(2).toString()).size(), QSize(20, 15));
         worker.stopThread();
         QVERIFY(worker.wait(5000));
+    }
+
+    void replacedThumbnailRefreshes_data()
+    {
+        QTest::addColumn<bool>("useFd");
+        QTest::newRow("path") << false;
+        QTest::newRow("fd") << true;
+    }
+
+    void replacedThumbnailRefreshes()
+    {
+        QFETCH(bool, useFd);
+        QTemporaryDir dir;
+        const QString source = dir.filePath("wallpaper.bmp");
+        QImage image(80, 60, QImage::Format_RGB32);
+        image.fill(Qt::red);
+        QVERIFY(image.save(source));
+        const QDateTime originalModifiedTime = QFileInfo(source).lastModified();
+        QVERIFY(originalModifiedTime.isValid());
+        const QString key = ScaleImageThread::pathMd5(source, false);
+        const QString cached = dir.filePath(key + "_40x30.bmp");
+        const QVariantList sizes{QVariant::fromValue(QSize(40, 30))};
+        ScaleImageThread worker;
+        worker.setCachePath(dir.path());
+        connect(CachedWallpaper::instance(), &CachedWallpaper::needHandleImage,
+                &worker, &ScaleImageThread::addTasks, Qt::QueuedConnection);
+        connect(&worker, &ScaleImageThread::imageScaled,
+                CachedWallpaper::instance(), &CachedWallpaper::cacheImage);
+        WallpaperCacheService service;
+        auto request = [&]() {
+            if (!useFd)
+                return service.GetProcessedImagePaths(source, sizes);
+            QFile input(source);
+            if (!input.open(QIODevice::ReadOnly))
+                return QStringList();
+            return service.GetProcessedImagePathByFd(QDBusUnixFileDescriptor(input.handle()), key, sizes);
+        };
+        QTRY_COMPARE(request(), QStringList{cached});
+        QCOMPARE(QImage(cached).pixelColor(0, 0), QColor(Qt::red));
+
+        for (int offset : {0, -3600}) {
+            QTest::qWait(10); // Keep replacement ctime distinct on coarse-clock filesystems.
+            const QColor color = offset == 0 ? Qt::green : Qt::blue;
+            image.fill(color);
+            QSaveFile replacement(source);
+            QVERIFY(replacement.open(QIODevice::WriteOnly));
+            QVERIFY(image.save(&replacement, "BMP"));
+            QVERIFY(replacement.flush());
+            QVERIFY(replacement.setFileTime(originalModifiedTime.addSecs(offset), QFileDevice::FileModificationTime));
+            QVERIFY(replacement.commit());
+            QCOMPARE(QFileInfo(source).lastModified(), originalModifiedTime.addSecs(offset));
+            QVERIFY(request() != QStringList{cached});
+            QTRY_COMPARE(request(), QStringList{cached});
+            QCOMPARE(QImage(cached).size(), QSize(40, 30));
+            QCOMPARE(QImage(cached).pixelColor(0, 0), color);
+        }
     }
 
     void idleWorkerStops()

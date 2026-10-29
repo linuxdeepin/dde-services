@@ -61,10 +61,14 @@ QStringList WallpaperCacheService::GetProcessedImagePaths(const QString &origina
 QStringList WallpaperCacheService::GetProcessedImagePathByFd(const QDBusUnixFileDescriptor &fd, const QString &imagePathMd5, const QVariantList &sizeArray)
 {
     const QList<QSize> sizes = parseSizeArray(sizeArray);
-    if (fd.fileDescriptor() < 0)
+    QFile source;
+    if (!source.open(fd.fileDescriptor(), QIODevice::ReadOnly, QFileDevice::DontCloseHandle))
+        return {};
+    const QDateTime sourceChangeTime = source.fileTime(QFileDevice::FileMetadataChangeTime);
+    if (!sourceChangeTime.isValid())
         return {};
 
-    const QStringList cached = CachedWallpaper::instance()->findCachedImagePaths(imagePathMd5, sizes);
+    const QStringList cached = CachedWallpaper::instance()->findCachedImagePaths(imagePathMd5, sizes, sourceChangeTime);
     if (!sizes.isEmpty() && cached.size() == sizes.size())
         return cached;
 
@@ -75,7 +79,8 @@ QStringList WallpaperCacheService::GetProcessedImagePathByFd(const QDBusUnixFile
 
     qDebug() << "get processed image from origin path:" << destinationPath;
 
-    QStringList results = CachedWallpaper::instance()->getCachedImagePaths(destinationPath, sizes, true);
+    // Compare with the original file, not the newly imported copy.
+    QStringList results = CachedWallpaper::instance()->getCachedImagePaths(destinationPath, sizes, true, sourceChangeTime);
     if (results.isEmpty()) {
         results << destinationPath;
     }

@@ -30,15 +30,18 @@ CachedWallpaper *CachedWallpaper::instance()
     return &cachedWallpaper;
 }
 
-QStringList CachedWallpaper::getCachedImagePaths(const QString &originalPath, const QList<QSize> &sizes, bool isMd5Path)
+QStringList CachedWallpaper::getCachedImagePaths(const QString &originalPath, const QList<QSize> &sizes,
+                                                bool isMd5Path, const QDateTime &sourceChangeTime)
 {
     QList<QSize> noCachedSizes;
     QStringList results;
 
     QString pathMd5 = ScaleImageThread::pathMd5(originalPath, isMd5Path);
+    const QDateTime changeTime = sourceChangeTime.isValid()
+        ? sourceChangeTime : QFileInfo(originalPath).metadataChangeTime();
 
     for (const QSize &size : sizes) {
-        const QStringList cached = findCachedImagePaths(pathMd5, {size});
+        const QStringList cached = findCachedImagePaths(pathMd5, {size}, changeTime);
         if (cached.isEmpty()) {
             noCachedSizes.append(size);
         } else {
@@ -54,7 +57,8 @@ QStringList CachedWallpaper::getCachedImagePaths(const QString &originalPath, co
     return results;
 }
 
-QStringList CachedWallpaper::findCachedImagePaths(const QString &pathMd5, const QList<QSize> &sizes) const
+QStringList CachedWallpaper::findCachedImagePaths(const QString &pathMd5, const QList<QSize> &sizes,
+                                                 const QDateTime &sourceChangeTime) const
 {
     QStringList results;
     const auto it = m_cachedImages.constFind(pathMd5);
@@ -65,6 +69,10 @@ QStringList CachedWallpaper::findCachedImagePaths(const QString &pathMd5, const 
         const QString path = it->value(ScaleImageThread::sizeToString(size));
         const QFileInfo info(path);
         if (path.isEmpty() || !info.isFile() || !info.isReadable() || info.size() == 0)
+            return {};
+        // ponytail: Qt uses milliseconds; native timestamps only if finer precision is needed.
+        const QDateTime cacheChangeTime = info.metadataChangeTime();
+        if (!sourceChangeTime.isValid() || !cacheChangeTime.isValid() || cacheChangeTime < sourceChangeTime)
             return {};
         results.append(path);
     }
