@@ -1,3 +1,10 @@
+dde-services (1.0.48) unstable; urgency=medium
+
+  * test: 补充 dde-services 单元测试与 D-Bus 测试
+  * fix(wallpaper): refresh stale thumbnails
+
+ -- Kun Zhang <zhangkun2@uniontech.com>  Thu, 29 Oct 2026 16:30:04 +0800
+
 dde-services (1.0.47) unstable; urgency=medium
 
   * fix: preserve wallpaper FD imports and reuse valid cached images
