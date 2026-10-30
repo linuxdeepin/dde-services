@@ -78,7 +78,7 @@ class TestX11GrabResilientShortcuts : public QObject
 private slots:
     void legacyShortcutsActivateExactlyOnce();
     void xcbFallbackDuringRecordRestart();
-    // TODO(TASK-397845): Temporarily disable the capture timeout case.
+    // TODO(TASK-397845): Temporarily disable the captureReportsExplicitResults test.
     // void captureReportsExplicitResults();
     void activeCaptureRejectsReplacement();
     void captureReportsTimeout();
@@ -166,7 +166,7 @@ void TestX11GrabResilientShortcuts::xcbFallbackDuringRecordRestart()
     XCloseDisplay(display);
 }
 
-/*
+#if 0
 void TestX11GrabResilientShortcuts::captureReportsExplicitResults()
 {
     Display *display = XOpenDisplay(nullptr);
@@ -216,7 +216,7 @@ void TestX11GrabResilientShortcuts::captureReportsExplicitResults()
 
     XCloseDisplay(display);
 }
-*/
+#endif
 
 void TestX11GrabResilientShortcuts::activeCaptureRejectsReplacement()
 {
