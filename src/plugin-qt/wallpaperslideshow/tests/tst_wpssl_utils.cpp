@@ -164,7 +164,10 @@ void TestWpsslUtils::userHomeDirIsNonEmpty()
 {
     const QString home = utils::GetUserHomeDir();
     QVERIFY(!home.isEmpty());
-    QVERIFY(QFileInfo(home).isDir());
+    // The helper mirrors the HOME environment variable, which does not have to
+    // point at an existing directory (pbuilder builds run with
+    // HOME=/nonexistent), so only the mapping is asserted here.
+    QCOMPARE(QDir::cleanPath(home), QDir::cleanPath(QDir::homePath()));
 }
 
 // ---- branch-coverage additions ----
