@@ -196,24 +196,29 @@ void ipwd_analyse (u_char * args, const struct pcap_pkthdr *header, const u_char
 		if (config.script != NULL)
 		{
 			/* Run user-defined script in form: script "dev" "ip" "mac" */
-			command_len = strlen (config.script) + 2 + strlen (devices.dev[i].device) + 3 + strlen (devices.dev[i].ip) + 3 + strlen (rcv_smac) + 2;
-
-			if ((command = (char *) malloc (command_len * sizeof (char))) == NULL)
+			/* Use fork+execl instead of system() to avoid CWE-78 command injection */
+			pid_t pid = fork ();
+			if (pid == -1)
 			{
-				ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to execute user-defined script - malloc failed");
-				break;
- 			}
-
-			snprintf (command, command_len, "%s \"%s\" \"%s\" \"%s\"", config.script, devices.dev[i].device, devices.dev[i].ip, rcv_smac);
-
-			rv = system (command);
-			if (rv == -1)
-			{
-				ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to execute user-defined script: %s", command);
+				ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to execute user-defined script - fork failed");
 			}
-
-			free (command);
-			command = NULL;
+			else if (pid == 0)
+			{
+				/* Child process */
+				execl (config.script, config.script, devices.dev[i].device, devices.dev[i].ip, rcv_smac, (char *) NULL);
+				/* If execl returns, it failed */
+				_exit (127);
+			}
+			else
+			{
+				/* Parent process - wait for child */
+				int status;
+				rv = waitpid (pid, &status, 0);
+				if (rv == -1)
+				{
+					ipwd_message (IPWD_MSG_TYPE_ERROR, "Unable to execute user-defined script: %s", config.script);
+				}
+			}
 		}
 
 		if (testing_flag == 1)
