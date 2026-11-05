@@ -304,8 +304,6 @@ void PowerSavePlan::setScreenSaverTimeout(int seconds)
 
 void PowerSavePlan::startScreensaver()
 {
-    if (m_powerManager->useWayland())
-        return;
     if (qEnvironmentVariable("DESKTOP_CAN_SCREENSAVER") == "N" || !m_allowScreenSaver)
         return;
 
