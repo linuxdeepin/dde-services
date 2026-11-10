@@ -553,6 +553,8 @@ void SystemPowerManager::initPowerSavingDConfig()
             setPowerSavingModeBrightnessDropPercent(value.toUInt());
         else if (key == QLatin1String(kPowerSavingModeAutoBatteryPercent))
             setPowerSavingModeAutoBatteryPercent(value.toUInt());
+        else if (key == QLatin1String(kDeviceIdlePowerSaving))
+            SetDeviceIdlePowerSaving(value.toBool());
         else if (key == QLatin1String(kShortIdleEnable))
             m_shortIdleEnabled = value.toBool();
         else if (key == QLatin1String(kShortIdleState))
@@ -603,6 +605,7 @@ void SystemPowerManager::initPowerSavingDConfig()
     load(kPowerSavingModeAutoWhenBatteryLow);
     load(kPowerSavingModeBrightnessDropPercent);
     load(kPowerSavingModeAutoBatteryPercent);
+    load(kDeviceIdlePowerSaving);
     load(kShortIdleState);
     load(kShortIdleEnable);
     load(kIdleStatePath);
@@ -859,7 +862,18 @@ void SystemPowerManager::applyMode(const QString &mode)
              : logicalMode == QLatin1String("powersave") ? QStringLiteral("saving")
              : logicalMode;
     }
-    enqueuePowerControl({QStringLiteral("set"), dspc});
+
+    m_lastCommandMode = dspc;
+    enqueueModeCommand();
+}
+
+void SystemPowerManager::enqueueModeCommand()
+{
+    QStringList args{QStringLiteral("set"), m_lastCommandMode};
+    if (m_deviceIdlePowerSaving)
+        args << QStringLiteral("--dev-idle");
+
+    enqueuePowerControl(args);
 }
 
 void SystemPowerManager::setMode(const QString &mode)
@@ -1086,6 +1100,24 @@ void SystemPowerManager::SetShortIdleState(bool state)
         return;
     setShortIdleState(state);
 }
+
+void SystemPowerManager::SetDeviceIdlePowerSaving(bool enabled)
+{
+    if (m_deviceIdlePowerSaving == enabled)
+        return;
+
+    if (!m_loadingConfig && !authorizePowerAction())
+        return;
+
+    m_deviceIdlePowerSaving = enabled;
+    Q_EMIT deviceIdlePowerSavingChanged();
+    persist(kDeviceIdlePowerSaving, enabled);
+
+    // 启动加载时模式尚未应用，跳过本次下发
+    if (!m_loadingConfig)
+        enqueueModeCommand();
+}
+
 void SystemPowerManager::SetIdleState(bool state)
 {
     if (!authorizePowerAction())

@@ -37,6 +37,8 @@ class SystemPowerManager : public QObject, protected QDBusContext {
                WRITE setPowerSavingModeBrightnessDropPercent NOTIFY powerSavingModeBrightnessDropPercentChanged)
     Q_PROPERTY(uint PowerSavingModeAutoBatteryPercent READ powerSavingModeAutoBatteryPercent
                WRITE setPowerSavingModeAutoBatteryPercent NOTIFY powerSavingModeAutoBatteryPercentChanged)
+    Q_PROPERTY(bool DeviceIdlePowerSaving READ deviceIdlePowerSaving
+               WRITE SetDeviceIdlePowerSaving NOTIFY deviceIdlePowerSavingChanged)
     Q_PROPERTY(QString PowerSavingModeBrightnessData READ powerSavingModeBrightnessData WRITE setPowerSavingModeBrightnessData NOTIFY powerSavingModeBrightnessDataChanged)
     Q_PROPERTY(bool ShortIdleState READ shortIdleState NOTIFY shortIdleStateChanged)
     Q_PROPERTY(QString TlpMode READ tlpMode NOTIFY tlpModeChanged)
@@ -86,6 +88,7 @@ private Q_SLOTS:
     void setPowerSavingModeBrightnessDropPercent(uint v);
     uint powerSavingModeAutoBatteryPercent() const { return m_psmAutoPct; }
     void setPowerSavingModeAutoBatteryPercent(uint v);
+    bool deviceIdlePowerSaving() const { return m_deviceIdlePowerSaving; }
     QString powerSavingModeBrightnessData() const { return m_psmBrightnessData; }
     void setPowerSavingModeBrightnessData(const QString &v);
     bool shortIdleState() const { return m_shortIdleState; }
@@ -115,6 +118,7 @@ public Q_SLOTS:
     void SetTlpMode(const QString &mode);
     void SetAllowCaller(const QString &uniqueName);
     void SetShortIdleState(bool state);
+    void SetDeviceIdlePowerSaving(bool enabled);
     void SetIdleState(bool state);
     void SetScreenState(bool state);
 
@@ -140,6 +144,7 @@ Q_SIGNALS:
     void powerSavingModeAutoBatteryPercentChanged();
     void powerSavingModeBrightnessDataChanged();
     void shortIdleStateChanged();
+    void deviceIdlePowerSavingChanged();
     void tlpModeChanged();
     void modeChanged();
     void isHighPerformanceSupportedChanged();
@@ -155,6 +160,7 @@ private:
     void initializePowerMode();
     void recalcBatteryLow();
     void applyMode(const QString &mode);
+    void enqueueModeCommand();
     void setMode(const QString &mode);
     QString mappedDspcMode(const QString &mode) const;
     void setShortIdleState(bool state);
@@ -194,9 +200,11 @@ private:
     QString m_psmBrightnessData;
     bool m_shortIdleEnabled = false;
     bool m_shortIdleState = false;
+    bool m_deviceIdlePowerSaving = false;
     QString m_tlpMode;
     QString m_mode = "balance";
     QString m_lastMode = "balance";
+    QString m_lastCommandMode = "balance";  // 最近一次入队下发的 DSPC 模式
     bool m_batteryLow = false;
     QString m_governor;
     bool m_boost = true;
