@@ -11,7 +11,14 @@
 enum class TriggerType {
     Command = 1,
     App,
-    Action
+    Action,
+    PortalNotification
+};
+
+enum class ShortcutOrigin {
+    Builtin,
+    Custom,
+    Portal
 };
 
 // Key event flags (bitfield, matches Wayland protocol keybind_flag)
@@ -33,6 +40,7 @@ namespace CategoryKey {
 // Base configuration information
 struct BaseConfig
 {
+    ShortcutOrigin origin = ShortcutOrigin::Builtin;
     QString appId;              // Application ID
     QString subPath;            // DConfig subPath (e.g. [appId].shortcut.xxx)
     QString displayName;        // Localized name
@@ -45,7 +53,8 @@ struct BaseConfig
 
     QString getId() const { return subPath; }
     bool operator==(const BaseConfig &other) const {
-        return appId == other.appId
+        return origin == other.origin
+                && appId == other.appId
                 && subPath == other.subPath
                 && displayName == other.displayName
                 && displayOrder == other.displayOrder

@@ -46,17 +46,17 @@ bool PluginShortcutManager::init(QDBusConnection *connection)
     const auto registerEndpoint = [connection](const QString &service,
                                                const QString &path,
                                                QObject *object) {
-        if (!connection->registerService(service)) {
-            qCCritical(logShortcut) << "[PluginShortcutManager] Failed to register service" << service << ":"
-                        << connection->lastError().message();
-            return false;
-        }
-
         if (!connection->registerObject(path, object,
                                         QDBusConnection::ExportScriptableContents)) {
             qCCritical(logShortcut) << "[PluginShortcutManager] Failed to register object" << path << ":"
                         << connection->lastError().message();
-            connection->unregisterService(service);
+            return false;
+        }
+
+        if (!connection->registerService(service)) {
+            qCCritical(logShortcut) << "[PluginShortcutManager] Failed to register service" << service << ":"
+                                    << connection->lastError().message();
+            connection->unregisterObject(path);
             return false;
         }
 

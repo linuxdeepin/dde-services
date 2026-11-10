@@ -323,6 +323,7 @@ void X11KeyHandler::finishCapture(bool notify)
 
 bool X11KeyHandler::registerKey(const KeyConfig &config)
 {
+    const bool portalShortcut = config.origin == ShortcutOrigin::Portal;
     if (!isAvailable()) {
         qCCritical(logShortcut) << "X11KeyHandler: XCB connection not available, cannot register key:" << config.getId();
         return false;
@@ -368,15 +369,26 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
                     resolution == HotkeyResolution::UnavailableInKeymap
                     && candidate.requirement == PhysicalKeyAlias::X11CandidateRequirement::IfAvailable;
             if (unavailableAlias) {
-                qCInfo(logShortcut) << "X11KeyHandler: Physical alias is unavailable in the current keymap:"
-                        << xkbHotkey;
+                if (portalShortcut)
+                    qCInfo(logShortcut) << "X11KeyHandler: Portal physical alias is unavailable:" << config.getId();
+                else
+                    qCInfo(logShortcut) << "X11KeyHandler: Physical alias is unavailable in the current keymap:"
+                                        << xkbHotkey;
                 continue;
             }
 
-            qCWarning(logShortcut) << "X11KeyHandler: Failed to resolve hotkey:" << xkbHotkey
-                       << (resolution == HotkeyResolution::InvalidSpecification
-                                   ? "invalid specification"
-                                   : "unavailable in current keymap");
+            if (portalShortcut) {
+                qCWarning(logShortcut) << "X11KeyHandler: Failed to resolve Portal shortcut:"
+                                       << config.getId()
+                                       << (resolution == HotkeyResolution::InvalidSpecification
+                                                   ? "invalid specification"
+                                                   : "unavailable in current keymap");
+            } else {
+                qCWarning(logShortcut) << "X11KeyHandler: Failed to resolve hotkey:" << xkbHotkey
+                                       << (resolution == HotkeyResolution::InvalidSpecification
+                                                   ? "invalid specification"
+                                                   : "unavailable in current keymap");
+            }
             allSuccess = false;
             break;
         }
@@ -386,7 +398,10 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
                 && isStandaloneModifierKey(hotkey.keysym, hotkey.modifierCombinations.constFirst());
         if (isStandaloneModifier
                 && (!m_modifierMonitor || !m_modifierMonitor->isAvailable())) {
-            qCWarning(logShortcut) << "X11KeyHandler: Standalone modifier monitor is unavailable:" << xkbHotkey;
+            if (portalShortcut)
+                qCWarning(logShortcut) << "X11KeyHandler: Portal modifier monitor is unavailable:" << config.getId();
+            else
+                qCWarning(logShortcut) << "X11KeyHandler: Standalone modifier monitor is unavailable:" << xkbHotkey;
             allSuccess = false;
             break;
         }
@@ -400,8 +415,13 @@ bool X11KeyHandler::registerKey(const KeyConfig &config)
 
                 if (!isStandaloneModifier && !grabKey(keycode, modifiers)) {
                     candidateFailed = true;
-                    qCWarning(logShortcut) << "X11KeyHandler: Failed to grab hotkey:" << xkbHotkey
-                               << "keycode:" << keycode << "modifiers:" << Qt::hex << modifiers;
+                    if (portalShortcut) {
+                        qCWarning(logShortcut) << "X11KeyHandler: Failed to grab Portal shortcut:"
+                                               << config.getId();
+                    } else {
+                        qCWarning(logShortcut) << "X11KeyHandler: Failed to grab hotkey:" << xkbHotkey
+                                               << "keycode:" << keycode << "modifiers:" << Qt::hex << modifiers;
+                    }
                     break;
                 }
 
@@ -1041,7 +1061,7 @@ void X11KeyHandler::flushPendingReleases()
 void X11KeyHandler::activate(const QString &shortcutId, int eventFlag)
 {
     if (m_shortcutFlags.value(shortcutId, KeyEventFlag::Release) & eventFlag)
-        emit keyActivated(shortcutId);
+        emit keyActivated(shortcutId, eventFlag);
 }
 
 void X11KeyHandler::clearPressedState(const QString &shortcutId)

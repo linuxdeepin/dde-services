@@ -295,6 +295,24 @@ private slots:
         QVERIFY(m_server.bindings().isEmpty());
     }
 
+    void portalKeypadIdentityReachesWire()
+    {
+        WaylandKeyHandler handler(m_wrapper.get());
+        KeyConfig config = keyConfig("portal:keypad", {"Ctrl+Num+1"});
+        config.origin = ShortcutOrigin::Portal;
+        config.keyEventFlags = KeyEventFlag::Press | KeyEventFlag::Release;
+        QVERIFY(handler.registerKey(config));
+        QVERIFY(handler.registerKey(keyConfig("main-digit", {"Ctrl+1"})));
+        QVERIFY(handler.commitSync());
+        const auto bindings = m_server.bindings();
+        QCOMPARE(bindings.size(), 2);
+        QStringList keys;
+        for (const Binding &binding : bindings)
+            keys.append(binding.key);
+        QVERIFY(keys.contains(QStringLiteral("Ctrl+Num+1")));
+        QVERIFY(keys.contains(QStringLiteral("Ctrl+1")));
+    }
+
     void mapsGestureBusinessIdsToWireValues()
     {
         WaylandGestureHandler handler(m_wrapper.get());
