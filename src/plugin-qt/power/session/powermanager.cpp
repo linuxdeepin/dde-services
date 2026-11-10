@@ -632,11 +632,13 @@ void PowerManager::TurnOffScreen()
         return;
     }
 
-    if (m_screenBlackLock)
-        doLock(true);
     SetPrepareSuspend(PS_ButtonClick);
 
+    // Blank first: locking goes through LockFront, which reads Power1 back, so
+    // it must never gate how long the display stays lit.
     setDPMSModeOff();
+    if (m_screenBlackLock)
+        doLock(true);
 
     SetPrepareSuspend(PS_Finish);
 }
