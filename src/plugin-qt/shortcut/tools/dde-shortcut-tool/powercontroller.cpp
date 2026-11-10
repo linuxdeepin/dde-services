@@ -275,7 +275,9 @@ void PowerController::doLock(bool autoStartAuth)
         qWarning() << "PowerController: LockFront1 unavailable";
         return;
     }
-    lockFront.call("ShowAuth", autoStartAuth);
+    // Fire and forget: LockFront reads Power1 back, so waiting for its reply
+    // from a key handler only risks the 25s D-Bus timeout.
+    lockFront.asyncCall("ShowAuth", autoStartAuth);
 }
 
 void PowerController::systemShutdown()
