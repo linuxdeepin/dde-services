@@ -337,10 +337,13 @@ void SessionDBusProxy::requestShutdownByFront()
 
 void SessionDBusProxy::showLockAuth(bool autoStart)
 {
+    // LockFront's handler reads Power1 properties (SleepLock) synchronously. A
+    // blocking call here parks the Power1 main thread until the 25s D-Bus
+    // timeout, which in turn delays whatever triggered the lock (screen-off).
     QDBusMessage msg = QDBusMessage::createMethodCall(
         kLockFront, kLockFrontPath, kLockFront, QStringLiteral("ShowAuth"));
     msg << autoStart;
-    QDBusConnection::sessionBus().call(msg, QDBus::Block);
+    QDBusConnection::sessionBus().asyncCall(msg);
 }
 
 void SessionDBusProxy::lockSession(const QString &sessionId)
