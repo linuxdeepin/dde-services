@@ -6,6 +6,7 @@
 
 #include "shortcutconfig.h"
 #include "crosschannelactivationguard.h"
+#include "portalshortcutmanager.h"
 
 #include <QElapsedTimer>
 #include <QObject>
@@ -13,6 +14,7 @@
 #include <QDBusContext>
 #include <QDBusArgument>
 #include <QDBusMetaType>
+#include <QList>
 #include <QSet>
 
 
@@ -47,7 +49,9 @@ struct CategoryInfo {
 Q_DECLARE_METATYPE(CategoryInfo)
 Q_DECLARE_METATYPE(QList<CategoryInfo>)
 
-class KeybindingManager : public QObject, protected QDBusContext
+class KeybindingManager : public QObject,
+                          protected QDBusContext,
+                          private PortalShortcutRuntime
 {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.deepin.dde.Keybinding1")
@@ -62,7 +66,8 @@ public:
                                AbstractKeyHandler *keyHandler,
                                SessionActiveMonitor *sessionMonitor,
                                X11GestureActionExecutor *x11ActionExecutor = nullptr,
-                               QObject *parent = nullptr);
+                               QObject *parent = nullptr,
+                               PortalShortcutStore *portalStore = nullptr);
     ~KeybindingManager() override;
 
     /** Register all configured shortcuts in the current backend batch. */
@@ -107,6 +112,29 @@ public slots:
     Q_SCRIPTABLE bool ReplaceHotkey(const QString &targetId, const QString &newHotkey, const QString &conflictId);
     Q_SCRIPTABLE void ReloadConfigs();
     Q_SCRIPTABLE void Reset();
+
+    // GlobalShortcuts portal core. These methods are caller-restricted to
+    // the current DDE portal backend owner.
+    Q_SCRIPTABLE PortalShortcutInfoList ListPortalShortcuts(const QString &appId);
+    Q_SCRIPTABLE PortalTriggerList NormalizeXdgPortalTriggers(const PortalTriggerList &requested);
+    Q_SCRIPTABLE PortalShortcutInfoList CommitPortalSessionBindings(
+            const QString &appId,
+            const QString &sessionToken,
+            const PortalShortcutUpdateList &requested);
+    Q_SCRIPTABLE PortalShortcutInfoList RestorePortalSessionBindings(
+            const QString &appId,
+            const QString &sessionToken,
+            const PortalShortcutUpdateList &declared,
+            const QStringList &activeShortcutIds);
+    Q_SCRIPTABLE PortalShortcutInfoList ApplyPortalSessionUpdates(
+            const QString &appId,
+            const QString &sessionToken,
+            const PortalShortcutUpdateList &updates);
+    Q_SCRIPTABLE void DeactivatePortalShortcuts(const QString &appId,
+                                                const QString &sessionToken);
+    Q_SCRIPTABLE PortalShortcutConflictList CheckPortalShortcutConflicts(
+            const QString &appId,
+            const PortalShortcutUpdateList &shortcuts);
     
     // Lock key state methods (0=off, 1=on)
     Q_SCRIPTABLE uint GetNumLockState() const;
@@ -121,6 +149,17 @@ signals:
     Q_SCRIPTABLE void ShortcutRemoved(const QString &id);
     Q_SCRIPTABLE void KeyEvent(bool pressed, const QString &keystroke);
     Q_SCRIPTABLE void CaptureFinished(quint64 captureId, uint result, const QString &keystroke);
+    Q_SCRIPTABLE void PortalShortcutPressed(const QString &appId,
+                                            const QString &shortcutId,
+                                            qulonglong timestamp);
+    Q_SCRIPTABLE void PortalShortcutReleased(const QString &appId,
+                                             const QString &shortcutId,
+                                             qulonglong timestamp);
+    Q_SCRIPTABLE void PortalShortcutsChanged(const QString &appId,
+                                             const PortalShortcutInfoList &shortcuts);
+    Q_SCRIPTABLE void PortalSessionShortcutsChanged(const QString &appId,
+                                                    const QString &sessionToken,
+                                                    const PortalShortcutInfoList &shortcuts);
     
     // Lock key state signals (0=off, 1=on)
     Q_SCRIPTABLE void NumLockStateChanged(uint state);
@@ -130,9 +169,9 @@ private slots:
     void onKeyConfigAdded(const KeyConfig &config);
     void onKeyConfigChanged(const KeyConfig &config);
     void onConfigRemoved(const QString &id);
-    void onKeyActivated(const QString &shortcutId);
+    void onKeyActivated(const QString &shortcutId, int eventFlag);
     void onKeyRegistrationFailed(const QString &shortcutId);
-    void onSpecialKeyActivated(const QString &shortcutId);
+    void onSpecialKeyActivated(const QString &shortcutId, int eventFlag);
     void onCaptureKeyEvent(bool pressed, const QString &keystroke);
     void onCaptureResult(quint64 captureId, uint result, const QString &keystroke);
     void updateNumLockState(bool on);
@@ -145,6 +184,21 @@ private:
     enum class ShortcutActivationSource {
         Backend,
         SpecialKey,
+    };
+
+    enum class DeferredRuntimeEventType {
+        KeyConfigAdded,
+        KeyConfigChanged,
+        ConfigRemoved,
+        BackendKeymapAboutToChange,
+        BackendKeymapChanged,
+        KeyRegistrationFailed,
+    };
+
+    struct DeferredRuntimeEvent {
+        DeferredRuntimeEventType type;
+        KeyConfig config;
+        QString id;
     };
 
     enum class RollbackResult {
@@ -172,7 +226,8 @@ private:
     void updateCustomShortcutConfigFields(KeyConfig &config, const QString &displayName,
                                           const QStringList &commandArguments,
                                           const QString &normalizedHotkey) const;
-    void activateShortcut(const QString &shortcutId, ShortcutActivationSource source);
+    void activateShortcut(const QString &shortcutId, int eventFlag,
+                          ShortcutActivationSource source);
 
     struct CustomShortcutChange {
         bool hasOldTarget = false;
@@ -188,6 +243,27 @@ private:
     bool prepareConflictShortcutChange(const QString &hotkey, CustomShortcutChange &change,
                                        const QString &selfId,
                                        const QString &expectedConflictId);
+    void queueDeferredRuntimeEvent(DeferredRuntimeEventType type,
+                                   const KeyConfig &config = {},
+                                   const QString &id = {});
+    void scheduleDeferredRuntimeEvents();
+    void processDeferredRuntimeEvents();
+    void applyKeyConfigAdded(const KeyConfig &config);
+    void applyKeyConfigChanged(const KeyConfig &config);
+    void applyConfigRemoved(const QString &id);
+    void applyBackendKeymapAboutToChange();
+    void applyBackendKeymapChanged();
+    bool verifyPortalCaller();
+    void sendPortalError(const PortalOperationError &error);
+
+    // PortalShortcutRuntime
+    bool beginPortalWrite() override;
+    void endPortalWrite() override;
+    PortalRuntimeConflict lookupPortalConflict(const QString &hotkey,
+                                               const QStringList &excludeIds) const override;
+    bool registerPortalShortcut(const KeyConfig &config) override;
+    void unregisterPortalShortcut(const QString &id) override;
+    bool commitPortalShortcuts() override;
 
     ConfigLoader *m_loader;
     AbstractKeyHandler *m_keyHandler;
@@ -196,6 +272,7 @@ private:
     ActionExecutor *m_executor;
     TranslationManager *m_translationManager;
     X11GestureActionExecutor *m_x11ActionExecutor;
+    PortalShortcutManager *m_portalManager;
 
     // id(shortcutId) -> KeyConfig
     QMap<QString, KeyConfig> m_keyConfigsMap;
@@ -205,6 +282,9 @@ private:
     QElapsedTimer m_activationClock;
     uint m_lastNumLockState = 0;
     uint m_lastCapsLockState = 0;
+    QList<DeferredRuntimeEvent> m_deferredRuntimeEvents;
+    bool m_shortcutWriteInProgress = false;
+    bool m_deferredRuntimeEventsScheduled = false;
     bool m_isWayland = false;
     X11NumLockStateController *m_numLockStateController = nullptr;
 };

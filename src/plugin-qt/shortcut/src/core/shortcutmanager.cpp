@@ -99,12 +99,6 @@ bool ShortcutManager::registerDBusService()
 {
     QDBusConnection connection = QDBusConnection::sessionBus();
 
-    // Register Keybinding service
-    if (!connection.registerService("org.deepin.dde.Keybinding1")) {
-        qCCritical(logShortcut) << "Failed to register DBus service org.deepin.dde.Keybinding1";
-        return false;
-    }
-
     if (!connection.registerObject("/org/deepin/dde/Keybinding1", m_keybindingManager,
                                    QDBusConnection::ExportAllSlots | 
                                    QDBusConnection::ExportAllSignals |
@@ -113,18 +107,25 @@ bool ShortcutManager::registerDBusService()
         return false;
     }
 
+    if (!connection.registerService("org.deepin.dde.Keybinding1")) {
+        qCCritical(logShortcut) << "Failed to register DBus service org.deepin.dde.Keybinding1";
+        connection.unregisterObject("/org/deepin/dde/Keybinding1");
+        return false;
+    }
+
     qCInfo(logShortcut) << "Deepin Keybinding Service started.";
 
     // Register Gesture service
     if (m_gestureManager) {
-        if (!connection.registerService("org.deepin.dde.Gesture1")) {
-            qCCritical(logShortcut) << "Failed to register DBus service org.deepin.dde.Gesture1";
-            return false;
-        }
-
         if (!connection.registerObject("/org/deepin/dde/Gesture1", m_gestureManager,
                                     QDBusConnection::ExportAllSlots | QDBusConnection::ExportAllSignals)) {
             qCCritical(logShortcut) << "Failed to register DBus object for Gesture1";
+            return false;
+        }
+
+        if (!connection.registerService("org.deepin.dde.Gesture1")) {
+            qCCritical(logShortcut) << "Failed to register DBus service org.deepin.dde.Gesture1";
+            connection.unregisterObject("/org/deepin/dde/Gesture1");
             return false;
         }
 

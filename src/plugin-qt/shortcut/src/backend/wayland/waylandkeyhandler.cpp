@@ -74,18 +74,30 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
 
     QStringList bindings;
     bool allSuccess = true;
+    int bindingIndex = 0;
 
     for (const QString &hotkey : config.hotkeys) {
         if (isLockKey(hotkey)) {
-            qCDebug(logShortcut) << "Skipping lock key registration on Wayland:" << hotkey
-                     << "for" << config.getId();
+            if (config.origin == ShortcutOrigin::Portal) {
+                qCWarning(logShortcut) << "Portal lock key is unsupported on Wayland:"
+                                       << config.getId();
+                allSuccess = false;
+            } else {
+                qCDebug(logShortcut) << "Skipping lock key registration on Wayland:" << hotkey
+                                     << "for" << config.getId();
+            }
+            ++bindingIndex;
             continue;
         }
 
         // A deferred failure from an older registration must not invalidate a
         // replacement for the same config/hotkey after a session switch.
-        const QString name = config.getId() + "_" + hotkey
-                + "#" + QString::number(++m_bindingSerial);
+        const QString bindingSuffix = config.origin == ShortcutOrigin::Portal
+                ? QString::number(bindingIndex)
+                : hotkey;
+        const QString name = config.getId() + QLatin1Char('_') + bindingSuffix
+                + QLatin1Char('#') + QString::number(++m_bindingSerial);
+        ++bindingIndex;
         
         // Use keyEventFlags from config, default to key_release (0x2)
         int flags = config.keyEventFlags;
@@ -94,7 +106,10 @@ bool WaylandKeyHandler::registerKey(const KeyConfig &config)
             bindings.append(name);
         } else {
             allSuccess = false;
-            qCWarning(logShortcut) << "Failed to bind key:" << hotkey << "for" << config.getId();
+            if (config.origin == ShortcutOrigin::Portal)
+                qCWarning(logShortcut) << "Failed to bind Portal shortcut:" << config.getId();
+            else
+                qCWarning(logShortcut) << "Failed to bind key:" << hotkey << "for" << config.getId();
         }
     }
 
@@ -137,14 +152,13 @@ bool WaylandKeyHandler::commitSync()
 
 void WaylandKeyHandler::onActivated(const QString &name, uint32_t flags)
 {
-    Q_UNUSED(flags);
     // Forward the activation signal to KeybindingManager
     if (m_nameToId.contains(name)) {
         QString id = m_nameToId.value(name);
         qCDebug(logShortcut) << "WaylandKeyHandler::onActivated name:" << name << "id:" << id
                  << "flags:" << flags;
         
-        emit keyActivated(id);
+        emit keyActivated(id, static_cast<int>(flags));
     }
 }
 

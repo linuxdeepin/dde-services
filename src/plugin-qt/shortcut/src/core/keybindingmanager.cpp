@@ -23,9 +23,14 @@
 #include <DGuiApplicationHelper>
 
 #include <QDebug>
+#include <QDBusConnectionInterface>
 #include <QDBusMessage>
+#include <QDBusReply>
+#include <QDBusServiceWatcher>
 #include <QHash>
 #include <QKeySequence>
+#include <QScopeGuard>
+#include <QTimer>
 #include <QUuid>
 
 #include <algorithm>
@@ -37,6 +42,7 @@ DGUI_USE_NAMESPACE
 namespace {
 constexpr const char *kDefaultShortcutAppId = "org.deepin.dde.keybinding";
 constexpr const char *kNoHotkeyText = "None";
+constexpr const char *kPortalBackendService = "org.freedesktop.impl.portal.desktop.dde";
 
 bool isFixedCompatibilityAlias(const KeyConfig &config)
 {
@@ -294,7 +300,8 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
                                      AbstractKeyHandler *keyHandler,
                                      SessionActiveMonitor *sessionMonitor,
                                      X11GestureActionExecutor *x11ActionExecutor,
-                                     QObject *parent)
+                                     QObject *parent,
+                                     PortalShortcutStore *portalStore)
     : QObject(parent)
     , m_loader(loader)
     , m_keyHandler(keyHandler)
@@ -303,6 +310,8 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
     , m_executor(executor)
     , m_translationManager(translationManager)
     , m_x11ActionExecutor(x11ActionExecutor)
+    , m_portalManager(portalStore ? new PortalShortcutManager(this, portalStore, this)
+                                  : new PortalShortcutManager(this, this))
     , m_isWayland(DGuiApplicationHelper::testAttribute(DGuiApplicationHelper::IsWaylandPlatform))
 {
     m_activationClock.start();
@@ -317,6 +326,8 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
     qRegisterMetaType<QList<CategoryInfo>>("QList<CategoryInfo>");
     qDBusRegisterMetaType<CategoryInfo>();
     qDBusRegisterMetaType<QList<CategoryInfo>>();
+    registerPortalShortcutMetaTypes();
+    m_portalManager->load();
 
     connect(m_sessionMonitor, &SessionActiveMonitor::activeChanged,
             this, [this](bool active) {
@@ -353,6 +364,33 @@ KeybindingManager::KeybindingManager(ConfigLoader *loader, ActionExecutor *execu
     // Connect signals from special key handler
     connect(m_specialKeyHandler, &SpecialKeyHandler::keyActivated,
             this, &KeybindingManager::onSpecialKeyActivated);
+
+    connect(m_portalManager,
+            &PortalShortcutManager::shortcutPressed,
+            this,
+            &KeybindingManager::PortalShortcutPressed);
+    connect(m_portalManager,
+            &PortalShortcutManager::shortcutReleased,
+            this,
+            &KeybindingManager::PortalShortcutReleased);
+    connect(m_portalManager,
+            &PortalShortcutManager::shortcutsChanged,
+            this,
+            &KeybindingManager::PortalShortcutsChanged);
+    connect(m_portalManager,
+            &PortalShortcutManager::sessionShortcutsChanged,
+            this,
+            &KeybindingManager::PortalSessionShortcutsChanged);
+
+    auto *portalBackendWatcher = new QDBusServiceWatcher(
+            QString::fromLatin1(kPortalBackendService),
+            QDBusConnection::sessionBus(),
+            QDBusServiceWatcher::WatchForUnregistration,
+            this);
+    connect(portalBackendWatcher,
+            &QDBusServiceWatcher::serviceUnregistered,
+            m_portalManager,
+            &PortalShortcutManager::deactivateAllSessions);
     
     connect(m_loader, &ConfigLoader::keyConfigChanged, this, &KeybindingManager::onKeyConfigChanged);
     connect(m_loader, &ConfigLoader::keyConfigAdded,
@@ -407,6 +445,7 @@ void KeybindingManager::registerAllShortcuts()
 
     qCInfo(logShortcut) << "KeybindingManager: configured" << m_keyConfigsMap.size()
             << "active" << m_activeShortcutIds.size();
+    m_portalManager->restoreRuntimeBindings();
 }
 
 void KeybindingManager::clearState()
@@ -423,9 +462,11 @@ QList<ShortcutInfo> KeybindingManager::ListAllShortcuts()
     for (const auto &config : m_keyConfigsMap) {
         // Only expose modifiable shortcuts — control center filters out
         // non-modifiable entries to avoid showing read-only items.
+        // Portal shortcuts use their dedicated management API and are not
+        // exposed in the legacy control-center list yet.
         // Empty hotkeys are still exposed so the control center can show
         // the existing row as "None" after another shortcut takes its binding.
-        if (!config.modifiable) {
+        if (config.origin == ShortcutOrigin::Portal || !config.modifiable) {
             continue;
         }
         list.append(toShortcutInfo(config));
@@ -440,7 +481,7 @@ QList<ShortcutInfo> KeybindingManager::ListShortcutsByApp(const QString &appId)
     QList<ShortcutInfo> list;
     QList<KeyConfig> configs = m_keyConfigsMap.values();
     for (const KeyConfig &config : configs) {
-        if (config.appId == appId) {
+        if (config.origin != ShortcutOrigin::Portal && config.appId == appId) {
             list.append(toShortcutInfo(config));
         }
     }
@@ -453,7 +494,7 @@ QList<ShortcutInfo> KeybindingManager::ListShortcutsByCategory(const QString &ca
     QList<ShortcutInfo> list;
     QList<KeyConfig> configs = m_keyConfigsMap.values();
     for (const KeyConfig &config : configs) {
-        if (config.category == category) {
+        if (config.origin != ShortcutOrigin::Portal && config.category == category) {
             list.append(toShortcutInfo(config));
         }
     }
@@ -470,8 +511,10 @@ QList<CategoryInfo> KeybindingManager::ListCategories()
     QHash<QString, CategoryInfo> seen;
     const QHash<QString, int> categoryOrders = categoryDisplayOrders(m_keyConfigsMap);
     for (const auto &config : m_keyConfigsMap) {
-        if (!config.modifiable || config.category.isEmpty())
+        if (config.origin == ShortcutOrigin::Portal
+            || !config.modifiable || config.category.isEmpty()) {
             continue;
+        }
         if (!seen.contains(config.category)) {
             CategoryInfo ci;
             ci.key = config.category;
@@ -514,12 +557,13 @@ QString KeybindingManager::GetShortcutCommand(const QString &id)
 ShortcutInfo KeybindingManager::LookupConflictShortcut(const QString &hotkey)
 {
     const QString needle = normalizeHotkey(hotkey);
-    for (const KeyConfig &config : m_keyConfigsMap) {
-        if (!config.enabled) continue;
-        if (config.hotkeys.contains(needle)) {
-            return toShortcutInfo(config);
-        }
-    }
+    const QString conflictId = lookupRuntimeConflict(needle, {});
+    const auto ordinary = m_keyConfigsMap.constFind(conflictId);
+    if (ordinary != m_keyConfigsMap.cend())
+        return toShortcutInfo(*ordinary);
+    const auto portal = m_portalManager->activeConfig(conflictId);
+    if (portal)
+        return toShortcutInfo(*portal);
     return ShortcutInfo(); // Empty struct if no conflict
 }
 
@@ -530,7 +574,8 @@ QList<ShortcutInfo> KeybindingManager::SearchShortcuts(const QString &keyword)
 
     for (auto it = m_keyConfigsMap.constBegin(); it != m_keyConfigsMap.constEnd(); ++it) {
         const KeyConfig &config = it.value();
-        if (!config.isValid()) continue;
+        if (config.origin == ShortcutOrigin::Portal || !config.isValid())
+            continue;
 
         // Match against shortcutId
         if (config.getId().contains(keyword, Qt::CaseInsensitive)) {
@@ -566,6 +611,10 @@ QList<ShortcutInfo> KeybindingManager::SearchShortcuts(const QString &keyword)
 
 bool KeybindingManager::ModifyHotkeys(const QString &id, const QStringList &newHotkeys)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (!m_keyConfigsMap.contains(id)) return false;
 
     KeyConfig config = m_keyConfigsMap[id];
@@ -638,6 +687,9 @@ bool KeybindingManager::ModifyHotkeys(const QString &id, const QStringList &newH
 
 QString KeybindingManager::AddCustomShortcut(const QString &name, const QString &action, const QString &hotkey)
 {
+    if (!beginPortalWrite())
+        return {};
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
     return addCustomShortcut(name, action, hotkey, QString());
 }
 
@@ -645,6 +697,10 @@ QString KeybindingManager::AddCustomShortcutWithConflict(const QString &name, co
                                                           const QString &hotkey,
                                                           const QString &expectedConflictId)
 {
+    if (!beginPortalWrite())
+        return {};
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (expectedConflictId.trimmed().isEmpty()) {
         qCWarning(logShortcut) << "AddCustomShortcutWithConflict: expected conflict id is empty";
         return QString();
@@ -702,6 +758,9 @@ QString KeybindingManager::addCustomShortcut(const QString &name, const QString 
 bool KeybindingManager::ModifyCustomShortcut(const QString &id, const QString &name,
                                              const QString &action, const QString &hotkey)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
     return modifyCustomShortcut(id, name, action, hotkey, QString());
 }
 
@@ -710,6 +769,10 @@ bool KeybindingManager::ModifyCustomShortcutWithConflict(const QString &id, cons
                                                          const QString &hotkey,
                                                          const QString &expectedConflictId)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (expectedConflictId.trimmed().isEmpty()) {
         qCWarning(logShortcut) << "ModifyCustomShortcutWithConflict: expected conflict id is empty";
         return false;
@@ -788,6 +851,10 @@ bool KeybindingManager::modifyCustomShortcut(const QString &id, const QString &n
 
 bool KeybindingManager::DeleteCustomShortcut(const QString &id)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (!m_keyConfigsMap.contains(id)) {
         return false;
     }
@@ -820,6 +887,10 @@ bool KeybindingManager::DeleteCustomShortcut(const QString &id)
 
 bool KeybindingManager::SwapHotkeys(const QString &id1, const QString &id2)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (id1 == id2)
         return false;
 
@@ -998,6 +1069,10 @@ void KeybindingManager::rebuildPersistedShortcutPair(const QString &id1, const Q
 
 bool KeybindingManager::ReplaceHotkey(const QString &targetId, const QString &newHotkey, const QString &conflictId)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (targetId == conflictId) return false;
     if (!m_keyConfigsMap.contains(targetId) || !m_keyConfigsMap.contains(conflictId))
         return false;
@@ -1106,6 +1181,10 @@ bool KeybindingManager::ReplaceHotkey(const QString &targetId, const QString &ne
 
 bool KeybindingManager::Disable(const QString &id)
 {
+    if (!beginPortalWrite())
+        return false;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     if (!m_keyConfigsMap.contains(id)) {
         return false;
     }
@@ -1137,6 +1216,10 @@ bool KeybindingManager::Disable(const QString &id)
 
 void KeybindingManager::ReloadConfigs()
 {
+    if (!beginPortalWrite())
+        return;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     qCInfo(logShortcut) << "ReloadConfigs called via DBus (delegating to Smart ConfigLoader)";
     
     // ConfigLoader will calculate diff (Add/Remove) and emit:
@@ -1149,6 +1232,10 @@ void KeybindingManager::ReloadConfigs()
 
 void KeybindingManager::Reset()
 {
+    if (!beginPortalWrite())
+        return;
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
     // Reset shortcut hotkeys to defaults; other fields (enabled, etc.) are untouched.
     const QStringList resetIds = m_loader->resettableHotkeyIds();
     if (resetIds.isEmpty()) {
@@ -1207,7 +1294,113 @@ void KeybindingManager::Reset()
     m_resetInProgressIds.subtract(resetIdSet);
 }
 
+PortalShortcutInfoList KeybindingManager::ListPortalShortcuts(const QString &appId)
+{
+    if (!verifyPortalCaller())
+        return {};
+    return m_portalManager->listShortcuts(appId);
+}
+
+PortalTriggerList KeybindingManager::NormalizeXdgPortalTriggers(
+        const PortalTriggerList &requested)
+{
+    if (!verifyPortalCaller())
+        return {};
+    PortalOperationError error;
+    const auto normalized = m_portalManager->normalizeTriggers(requested, &error);
+    if (!normalized) {
+        sendPortalError(error);
+        return {};
+    }
+    return *normalized;
+}
+
+PortalShortcutInfoList KeybindingManager::CommitPortalSessionBindings(
+        const QString &appId,
+        const QString &sessionToken,
+        const PortalShortcutUpdateList &requested)
+{
+    if (!verifyPortalCaller())
+        return {};
+    PortalOperationError error;
+    const auto bound = m_portalManager->commitSessionBindings(
+            appId, sessionToken, requested, &error);
+    if (!bound) {
+        sendPortalError(error);
+        return {};
+    }
+    return *bound;
+}
+
+PortalShortcutInfoList KeybindingManager::RestorePortalSessionBindings(
+        const QString &appId,
+        const QString &sessionToken,
+        const PortalShortcutUpdateList &declared,
+        const QStringList &activeShortcutIds)
+{
+    if (!verifyPortalCaller())
+        return {};
+    PortalOperationError error;
+    const auto bound = m_portalManager->restoreSessionBindings(
+            appId, sessionToken, declared, activeShortcutIds, &error);
+    if (!bound) {
+        sendPortalError(error);
+        return {};
+    }
+    return *bound;
+}
+
+PortalShortcutInfoList KeybindingManager::ApplyPortalSessionUpdates(
+        const QString &appId,
+        const QString &sessionToken,
+        const PortalShortcutUpdateList &updates)
+{
+    if (!verifyPortalCaller())
+        return {};
+    PortalOperationError error;
+    const auto bound = m_portalManager->applySessionUpdates(
+            appId, sessionToken, updates, &error);
+    if (!bound) {
+        sendPortalError(error);
+        return {};
+    }
+    return *bound;
+}
+
+void KeybindingManager::DeactivatePortalShortcuts(const QString &appId,
+                                                  const QString &sessionToken)
+{
+    if (!verifyPortalCaller())
+        return;
+    m_portalManager->deactivateSession(appId, sessionToken);
+}
+
+PortalShortcutConflictList KeybindingManager::CheckPortalShortcutConflicts(
+        const QString &appId,
+        const PortalShortcutUpdateList &shortcuts)
+{
+    if (!verifyPortalCaller())
+        return {};
+    PortalOperationError error;
+    const auto conflicts = m_portalManager->checkConflicts(appId, shortcuts, &error);
+    if (!conflicts) {
+        sendPortalError(error);
+        return {};
+    }
+    return *conflicts;
+}
+
 void KeybindingManager::onKeyConfigAdded(const KeyConfig &loadedConfig)
+{
+    if (!beginPortalWrite()) {
+        queueDeferredRuntimeEvent(DeferredRuntimeEventType::KeyConfigAdded, loadedConfig);
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+    applyKeyConfigAdded(loadedConfig);
+}
+
+void KeybindingManager::applyKeyConfigAdded(const KeyConfig &loadedConfig)
 {
     KeyConfig config = loadedConfig;
     config.hotkeys = normalizeHotkeys(config.hotkeys);
@@ -1231,10 +1424,20 @@ void KeybindingManager::onKeyConfigChanged(const KeyConfig &loadedConfig)
     if (m_resetInProgressIds.contains(loadedConfig.getId()))
         return;
 
+    if (!beginPortalWrite()) {
+        queueDeferredRuntimeEvent(DeferredRuntimeEventType::KeyConfigChanged, loadedConfig);
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+    applyKeyConfigChanged(loadedConfig);
+}
+
+void KeybindingManager::applyKeyConfigChanged(const KeyConfig &loadedConfig)
+{
     KeyConfig config = loadedConfig;
     config.hotkeys = normalizeHotkeys(config.hotkeys);
     if (!m_keyConfigsMap.contains(config.getId())) {
-        onKeyConfigAdded(config);
+        applyKeyConfigAdded(config);
         return;
     }
 
@@ -1281,6 +1484,16 @@ void KeybindingManager::onKeyConfigChanged(const KeyConfig &loadedConfig)
 void KeybindingManager::onConfigRemoved(const QString &id)
 {
     m_resetInProgressIds.remove(id);
+    if (!beginPortalWrite()) {
+        queueDeferredRuntimeEvent(DeferredRuntimeEventType::ConfigRemoved, {}, id);
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+    applyConfigRemoved(id);
+}
+
+void KeybindingManager::applyConfigRemoved(const QString &id)
+{
     if (m_keyConfigsMap.contains(id)) {
         m_keyConfigsMap.remove(id);
         const bool wasActive = m_activeShortcutIds.contains(id);
@@ -1301,21 +1514,26 @@ void KeybindingManager::onConfigRemoved(const QString &id)
     }
 }
 
-void KeybindingManager::onKeyActivated(const QString &shortcutId)
+void KeybindingManager::onKeyActivated(const QString &shortcutId, int eventFlag)
 {
-    activateShortcut(shortcutId, ShortcutActivationSource::Backend);
+    activateShortcut(shortcutId, eventFlag, ShortcutActivationSource::Backend);
 }
 
-void KeybindingManager::onSpecialKeyActivated(const QString &shortcutId)
+void KeybindingManager::onSpecialKeyActivated(const QString &shortcutId, int eventFlag)
 {
-    activateShortcut(shortcutId, ShortcutActivationSource::SpecialKey);
+    activateShortcut(shortcutId, eventFlag, ShortcutActivationSource::SpecialKey);
 }
 
 void KeybindingManager::activateShortcut(const QString &shortcutId,
+                                         int eventFlag,
                                          ShortcutActivationSource source)
 {
     qCDebug(logShortcut) << "Key activated:" << shortcutId
+                         << "event flag:" << eventFlag
                          << "source:" << static_cast<int>(source);
+
+    if (m_portalManager->handleKeyEvent(shortcutId, eventFlag))
+        return;
 
     const auto configIt = m_keyConfigsMap.constFind(shortcutId);
     if (configIt == m_keyConfigsMap.constEnd() || !m_activeShortcutIds.contains(shortcutId))
@@ -1397,11 +1615,15 @@ void KeybindingManager::updateCapsLockState(bool on)
 bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringList &excludeIds)
 {
     if (!config.canRegister()) {
-        qCWarning(logShortcut) << "Shortcut can not be registered, skipping:"
-                   << "Enabled:" << config.enabled
-                   << "AppId:" << config.appId
-                   << "DisplayName:" << config.displayName
-                   << "hotkeys:" << config.hotkeys;
+        if (config.origin == ShortcutOrigin::Portal) {
+            qCWarning(logShortcut) << "Portal shortcut can not be registered:" << config.getId();
+        } else {
+            qCWarning(logShortcut) << "Shortcut can not be registered, skipping:"
+                                   << "Enabled:" << config.enabled
+                                   << "AppId:" << config.appId
+                                   << "DisplayName:" << config.displayName
+                                   << "hotkeys:" << config.hotkeys;
+        }
         return false;
     }
     if (config.hotkeys.size() > MaxShortcutHotkeyCount) {
@@ -1420,12 +1642,21 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringL
             continue;
         seenHotkeys.insert(hotkey);
 
-        if (!isValidCustomShortcutHotkey(hotkey, false)) {
-            qCWarning(logShortcut) << "Shortcut contains an invalid hotkey, skipping:" << config.getId() << hotkey;
+        const QKeySequence sequence = QKeySequence::fromString(hotkey, QKeySequence::PortableText);
+        const bool valid = config.origin == ShortcutOrigin::Portal
+                ? !sequence.isEmpty() && sequence.count() == 1
+                        && sequence[0].key() != Qt::Key_unknown
+                : isValidCustomShortcutHotkey(hotkey, false);
+        if (!valid) {
+            if (config.origin == ShortcutOrigin::Portal)
+                qCWarning(logShortcut) << "Portal shortcut contains an invalid hotkey:" << config.getId();
+            else
+                qCWarning(logShortcut) << "Shortcut contains an invalid hotkey, skipping:"
+                                       << config.getId() << hotkey;
             continue;
         }
 
-        if (SpecialKeyHandler::isKeycode(hotkey)) {
+        if (config.origin != ShortcutOrigin::Portal && SpecialKeyHandler::isKeycode(hotkey)) {
             keycodeHotkeys.append(hotkey);
         } else {
             normalHotkeys.append(hotkey);
@@ -1443,12 +1674,17 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringL
         for (const QString &hotkey : normalHotkeys) {
             const QString conflictId = lookupRuntimeConflict(hotkey, excludeIds);
             if (!conflictId.isEmpty()) {
-                qCWarning(logShortcut) << "Shortcut conflict detected during init:"
-                            << "Config appId:" << config.appId
-                            << "Config displayName:" << config.displayName
-                            << "Config hotkeys:" << config.hotkeys
-                            << "Conflicts with:" << conflictId
-                            << "- Skipping symbolic registration";
+                if (config.origin == ShortcutOrigin::Portal) {
+                    qCWarning(logShortcut) << "Portal shortcut conflict during registration:"
+                                           << config.getId() << "conflicts with" << conflictId;
+                } else {
+                    qCWarning(logShortcut) << "Shortcut conflict detected during init:"
+                                           << "Config appId:" << config.appId
+                                           << "Config displayName:" << config.displayName
+                                           << "Config hotkeys:" << config.hotkeys
+                                           << "Conflicts with:" << conflictId
+                                           << "- Skipping symbolic registration";
+                }
                 return false;
             }
         }
@@ -1458,8 +1694,11 @@ bool KeybindingManager::registerShortcut(const KeyConfig &config, const QStringL
         if (m_keyHandler->registerKey(normalConfig))
             return true;
 
-        qCWarning(logShortcut) << "Failed to register symbolic hotkeys:"
-                               << config.getId() << normalHotkeys;
+        if (config.origin == ShortcutOrigin::Portal)
+            qCWarning(logShortcut) << "Failed to register Portal shortcut:" << config.getId();
+        else
+            qCWarning(logShortcut) << "Failed to register symbolic hotkeys:"
+                                   << config.getId() << normalHotkeys;
         // Wayland may retain successful bindings from a partially failed batch.
         m_keyHandler->unregisterKey(config.getId());
         return false;
@@ -1531,6 +1770,12 @@ void KeybindingManager::onKeyRegistrationFailed(const QString &id)
     // Preserve the configured value, but remove all runtime channels for it.
     unregisterShortcut(id);
     qCWarning(logShortcut) << "KeybindingManager: shortcut registration failed:" << id;
+    if (!beginPortalWrite()) {
+        queueDeferredRuntimeEvent(DeferredRuntimeEventType::KeyRegistrationFailed, {}, id);
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+    m_portalManager->handleRegistrationFailure(id);
 }
 
 QString KeybindingManager::lookupRuntimeConflict(const QString &hotkey,
@@ -1543,11 +1788,168 @@ QString KeybindingManager::lookupRuntimeConflict(const QString &hotkey,
         const auto configIt = m_keyConfigsMap.constFind(id);
         if (configIt != m_keyConfigsMap.constEnd() && configIt->hotkeys.contains(normalized))
             return id;
+        const auto portalConfig = m_portalManager->activeConfig(id);
+        if (portalConfig && portalConfig->hotkeys.contains(normalized))
+            return id;
     }
     return QString();
 }
 
+bool KeybindingManager::verifyPortalCaller()
+{
+    if (!calledFromDBus())
+        return true;
+
+    QDBusConnectionInterface *interface = QDBusConnection::sessionBus().interface();
+    const QDBusReply<QString> owner = interface
+            ? interface->serviceOwner(QString::fromLatin1(kPortalBackendService))
+            : QDBusReply<QString>();
+    if (!owner.isValid() || owner.value().isEmpty() || owner.value() != message().service()) {
+        sendErrorReply(QDBusError::AccessDenied,
+                       QStringLiteral("Only the current DDE portal backend may use this method"));
+        return false;
+    }
+    return true;
+}
+
+void KeybindingManager::sendPortalError(const PortalOperationError &error)
+{
+    if (!calledFromDBus() || !error.isValid())
+        return;
+    sendErrorReply(error.name, error.message);
+}
+
+bool KeybindingManager::beginPortalWrite()
+{
+    if (m_shortcutWriteInProgress)
+        return false;
+    m_shortcutWriteInProgress = true;
+    return true;
+}
+
+void KeybindingManager::endPortalWrite()
+{
+    m_shortcutWriteInProgress = false;
+    m_portalManager->processQueuedDeactivations();
+    scheduleDeferredRuntimeEvents();
+}
+
+void KeybindingManager::queueDeferredRuntimeEvent(DeferredRuntimeEventType type,
+                                                  const KeyConfig &config,
+                                                  const QString &id)
+{
+    m_deferredRuntimeEvents.append({type, config, id});
+    scheduleDeferredRuntimeEvents();
+}
+
+void KeybindingManager::scheduleDeferredRuntimeEvents()
+{
+    if (m_shortcutWriteInProgress || m_deferredRuntimeEvents.isEmpty()
+            || m_deferredRuntimeEventsScheduled) {
+        return;
+    }
+
+    m_deferredRuntimeEventsScheduled = true;
+    QTimer::singleShot(0, this, &KeybindingManager::processDeferredRuntimeEvents);
+}
+
+void KeybindingManager::processDeferredRuntimeEvents()
+{
+    m_deferredRuntimeEventsScheduled = false;
+    if (m_deferredRuntimeEvents.isEmpty())
+        return;
+    if (!beginPortalWrite()) {
+        scheduleDeferredRuntimeEvents();
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+
+    const QList<DeferredRuntimeEvent> events = std::exchange(
+            m_deferredRuntimeEvents, QList<DeferredRuntimeEvent>{});
+    for (const DeferredRuntimeEvent &event : events) {
+        switch (event.type) {
+        case DeferredRuntimeEventType::KeyConfigAdded:
+            applyKeyConfigAdded(event.config);
+            break;
+        case DeferredRuntimeEventType::KeyConfigChanged:
+            applyKeyConfigChanged(event.config);
+            break;
+        case DeferredRuntimeEventType::ConfigRemoved:
+            applyConfigRemoved(event.id);
+            break;
+        case DeferredRuntimeEventType::BackendKeymapAboutToChange:
+            applyBackendKeymapAboutToChange();
+            break;
+        case DeferredRuntimeEventType::BackendKeymapChanged:
+            applyBackendKeymapChanged();
+            break;
+        case DeferredRuntimeEventType::KeyRegistrationFailed:
+            // A successful rollback or rebind supersedes the queued failure.
+            if (!m_activeShortcutIds.contains(event.id))
+                m_portalManager->handleRegistrationFailure(event.id);
+            break;
+        }
+    }
+}
+
+PortalRuntimeConflict KeybindingManager::lookupPortalConflict(
+        const QString &hotkey,
+        const QStringList &excludeIds) const
+{
+    const QString id = lookupRuntimeConflict(hotkey, excludeIds);
+    if (id.isEmpty())
+        return {};
+
+    const auto ordinary = m_keyConfigsMap.constFind(id);
+    if (ordinary != m_keyConfigsMap.cend()) {
+        return {id,
+                ordinary->origin,
+                ordinary->modifiable,
+                ordinary->appId,
+                ordinary->getId()};
+    }
+
+    const auto portal = m_portalManager->activeConfig(id);
+    if (portal) {
+        return {id,
+                ShortcutOrigin::Portal,
+                true,
+                portal->appId,
+                portal->triggerValue.value(0)};
+    }
+    return {};
+}
+
+bool KeybindingManager::registerPortalShortcut(const KeyConfig &config)
+{
+    if (config.origin != ShortcutOrigin::Portal
+        || config.triggerType != static_cast<int>(TriggerType::PortalNotification)) {
+        return false;
+    }
+    return registerShortcut(config, {config.getId()});
+}
+
+void KeybindingManager::unregisterPortalShortcut(const QString &id)
+{
+    unregisterShortcut(id);
+}
+
+bool KeybindingManager::commitPortalShortcuts()
+{
+    return m_keyHandler->commitSync();
+}
+
 void KeybindingManager::onBackendKeymapChanged()
+{
+    if (!beginPortalWrite()) {
+        queueDeferredRuntimeEvent(DeferredRuntimeEventType::BackendKeymapChanged);
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+    applyBackendKeymapChanged();
+}
+
+void KeybindingManager::applyBackendKeymapChanged()
 {
     qCInfo(logShortcut) << "KeybindingManager: keyboard mapping changed, rebuilding X11 grabs";
     for (const KeyConfig &config : std::as_const(m_keyConfigsMap)) {
@@ -1555,10 +1957,35 @@ void KeybindingManager::onBackendKeymapChanged()
             qCWarning(logShortcut) << "KeybindingManager: shortcut remains inactive after keymap change:" << config.getId();
         }
     }
-    m_keyHandler->commitSync();
+    for (const KeyConfig &config : m_portalManager->activeConfigs()) {
+        if (!registerPortalShortcut(config)) {
+            qCWarning(logShortcut) << "KeybindingManager: Portal shortcut remains inactive after keymap change:"
+                                   << config.getId();
+            m_portalManager->handleRegistrationFailure(config.getId());
+        }
+    }
+    if (!m_keyHandler->commitSync()) {
+        qCCritical(logShortcut) << "KeybindingManager: failed to commit shortcuts after keymap change";
+        for (const KeyConfig &config : m_portalManager->activeConfigs()) {
+            unregisterPortalShortcut(config.getId());
+            m_portalManager->handleRegistrationFailure(config.getId());
+        }
+        if (!m_keyHandler->commitSync())
+            qCCritical(logShortcut) << "KeybindingManager: failed to clear Portal grabs after keymap change";
+    }
 }
 
 void KeybindingManager::onBackendKeymapAboutToChange()
+{
+    if (!beginPortalWrite()) {
+        queueDeferredRuntimeEvent(DeferredRuntimeEventType::BackendKeymapAboutToChange);
+        return;
+    }
+    const auto writeGuard = qScopeGuard([this] { endPortalWrite(); });
+    applyBackendKeymapAboutToChange();
+}
+
+void KeybindingManager::applyBackendKeymapAboutToChange()
 {
     const QStringList activeIds = m_activeShortcutIds.values();
     for (const QString &id : activeIds)
@@ -1613,6 +2040,7 @@ void KeybindingManager::updateCustomShortcutConfigFields(KeyConfig &config, cons
                                                          const QString &normalizedHotkey) const
 {
     config.displayName = displayName;
+    config.origin = ShortcutOrigin::Custom;
     config.category = QString::fromLatin1(CategoryKey::Custom);
     config.enabled = true;
     config.modifiable = true;
@@ -1640,7 +2068,10 @@ ShortcutInfo KeybindingManager::toShortcutInfo(const KeyConfig &config)
     }
     info.localLanguageName = m_translationManager->translate(config.appId, config.displayName);
     info.isCustom = (config.category == CategoryKey::Custom);
-    info.modifiable = config.modifiable;
+    // ShortcutInfo is the legacy control-center API, where modifiable means
+    // ReplaceHotkey can persist the conflicting shortcut. Portal shortcuts are
+    // edited through the Portal management API instead.
+    info.modifiable = config.origin != ShortcutOrigin::Portal && config.modifiable;
     info.localLanguageCategory = m_translationManager->translate(config.appId, config.category);
     return info;
 }

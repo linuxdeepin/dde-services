@@ -9,6 +9,48 @@
 #include <QMap>
 #include <QKeySequence>
 
+static const QMap<QString, QString> &getQtToKeypadMap()
+{
+    static const QMap<QString, QString> map = {
+        {QStringLiteral("0"), QStringLiteral("KP_0")},
+        {QStringLiteral("1"), QStringLiteral("KP_1")},
+        {QStringLiteral("2"), QStringLiteral("KP_2")},
+        {QStringLiteral("3"), QStringLiteral("KP_3")},
+        {QStringLiteral("4"), QStringLiteral("KP_4")},
+        {QStringLiteral("5"), QStringLiteral("KP_5")},
+        {QStringLiteral("6"), QStringLiteral("KP_6")},
+        {QStringLiteral("7"), QStringLiteral("KP_7")},
+        {QStringLiteral("8"), QStringLiteral("KP_8")},
+        {QStringLiteral("9"), QStringLiteral("KP_9")},
+        {QStringLiteral("."), QStringLiteral("KP_Decimal")},
+        {QStringLiteral(","), QStringLiteral("KP_Separator")},
+        {QStringLiteral("+"), QStringLiteral("KP_Add")},
+        {QStringLiteral("-"), QStringLiteral("KP_Subtract")},
+        {QStringLiteral("*"), QStringLiteral("KP_Multiply")},
+        {QStringLiteral("/"), QStringLiteral("KP_Divide")},
+        {QStringLiteral("="), QStringLiteral("KP_Equal")},
+        {QStringLiteral("Enter"), QStringLiteral("KP_Enter")},
+        {QStringLiteral("Space"), QStringLiteral("KP_Space")},
+        {QStringLiteral("Tab"), QStringLiteral("KP_Tab")},
+        {QStringLiteral("F1"), QStringLiteral("KP_F1")},
+        {QStringLiteral("F2"), QStringLiteral("KP_F2")},
+        {QStringLiteral("F3"), QStringLiteral("KP_F3")},
+        {QStringLiteral("F4"), QStringLiteral("KP_F4")},
+        {QStringLiteral("Home"), QStringLiteral("KP_Home")},
+        {QStringLiteral("Left"), QStringLiteral("KP_Left")},
+        {QStringLiteral("Up"), QStringLiteral("KP_Up")},
+        {QStringLiteral("Right"), QStringLiteral("KP_Right")},
+        {QStringLiteral("Down"), QStringLiteral("KP_Down")},
+        {QStringLiteral("PgUp"), QStringLiteral("KP_Page_Up")},
+        {QStringLiteral("PgDown"), QStringLiteral("KP_Page_Down")},
+        {QStringLiteral("End"), QStringLiteral("KP_End")},
+        {QStringLiteral("Clear"), QStringLiteral("KP_Begin")},
+        {QStringLiteral("Ins"), QStringLiteral("KP_Insert")},
+        {QStringLiteral("Del"), QStringLiteral("KP_Delete")},
+    };
+    return map;
+}
+
 // Build Qt key name to XKB name mapping table
 // Key: Qt Canonical Name (as returned by QKeySequence::toString(PortableText))
 // Value: XKB/X11 Name
@@ -155,6 +197,12 @@ static const QMap<QString, QString>& getXkbToQtMap() {
         map.insert("Page_Down", "PgDown");
         map.insert("Delete", "Del");
         map.insert("Insert", "Ins");
+        const auto &keypad = getQtToKeypadMap();
+        for (auto it = keypad.cbegin(); it != keypad.cend(); ++it) {
+            // Qt's Enter key already denotes KP_Enter; Return is the main key.
+            map.insert(it.value(), it.key() == QLatin1String("Enter")
+                    ? it.key() : QStringLiteral("Num+") + it.key());
+        }
     }
     return map;
 }
@@ -215,7 +263,11 @@ QString QKeySequenceConverter::qKeySequenceToXkb(const QString &qksString)
         if (mods & Qt::MetaModifier) result += "<Super>";
         
         QString qtKeyName = QKeySequence(key).toString(QKeySequence::PortableText);
-        
+        if (mods & Qt::KeypadModifier) {
+            const QString keypadName = getQtToKeypadMap().value(qtKeyName);
+            return keypadName.isEmpty() ? QString() : result + keypadName;
+        }
+
         if (map.contains(qtKeyName)) {
             result += map.value(qtKeyName);
         } else {

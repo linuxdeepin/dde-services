@@ -54,7 +54,7 @@ public:
     virtual void setNumLockState(bool on) { Q_UNUSED(on); }
 
 signals:
-    void keyActivated(const QString &shortcutId);
+    void keyActivated(const QString &shortcutId, int eventFlag);
     void registrationFailed(const QString &shortcutId);
     void numLockStateChanged(bool on);
     void capsLockStateChanged(bool on);
