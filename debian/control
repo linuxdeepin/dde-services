@@ -48,7 +48,7 @@ Depends:
  ${misc:Depends},
  deepin-service-manager (>> 1.0.21),
  dbus,
- deepin-power-control (>= 2.0.1),
+ deepin-power-control (>= 2.0.6),
  deepin-security-loader,
  dde-daemon (>> 6.1.104)
 Recommends:
