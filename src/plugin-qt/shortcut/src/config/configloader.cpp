@@ -525,6 +525,9 @@ KeyConfig ConfigLoader::parseKeyConfig(DConfig *config)
     keyConfig.triggerType = config->value("triggerType").toInt();
     keyConfig.triggerValue = config->value("triggerValue").toStringList();
     keyConfig.category = config->value("category").toString();
+    keyConfig.origin = keyConfig.category == QLatin1String(CategoryKey::Custom)
+            ? ShortcutOrigin::Custom
+            : ShortcutOrigin::Builtin;
     if (keyConfig.category == QLatin1String(CategoryKey::Custom)
             && keyConfig.triggerType == static_cast<int>(TriggerType::Command)) {
         keyConfig.triggerValue = normalizeLegacyCustomCommand(keyConfig.triggerValue);

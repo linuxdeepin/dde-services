@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+ SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+ SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
+<node name="/org/deepin/dde/Keybinding1">
+  <interface name="org.deepin.dde.Keybinding1">
+    <method name="ListPortalShortcuts">
+      <arg type="s" name="app_id" direction="in"/>
+      <arg type="a(ssssasasbb)" name="shortcuts" direction="out"/>
+    </method>
+
+    <method name="NormalizeXdgPortalTriggers">
+      <arg type="a(ss)" name="requested" direction="in"/>
+      <arg type="a(ss)" name="normalized" direction="out"/>
+    </method>
+
+    <method name="CommitPortalSessionBindings">
+      <arg type="s" name="app_id" direction="in"/>
+      <arg type="s" name="session_token" direction="in"/>
+      <arg type="a(ssasasb)" name="requested" direction="in"/>
+      <arg type="a(ssssasasbb)" name="bound" direction="out"/>
+    </method>
+
+    <method name="RestorePortalSessionBindings">
+      <arg type="s" name="app_id" direction="in"/>
+      <arg type="s" name="session_token" direction="in"/>
+      <arg type="a(ssasasb)" name="declared" direction="in"/>
+      <arg type="as" name="active_shortcut_ids" direction="in"/>
+      <arg type="a(ssssasasbb)" name="bound" direction="out"/>
+    </method>
+
+    <method name="ApplyPortalSessionUpdates">
+      <arg type="s" name="app_id" direction="in"/>
+      <arg type="s" name="session_token" direction="in"/>
+      <arg type="a(ssasasb)" name="updates" direction="in"/>
+      <arg type="a(ssssasasbb)" name="bound" direction="out"/>
+    </method>
+
+    <method name="DeactivatePortalShortcuts">
+      <arg type="s" name="app_id" direction="in"/>
+      <arg type="s" name="session_token" direction="in"/>
+    </method>
+
+    <method name="CheckPortalShortcutConflicts">
+      <arg type="s" name="app_id" direction="in"/>
+      <arg type="a(ssasasb)" name="shortcuts" direction="in"/>
+      <arg type="a(sssss)" name="conflicts" direction="out"/>
+    </method>
+
+    <signal name="PortalShortcutPressed">
+      <arg type="s" name="app_id"/>
+      <arg type="s" name="shortcut_id"/>
+      <arg type="t" name="timestamp"/>
+    </signal>
+
+    <signal name="PortalShortcutReleased">
+      <arg type="s" name="app_id"/>
+      <arg type="s" name="shortcut_id"/>
+      <arg type="t" name="timestamp"/>
+    </signal>
+
+    <signal name="PortalShortcutsChanged">
+      <arg type="s" name="app_id"/>
+      <arg type="a(ssssasasbb)" name="shortcuts"/>
+    </signal>
+    <signal name="PortalSessionShortcutsChanged">
+      <arg type="s" name="app_id"/>
+      <arg type="s" name="session_token"/>
+      <arg type="a(ssssasasbb)" name="shortcuts"/>
+    </signal>
+  </interface>
+</node>

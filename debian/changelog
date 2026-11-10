@@ -1,3 +1,11 @@
+dde-services (1.0.51) UNRELEASED; urgency=medium
+
+  * Implement GlobalShortcuts Portal session binding and persistence APIs.
+  * Add the standalone authorization and shortcut capture provider.
+  * Preserve symbolic/keypad identity and reconcile failed binding transactions.
+
+ -- zhaoyingzhen <zhaoyingzhen@uniontech.com>  Tue, 10 Nov 2026 13:13:30 +0800
+
 dde-services (1.0.50) unstable; urgency=medium
 
   * test(shortcut): isolate capture result cases

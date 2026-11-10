@@ -68,7 +68,7 @@ signals:
      * @brief Emitted when a registered special key is activated
      * @param shortcutId The ID of the activated shortcut
      */
-    void keyActivated(const QString &shortcutId);
+    void keyActivated(const QString &shortcutId, int eventFlag);
 
 private slots:
     /**
