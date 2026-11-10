@@ -1,0 +1,86 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "appId": {
+            "value": "",
+            "serial": 0,
+            "flags": [],
+            "name": "appId",
+            "name[zh_CN]": "应用标识",
+            "description": "Portal application ID provided by the broker",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "shortcutId": {
+            "value": "",
+            "serial": 0,
+            "flags": [],
+            "name": "shortcutId",
+            "name[zh_CN]": "动作标识",
+            "description": "Application-defined shortcut action ID",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "description": {
+            "value": "",
+            "serial": 0,
+            "flags": [],
+            "name": "description",
+            "name[zh_CN]": "动作描述",
+            "description": "User-visible description of what the shortcut does",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "hotkeys": {
+            "value": [],
+            "serial": 0,
+            "flags": [],
+            "name": "hotkeys",
+            "name[zh_CN]": "快捷键组合",
+            "description": "User-selected hotkey bindings (normalized internal format)",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "preferredKeys": {
+            "value": [],
+            "serial": 0,
+            "flags": [],
+            "name": "preferredKeys",
+            "name[zh_CN]": "建议按键",
+            "description": "Application-suggested preferred triggers (XDG format → normalized)",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "enabled": {
+            "value": false,
+            "serial": 0,
+            "flags": [],
+            "name": "enabled",
+            "name[zh_CN]": "是否启用",
+            "description": "Whether the shortcut is enabled by the user",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "category": {
+            "value": "",
+            "serial": 0,
+            "flags": [],
+            "name": "category",
+            "name[zh_CN]": "分类",
+            "description": "Logical category key — fixed to 'Applications' for Portal shortcuts",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "modifiable": {
+            "value": false,
+            "serial": 0,
+            "flags": [],
+            "name": "modifiable",
+            "name[zh_CN]": "允许修改",
+            "description": "Whether the user can modify this shortcut",
+            "permissions": "readwrite",
+            "visibility": "private"
+        }
+    }
+}

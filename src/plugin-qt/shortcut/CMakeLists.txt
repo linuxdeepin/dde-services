@@ -9,9 +9,7 @@ set(PLUGIN_NAME plugin-dde-shortcut)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_AUTOMOC ON)
-
-find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui WaylandClient)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core DBus Gui WaylandClient Widgets)
 find_package(Dtk6 REQUIRED COMPONENTS Core DConfig Gui)
 find_package(PkgConfig REQUIRED)
 find_package(TreelandProtocols 0.6.0 REQUIRED)
@@ -23,6 +21,8 @@ pkg_check_modules(X11 REQUIRED x11)
 pkg_check_modules(X11_XCB REQUIRED x11-xcb)
 pkg_check_modules(XTST REQUIRED xtst)
 pkg_check_modules(WAYLAND_CLIENT REQUIRED wayland-client)
+pkg_get_variable(WAYLAND_PROTOCOLS_DATA_DIR wayland-protocols pkgdatadir)
+pkg_check_modules(XKBCOMMON REQUIRED xkbcommon)
 
 # Set source file path (using sources from plugin directory)
 set(SHORTCUT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -34,6 +34,9 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/core/shortcutmanager.cpp
     ${SHORTCUT_SRC_DIR}/core/keybindingmanager.cpp
     ${SHORTCUT_SRC_DIR}/core/customshortcuttransaction.cpp
+    ${SHORTCUT_SRC_DIR}/core/portalshortcuttypes.cpp
+    ${SHORTCUT_SRC_DIR}/core/portalshortcutmanager.cpp
+    ${SHORTCUT_SRC_DIR}/core/xdgshortcutparser.cpp
     ${SHORTCUT_SRC_DIR}/core/triggeractioncatalog.cpp
     ${SHORTCUT_SRC_DIR}/core/gestureactioncatalog.cpp
     ${SHORTCUT_SRC_DIR}/core/gesturemanager.cpp
@@ -50,6 +53,7 @@ set(SHORTCUT_COMMON_SOURCES
     ${SHORTCUT_SRC_DIR}/core/translationmanager.cpp
     ${SHORTCUT_SRC_DIR}/config/configloader.cpp
     ${SHORTCUT_SRC_DIR}/config/customshortcutstore.cpp
+    ${SHORTCUT_SRC_DIR}/config/portalshortcutstore.cpp
     ${SHORTCUT_SRC_DIR}/backend/abstractkeyhandler.h
     ${SHORTCUT_SRC_DIR}/backend/abstractgesturehandler.h
     ${SHORTCUT_SRC_DIR}/backend/specialkeyhandler.cpp
@@ -78,7 +82,7 @@ set(PLUGIN_SOURCES
 )
 
 # Create plugin library
-add_library(${PLUGIN_NAME} SHARED ${PLUGIN_SOURCES})
+qt_add_library(${PLUGIN_NAME} SHARED ${PLUGIN_SOURCES})
 
 # Wayland Protocol Generation
 qt6_generate_wayland_protocol_client_sources(
@@ -106,6 +110,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE
     ${X11_XCB_LIBRARIES}
     ${XTST_LIBRARIES}
     ${WAYLAND_CLIENT_LIBRARIES}
+    ${XKBCOMMON_LIBRARIES}
 )
 
 target_include_directories(${PLUGIN_NAME} PRIVATE
@@ -118,6 +123,7 @@ target_include_directories(${PLUGIN_NAME} PRIVATE
     ${X11_XCB_INCLUDE_DIRS}
     ${XTST_INCLUDE_DIRS}
     ${WAYLAND_CLIENT_INCLUDE_DIRS}
+    ${XKBCOMMON_INCLUDE_DIRS}
 )
 
 # Install plugin
@@ -160,6 +166,11 @@ dtk_add_config_meta_files(
     FILES "${CMAKE_CURRENT_SOURCE_DIR}/configs/org.deepin.dde.keybinding.keyboard.json"
 )
 
+dtk_add_config_meta_files(
+    APPID "org.deepin.dde.keybinding"
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/configs/org.deepin.shortcut.portal.json"
+)
+
 foreach(SUBDIR_PATH ${GESTURE_CONFIG_SUBDIRS})
     dtk_add_config_meta_files(
         APPID "org.deepin.dde.keybinding"
@@ -175,6 +186,90 @@ install(PROGRAMS
         scripts/toggle-grand-search
         DESTINATION libexec/dde-services/keybinding)
 
+# GlobalShortcuts portal provider. It is a separate UI process and must not
+# run inside deepin-service-manager.
+set(PORTAL_PROVIDER_TARGET dde-global-shortcuts-provider)
+set(PORTAL_PROVIDER_SOURCES
+    provider/main.cpp
+    provider/globalshortcutsprovider.cpp
+    provider/globalshortcutsprovider.h
+    provider/globalshortcutsdialog.cpp
+    provider/globalshortcutsdialog.h
+    provider/shortcutcapturecontroller.cpp
+    provider/shortcutcapturecontroller.h
+    provider/x11shortcutcapture.cpp
+    provider/x11shortcutcapture.h
+    provider/treelandshortcutcapture.cpp
+    provider/treelandshortcutcapture.h
+    provider/waylandforeignparent.cpp
+    provider/waylandforeignparent.h
+    ${SHORTCUT_SRC_DIR}/core/portalshortcuttypes.cpp
+    ${SHORTCUT_SRC_DIR}/core/qkeysequenceconverter.cpp
+)
+
+qt_add_executable(${PORTAL_PROVIDER_TARGET} ${PORTAL_PROVIDER_SOURCES})
+
+qt6_generate_wayland_protocol_client_sources(
+    ${PORTAL_PROVIDER_TARGET}
+    FILES
+        ${WAYLAND_PROTOCOLS_DATA_DIR}/unstable/xdg-foreign/xdg-foreign-unstable-v2.xml
+)
+
+# Reuse the Treeland client code generated for the plugin. Generating the same
+# protocol twice in one CMake binary directory creates duplicate custom rules.
+target_sources(${PORTAL_PROVIDER_TARGET} PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}/qwayland-treeland-shortcut-manager-unstable-v3.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/wayland-treeland-shortcut-manager-unstable-v3-protocol.c
+)
+add_dependencies(${PORTAL_PROVIDER_TARGET} ${PLUGIN_NAME})
+
+target_include_directories(${PORTAL_PROVIDER_TARGET} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${SHORTCUT_SRC_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${XCB_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIRS}
+    ${WAYLAND_CLIENT_INCLUDE_DIRS}
+    ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
+    ${Qt6WaylandClient_PRIVATE_INCLUDE_DIRS}
+)
+
+target_link_libraries(${PORTAL_PROVIDER_TARGET} PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::WaylandClient
+    Qt6::WaylandClientPrivate
+    ${XCB_LIBRARIES}
+    ${X11_LIBRARIES}
+    ${X11_XCB_LIBRARIES}
+    ${WAYLAND_CLIENT_LIBRARIES}
+)
+
+install(TARGETS ${PORTAL_PROVIDER_TARGET}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
+
+configure_file(
+    provider/org.deepin.dde.GlobalShortcutsProvider1.service.in
+    ${CMAKE_CURRENT_BINARY_DIR}/org.deepin.dde.GlobalShortcutsProvider1.service
+    @ONLY
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.deepin.dde.GlobalShortcutsProvider1.service
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/dbus-1/services)
+
+# The provider must be launched by the systemd user manager (via
+# SystemdService above) instead of being forked directly by dbus-daemon:
+# the session bus activation environment may lack DISPLAY/WAYLAND_DISPLAY,
+# which would leave the provider unable to open any dialog window.
+configure_file(
+    provider/dde-global-shortcuts-provider.service.in
+    ${CMAKE_CURRENT_BINARY_DIR}/dde-global-shortcuts-provider.service
+    @ONLY
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dde-global-shortcuts-provider.service
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/systemd/user/)
+
 # ============ i18n Translation Support ============
 # Install i18n extraction tool
 install(PROGRAMS tools/extract_shortcuts_i18n.py 
@@ -187,16 +282,50 @@ install(FILES cmake/DdeShortcutI18n.cmake
         RENAME DdeShortcutI18nConfig.cmake)
 
 # i18n integration
-find_package(Qt6 REQUIRED COMPONENTS LinguistTools)
-include(cmake/DdeShortcutI18n.cmake)
+find_package(Qt6 6.8 REQUIRED COMPONENTS LinguistTools)
 
-set(I18N_LANGUAGES 
-    "zh_CN" "zh_HK" "zh_TW" "en" "ast" "az" "bg" "bo" "ca" "cs" "da" 
-    "de" "el" "es" "et" "eu" "fa" "fi" "fr" "gl" "he" "hi" "hr" "hu" 
-    "hy" "id" "it" "ja" "ka" "kk" "ko" "ky" "lt" "lv" "ms" "nb" "ne" 
-    "nl" "pa" "pl" "pt_BR" "pt" "ro" "ru" "sk" "sl" "sq" "sr" "sv" "th" 
+set(I18N_LANGUAGES
+    "zh_CN" "zh_HK" "zh_TW" "en" "ast" "az" "bg" "bo" "ca" "cs" "da"
+    "de" "el" "es" "et" "eu" "fa" "fi" "fr" "gl" "he" "hi" "hr" "hu"
+    "hy" "id" "it" "ja" "ka" "kk" "ko" "ky" "lt" "lv" "ms" "nb" "ne"
+    "nl" "pa" "pl" "pt_BR" "pt" "ro" "ru" "sk" "sl" "sq" "sr" "sv" "th"
     "tr" "ug" "uk" "vi"
 )
+
+set(PORTAL_PROVIDER_TS_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/provider/translations/${PORTAL_PROVIDER_TARGET}.ts"
+)
+if(NOT EXISTS "${PORTAL_PROVIDER_TS_FILES}")
+    message(FATAL_ERROR "Missing provider translation template: ${PORTAL_PROVIDER_TS_FILES}")
+endif()
+foreach(LANG ${I18N_LANGUAGES})
+    set(TS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/provider/translations/${PORTAL_PROVIDER_TARGET}_${LANG}.ts")
+    if(NOT EXISTS "${TS_FILE}")
+        message(FATAL_ERROR "Missing provider translation template: ${TS_FILE}")
+    endif()
+    list(APPEND PORTAL_PROVIDER_TS_FILES "${TS_FILE}")
+endforeach()
+
+set(PORTAL_PROVIDER_I18N_SOURCES
+    provider/globalshortcutsprovider.cpp
+    provider/globalshortcutsdialog.cpp
+    provider/shortcutcapturecontroller.cpp
+    provider/x11shortcutcapture.cpp
+)
+qt_add_translations(${PORTAL_PROVIDER_TARGET}
+    SOURCE_TARGETS ${PORTAL_PROVIDER_TARGET}
+    LUPDATE_TARGET ${PORTAL_PROVIDER_TARGET}_lupdate
+    LRELEASE_TARGET ${PORTAL_PROVIDER_TARGET}_lrelease
+    TS_FILES ${PORTAL_PROVIDER_TS_FILES}
+    SOURCES ${PORTAL_PROVIDER_I18N_SOURCES}
+    LUPDATE_OPTIONS "-locations" "none"
+    LRELEASE_OPTIONS "-silent"
+    QM_FILES_OUTPUT_VARIABLE PORTAL_PROVIDER_QM_FILES
+)
+install(FILES ${PORTAL_PROVIDER_QM_FILES}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/${PORTAL_PROVIDER_TARGET}/translations)
+
+include(cmake/DdeShortcutI18n.cmake)
 
 dde_shortcut_add_translations(
     APP_ID "org.deepin.dde.keybinding"
@@ -248,6 +377,7 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         ${X11_XCB_LIBRARIES}
         ${XTST_LIBRARIES}
         ${WAYLAND_CLIENT_LIBRARIES}
+        ${XKBCOMMON_LIBRARIES}
     )
     
     target_include_directories(dde-shortcut-debug PRIVATE
@@ -261,5 +391,6 @@ if(BUILD_SHORTCUT_DEBUG_BINARY)
         ${X11_XCB_INCLUDE_DIRS}
         ${XTST_INCLUDE_DIRS}
         ${WAYLAND_CLIENT_INCLUDE_DIRS}
+        ${XKBCOMMON_INCLUDE_DIRS}
     )
 endif()

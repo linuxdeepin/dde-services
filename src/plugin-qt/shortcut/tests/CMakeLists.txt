@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-find_package(Qt6 REQUIRED COMPONENTS Test)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Test)
+find_program(DBUS_RUN_SESSION_EXECUTABLE dbus-run-session REQUIRED)
 
 add_executable(tst-brightnesspolicy
     tst_brightnesspolicy.cpp
@@ -295,4 +296,151 @@ if (XVFB_RUN_EXECUTABLE)
     )
 else()
     message(WARNING "xvfb-run was not found; unsafe X11 input-injection tests are disabled")
+endif()
+
+qt_add_executable(tst-portalshortcutcontracts
+    tst_portalshortcutcontracts.cpp
+    ../src/core/portalshortcuttypes.cpp
+    ../src/core/xdgshortcutparser.cpp
+    ../src/core/qkeysequenceconverter.cpp
+    ../src/config/portalshortcutstore.cpp
+)
+
+target_include_directories(tst-portalshortcutcontracts PRIVATE
+    ../src
+    ${XKBCOMMON_INCLUDE_DIRS}
+)
+
+target_compile_definitions(tst-portalshortcutcontracts PRIVATE
+    PORTAL_SHORTCUT_INTERFACE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/../interfaces/org.deepin.dde.Keybinding1.Portal.xml"
+    PORTAL_SHORTCUT_SCHEMA_PATH="${CMAKE_CURRENT_SOURCE_DIR}/../configs/org.deepin.shortcut.portal.json"
+)
+
+target_link_libraries(tst-portalshortcutcontracts PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Gui
+    Qt6::Test
+    Dtk6::Core
+    ${XKBCOMMON_LIBRARIES}
+    plugin-dde-shortcut
+)
+
+add_test(NAME shortcut-portal-contracts
+         COMMAND ${DBUS_RUN_SESSION_EXECUTABLE} -- $<TARGET_FILE:tst-portalshortcutcontracts>)
+set_tests_properties(shortcut-portal-contracts PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+)
+
+qt_add_executable(tst-portalshortcutmanager
+    tst_portalshortcutmanager.cpp
+    ../src/core/portalshortcutmanager.cpp
+    ../src/core/portalshortcuttypes.cpp
+    ../src/core/xdgshortcutparser.cpp
+    ../src/core/qkeysequenceconverter.cpp
+    ../src/config/portalshortcutstore.cpp
+)
+
+target_include_directories(tst-portalshortcutmanager PRIVATE
+    ../src
+    ${XKBCOMMON_INCLUDE_DIRS}
+)
+
+target_link_libraries(tst-portalshortcutmanager PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Gui
+    Qt6::Test
+    Dtk6::Core
+    ${XKBCOMMON_LIBRARIES}
+)
+
+add_test(NAME shortcut-portal-manager COMMAND tst-portalshortcutmanager)
+
+qt_add_executable(tst-globalshortcutsprovidercontract
+    tst_globalshortcutsprovidercontract.cpp
+)
+
+target_link_libraries(tst-globalshortcutsprovidercontract PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Test
+)
+
+target_compile_definitions(tst-globalshortcutsprovidercontract PRIVATE
+    PROVIDER_EXECUTABLE_PATH="$<TARGET_FILE:dde-global-shortcuts-provider>"
+    PROVIDER_SERVICE_FILE_PATH="${CMAKE_CURRENT_BINARY_DIR}/../org.deepin.dde.GlobalShortcutsProvider1.service"
+    PROVIDER_SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/../provider/main.cpp"
+)
+
+add_dependencies(tst-globalshortcutsprovidercontract dde-global-shortcuts-provider)
+add_test(NAME shortcut-globalshortcuts-provider-contract
+         COMMAND ${DBUS_RUN_SESSION_EXECUTABLE} -- $<TARGET_FILE:tst-globalshortcutsprovidercontract>)
+
+qt_add_executable(tst-globalshortcutsprovider
+    tst_globalshortcutsprovider.cpp
+    ../provider/globalshortcutsprovider.cpp
+    ../provider/globalshortcutsdialog.cpp
+    ../provider/shortcutcapturecontroller.cpp
+    ../provider/x11shortcutcapture.cpp
+    ../provider/treelandshortcutcapture.cpp
+    ../provider/waylandforeignparent.cpp
+    ../src/core/portalshortcuttypes.cpp
+    ../src/core/qkeysequenceconverter.cpp
+)
+qt6_generate_wayland_protocol_client_sources(tst-globalshortcutsprovider
+    FILES
+        ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-shortcut-manager-unstable-v3.xml
+        ${WAYLAND_PROTOCOLS_DATA_DIR}/unstable/xdg-foreign/xdg-foreign-unstable-v2.xml
+)
+target_include_directories(tst-globalshortcutsprovider PRIVATE
+    ..
+    ../src
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${XCB_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIRS}
+)
+target_link_libraries(tst-globalshortcutsprovider PRIVATE
+    Qt6::Core
+    Qt6::DBus
+    Qt6::Gui
+    Qt6::Widgets
+    Qt6::Test
+    Qt6::WaylandClient
+    Qt6::WaylandClientPrivate
+    ${XCB_LIBRARIES}
+    ${X11_LIBRARIES}
+    ${X11_XCB_LIBRARIES}
+    ${WAYLAND_CLIENT_LIBRARIES}
+)
+add_dependencies(tst-globalshortcutsprovider dde-global-shortcuts-provider)
+add_test(NAME shortcut-globalshortcuts-provider
+    COMMAND ${DBUS_RUN_SESSION_EXECUTABLE} -- $<TARGET_FILE:tst-globalshortcutsprovider>
+)
+set_tests_properties(shortcut-globalshortcuts-provider PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+    TIMEOUT 30
+)
+
+qt_add_executable(tst-x11shortcutcapture
+    tst_x11shortcutcapture.cpp
+    ../provider/x11shortcutcapture.cpp
+)
+target_include_directories(tst-x11shortcutcapture PRIVATE
+    ${XCB_INCLUDE_DIRS}
+    ${X11_INCLUDE_DIRS}
+)
+target_link_libraries(tst-x11shortcutcapture PRIVATE
+    Qt6::Core
+    Qt6::Test
+    ${XCB_LIBRARIES}
+    ${X11_LIBRARIES}
+    ${X11_XCB_LIBRARIES}
+    ${XTST_LIBRARIES}
+)
+if (XVFB_RUN_EXECUTABLE)
+    add_test(NAME shortcut-x11shortcutcapture
+        COMMAND ${XVFB_RUN_EXECUTABLE} -a $<TARGET_FILE:tst-x11shortcutcapture>
+    )
+    set_tests_properties(shortcut-x11shortcutcapture PROPERTIES TIMEOUT 10)
 endif()

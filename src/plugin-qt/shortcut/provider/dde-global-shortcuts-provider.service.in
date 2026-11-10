@@ -1,0 +1,11 @@
+[Unit]
+Description=Global shortcuts provider UI (DDE portal backend)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.deepin.dde.GlobalShortcutsProvider1
+ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/dde-global-shortcuts-provider
+Restart=on-failure
+RestartPreventExitStatus=1

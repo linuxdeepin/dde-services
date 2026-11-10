@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.deepin.dde.GlobalShortcutsProvider1
+Exec=@CMAKE_INSTALL_FULL_LIBEXECDIR@/dde-global-shortcuts-provider
+SystemdService=dde-global-shortcuts-provider.service

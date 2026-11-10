@@ -268,13 +268,13 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
             
             if (flags & KeyEventFlag::Press) {
                 qCDebug(logShortcut) << "SpecialKeyHandler: Key pressed, keycode:" << keycode;
-                emit keyActivated(binding.shortcutId);
+                emit keyActivated(binding.shortcutId, KeyEventFlag::Press);
             }
         } else {
             // Repeat event
             if (flags & KeyEventFlag::Repeat) {
                 qCDebug(logShortcut) << "SpecialKeyHandler: Key repeat, keycode:" << keycode;
-                emit keyActivated(binding.shortcutId);
+                emit keyActivated(binding.shortcutId, KeyEventFlag::Repeat);
             }
         }
     } else {
@@ -284,7 +284,7 @@ void SpecialKeyHandler::onKeyEvent(uint keycode, bool pressed,
         
         if (flags & KeyEventFlag::Release) {
             qCDebug(logShortcut) << "SpecialKeyHandler: Key released, keycode:" << keycode;
-            emit keyActivated(binding.shortcutId);
+            emit keyActivated(binding.shortcutId, KeyEventFlag::Release);
         }
     }
 }

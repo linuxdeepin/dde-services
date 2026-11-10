@@ -33,6 +33,7 @@ sudo cmake --build build --target install
 
 * [Service framework development guide](develop-guide.md)
 * [Shortcut and gesture integration guide](src/plugin-qt/shortcut/DEVELOPER_GUIDE.md)
+* [GlobalShortcuts Portal verification](src/plugin-qt/shortcut/PORTAL_TESTING.md)
 
 ## Getting help
 

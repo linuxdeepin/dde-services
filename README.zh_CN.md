@@ -33,6 +33,7 @@ sudo cmake --build build --target install
 
 * [服务框架开发指南](develop-guide.md)
 * [快捷键与手势适配指南](src/plugin-qt/shortcut/DEVELOPER_GUIDE.md)
+* [GlobalShortcuts Portal 契约与验证](src/plugin-qt/shortcut/PORTAL_TESTING.md)
 
 ## 帮助
 
