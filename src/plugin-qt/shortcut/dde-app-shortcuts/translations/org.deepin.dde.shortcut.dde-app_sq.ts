@@ -127,23 +127,23 @@
     </message>
     <message>
         <source>Switch window effects</source>
-        <translation type="unfinished"/>
+        <translation>Ndërroni efekte dritaresh</translation>
     </message>
     <message>
         <source>Switch windows</source>
-        <translation type="unfinished"/>
+        <translation>Ndërroni dritare</translation>
     </message>
     <message>
         <source>Switch windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Ndërroni dritare së prapthi</translation>
     </message>
     <message>
         <source>Switch similar windows</source>
-        <translation type="unfinished"/>
+        <translation>Ndërroni dritare të ngjashme</translation>
     </message>
     <message>
         <source>Switch similar windows in reverse</source>
-        <translation type="unfinished"/>
+        <translation>Ndërroni dritare të ngjashme së prapthi</translation>
     </message>
     <message>
         <source>Switch to left workspace</source>
