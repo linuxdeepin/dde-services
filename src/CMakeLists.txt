@@ -15,6 +15,7 @@ endif()
 
 add_subdirectory("plugin-qt")
 add_subdirectory("plugin-sdbus")
+add_subdirectory("plugin-rust")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory("demo")
