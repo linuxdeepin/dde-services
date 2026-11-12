@@ -147,11 +147,11 @@
     </message>
     <message>
         <source>Switch to left workspace</source>
-        <translation type="unfinished"/>
+        <translation>Hidhu te hapësira e punës majtas</translation>
     </message>
     <message>
         <source>Switch to right workspace</source>
-        <translation type="unfinished"/>
+        <translation>Hidhu te hapësira e punës djathtas</translation>
     </message>
     <message>
         <source>Tile window to left of screen</source>
