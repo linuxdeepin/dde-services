@@ -47,19 +47,19 @@
     </message>
     <message>
         <source>Delay screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Vonoje foton e ekranit</translation>
     </message>
     <message>
         <source>File manager</source>
-        <translation type="unfinished"/>
+        <translation>Përgjegjës kartelash</translation>
     </message>
     <message>
         <source>Full screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Foto e plotë ekrani</translation>
     </message>
     <message>
         <source>Grand search</source>
-        <translation type="unfinished"/>
+        <translation>Kërkim i madh</translation>
     </message>
     <message>
         <source>Screenshot</source>
@@ -67,15 +67,15 @@
     </message>
     <message>
         <source>System monitor</source>
-        <translation type="unfinished"/>
+        <translation>Monitor sistemi</translation>
     </message>
     <message>
         <source>Window screenshot</source>
-        <translation type="unfinished"/>
+        <translation>Foto ekrani dritareje</translation>
     </message>
     <message>
         <source>OCR (image to text)</source>
-        <translation type="unfinished"/>
+        <translation>OCR (figurë si tekst)</translation>
     </message>
     <message>
         <source>System</source>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Accessibility</source>
-        <translation type="unfinished"/>
+        <translation>Mjete Ndihmuese</translation>
     </message>
     <message>
         <source>Minimize window</source>
