@@ -52,6 +52,7 @@ inline constexpr auto kDelayWakeupInterval = "delayWakeupInterval";
     inline constexpr auto kPowerSavingModeEnabled               = "powerSavingModeEnabled";
     inline constexpr auto kSaveBrightnessWhilePsm             = "saveBrightnessWhilePsm";
     inline constexpr auto kPowerSavingModeAuto                  = "powerSavingModeAuto";
+    inline constexpr auto kDeviceIdlePowerSaving                = "deviceIdlePowerSaving";
     inline constexpr auto kPowerSavingModeAutoWhenBatteryLow    = "powerSavingModeAutoWhenBatteryLow";
     inline constexpr auto kPowerSavingModeAutoBatteryPercent    = "powerSavingModeAutoBatteryPercent";
     inline constexpr auto kPowerMappingConfig              = "powerMappingConfig";
