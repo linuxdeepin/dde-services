@@ -163,19 +163,19 @@
     </message>
     <message>
         <source>Zoom in</source>
-        <translation type="unfinished"/>
+        <translation>Zmadhoje</translation>
     </message>
     <message>
         <source>Zoom out</source>
-        <translation type="unfinished"/>
+        <translation>Zvogëloje</translation>
     </message>
     <message>
         <source>Reset zoom</source>
-        <translation type="unfinished"/>
+        <translation>Ktheje zoom-in te parazgjedhjet</translation>
     </message>
     <message>
         <source>Unmaximize window</source>
-        <translation type="unfinished"/>
+        <translation>Hiqja maksimizimin dritares</translation>
     </message>
 </context>
 </TS>
