@@ -45,7 +45,7 @@
             "description": "",
             "description[zh_CN]": "",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "specialCpuModeJson": {
             "value": "{\"PANGU\":{\"Balance\":true,\"Performace\":true,\"PowerSave\":true}}",
@@ -58,7 +58,7 @@
             "description": "",
             "description[zh_CN]": "需要进行特殊处理的cpu配置",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "idlePowersaveAspmEnabled": {
             "value": true,
@@ -82,7 +82,7 @@
             "name[zh_CN]": "使用电池自动开启节能模式",
             "description": "使用电池自动开启节能模式",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerSavingModeEnabled": {
             "value": false,
@@ -94,7 +94,7 @@
             "name[zh_CN]": "是否开启节能模式",
             "description": "是否开启节能模式",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerSavingModeAutoWhenBatteryLow": {
             "value": true,
@@ -106,7 +106,7 @@
             "name[zh_CN]": "低电量时自动开启节能模式",
             "description": "低电量时自动开启节能模式",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerSavingModeAutoBatteryPercent": {
             "value": 20,
@@ -118,7 +118,7 @@
             "name[zh_CN]": "自动开启节能模式阈值",
             "description": "自动开启节能模式阈值",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerSavingModeBrightnessDropPercent": {
             "value": 20,
@@ -130,7 +130,7 @@
             "name[zh_CN]": "节能模式亮度降低百分比",
             "description": "节能模式亮度降低百分比",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "mode": {
             "value": "balance",
@@ -142,7 +142,7 @@
             "name[zh_CN]": "性能模式",
             "description": "性能模式",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "allowScreenSaver": {
             "value": true,
@@ -154,7 +154,7 @@
             "name[zh_CN]": "允许屏幕保护",
             "description": "allow screen saver",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "scheduledShutdownState": {
             "value": false,
@@ -164,7 +164,7 @@
             "name[zh_CN]": "定时关机开关",
             "description": "Scheduled shutdown switch",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "shutdownTime": {
             "value": "19:00",
@@ -174,7 +174,7 @@
             "name[zh_CN]": "关机时间",
             "description": "time of timed shutdown",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "shutdownRepetition": {
             "value": 0,
@@ -184,7 +184,7 @@
             "name[zh_CN]": "重复类型, 0-3",
             "description": "type of the shutdown repetition",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "customShutdownWeekDays": {
             "value": [],
@@ -194,7 +194,7 @@
             "name[zh_CN]": "自定义关机重复日期",
             "description": "custom shutdown week days",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "shutdownCountdown": {
             "value": 60,
@@ -204,7 +204,7 @@
             "name[zh_CN]": "关机倒计时",
             "description": "shutdown countdown",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "delayWakeupInterval": {
             "value": 0,
@@ -216,7 +216,7 @@
             "name[zh_CN]": "延时关闭DDE黑屏程序时间间隔",
             "description": "延时关闭DDE黑屏程序时间间隔",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "nextShutdownTime": {
             "value": 0,
@@ -226,7 +226,7 @@
             "name[zh_CN]": "下一次关机时间",
             "description": "next shutdown time",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerMappingConfig":{
             "value": "{\"balance\":{\"DSPCConfig\":\"balance\"},\"lowBattery\":{\"DSPCConfig\":\"lowbat\"},\"performance\":{\"DSPCConfig\":\"performance\"},\"powersave\":{\"DSPCConfig\":\"saving\"}}",
@@ -238,7 +238,7 @@
             "name[zh_CN]": "电源性能模式映射配置",
             "description": "四种功耗模式对应的配置",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "delayHandleIdleOffIntervalWhenScreenBlack": {
             "value": 800,
@@ -250,7 +250,7 @@
             "name[zh_CN]": "延时调用HandleIdleOff时间间隔，单位ms",
             "description": "延时调用HandleIdleOff时间间隔，单位ms",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "linePowerScreensaverDelay": {
             "value": 0,
@@ -260,7 +260,7 @@
             "name[zh_CN]": "插电时显示屏保的超时时间",
             "description": "line power screen saver delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "batteryScreensaverDelay": {
             "value": 0,
@@ -270,7 +270,7 @@
             "name[zh_CN]": "使用电池时显示屏保的超时时间",
             "description": "battery screen saver delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "batteryScreenBlackDelay": {
             "value": 300,
@@ -280,7 +280,7 @@
             "name[zh_CN]": "使用电池时的屏幕黑屏延时",
             "description": "battery screen black delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "batterySleepDelay": {
             "value": 900,
@@ -290,7 +290,7 @@
             "name[zh_CN]": "使用电池时的休眠延时",
             "description": "battery sleep delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "linePowerScreenBlackDelay": {
             "value": 900,
@@ -300,7 +300,7 @@
             "name[zh_CN]": "插电时屏幕黑屏延时",
             "description": "line power screen black delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "linePowerSleepDelay": {
             "value": 1800,
@@ -310,7 +310,7 @@
             "name[zh_CN]": "插电时休眠延时",
             "description": "line power sleep delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "linePowerLockDelay": {
             "value": 900,
@@ -320,7 +320,7 @@
             "name[zh_CN]": "插电时锁屏延时",
             "description": "line power lock delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "batteryLockDelay": {
             "value": 300,
@@ -330,7 +330,7 @@
             "name[zh_CN]": "使用电池时锁屏延时",
             "description": "battery lock delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "adjustBrightnessEnabled": {
             "value": false,
@@ -340,7 +340,7 @@
             "name[zh_CN]": "启用自动调节亮度",
             "description": "adjust display brigtness enabled",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "ambientLightAdjustBrightness": {
             "value": true,
@@ -350,7 +350,7 @@
             "name[zh_CN]": "通过环境光自动调节亮度",
             "description": "auto adjust backlight brightness according to ambient light intensity",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "screenBlackLock": {
             "value": true,
@@ -360,7 +360,7 @@
             "name[zh_CN]": "关闭屏幕前锁定",
             "description": "screen black lock",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "sleepLock": {
             "value": true,
@@ -380,7 +380,7 @@
             "name[zh_CN]": "插电时合盖休眠",
             "description": "Sleep when close the lid if use line power",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "batteryLidClosedSleep": {
             "value": true,
@@ -390,7 +390,7 @@
             "name[zh_CN]": "使用电池时合盖休眠",
             "description": "Sleep when close the lid if use battery",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerButtonPressedExec": {
             "value": "dde-shutdown",
@@ -402,7 +402,7 @@
             "name[zh_CN]": "电源键按下执行的命令",
             "description": "power button pressed exec",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "fullscreenWorkaroundAppList": {
             "value": ["libflash", "chrome", "firefox","mplayer", "operaplugin", "soffice", "wpp", "evince", "vlc", "totem"],
@@ -412,7 +412,7 @@
             "name[zh_CN]": "全屏工作模式应用列表",
             "description": "app in list fullscreen inhbit screensaver",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "usePercentageForPolicy": {
             "value": true,
@@ -422,7 +422,7 @@
             "name[zh_CN]": "使用基于电池百分比的策略",
             "description": "Whether battery percentage based policy should be used. It should work around broken firmwares. It is also more reliable than the time left.",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "powerModuleInitialized": {
             "value": false,
@@ -432,7 +432,7 @@
             "name[zh_CN]": "电源模块是否初始化",
             "description": "power module initialized",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "lowPowerNotifyThreshold": {
             "value": 20,
@@ -610,7 +610,7 @@
             "name[zh_CN]": "插电时短idle延时",
             "description": "line power short idle delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "batteryShortIdleDelay": {
             "value": 300,
@@ -620,7 +620,7 @@
             "name[zh_CN]": "使用电池时短idle延时",
             "description": "battery short idle delay",
             "permissions": "readwrite",
-            "visibility": "public"
+            "visibility": "private"
         },
         "shortIdleEnable": {
             "value": false,
