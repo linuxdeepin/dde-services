@@ -591,8 +591,16 @@ void ModifierKeyMonitor::handleEvents()
         handleRawEvents();
         return;
     }
-    if (m_recordState != RecordState::Disabled && m_dataDisplay)
-        XRecordProcessReplies(m_dataDisplay);
+    if (m_recordState == RecordState::Disabled || !m_dataDisplay)
+        return;
+
+    // XRecordProcessReplies() calls XPending(), which does not read the
+    // socket while ordinary X events remain in Xlib's queue. Consume them
+    // so RECORD replies keep flowing and the read notifier can become idle.
+    while (XPending(m_dataDisplay) > 0) {
+        XEvent event;
+        XNextEvent(m_dataDisplay, &event);
+    }
 }
 
 void ModifierKeyMonitor::handleRecordedData(void *data)
