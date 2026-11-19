@@ -1,3 +1,10 @@
+dde-services (6.2.1) unstable; urgency=medium
+
+  * fix: make power and ambient DConfig internals private
+  * feat: support device idle power saving flag
+
+ -- zhaofangxun <zhaofangxun@uniontech.com>  Thu, 19 Nov 2026 20:45:26 +0800
+
 dde-services (6.2.0) unstable; urgency=medium
 
   * fix(power): play low battery sound via SoundEffect1 DBus service
