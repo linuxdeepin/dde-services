@@ -64,7 +64,7 @@ private:
     void systemAway();
 
     // autoStartAuth maps to LockFront1.ShowAuth's parameter on X11; ignored
-    // on Wayland where logind Session.Lock has no equivalent.
+    // on Wayland where the compositor-action protocol has no equivalent.
     void doLock(bool autoStartAuth);
 };
 

@@ -33,7 +33,7 @@ void registerControllerFactory(CommandParser &parser)
 int main(int argc, char *argv[])
 {
     // QGuiApplication (not QCoreApplication) so PowerController can talk to
-    // Treeland's dde-shell protocol for the Wayland shutdown UI; harmless on X11.
+    // Treeland's compositor-action protocol for the Wayland shutdown UI; harmless on X11.
     QGuiApplication app(argc, argv);
     app.setApplicationName("dde-shortcut-tool");
     app.setApplicationVersion("1.0.0");

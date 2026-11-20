@@ -259,7 +259,7 @@ void PowerController::doLock(bool autoStartAuth)
     qInfo() << "PowerController: lock screen (autoStartAuth=" << autoStartAuth << ")";
 
     if (isWaylandSession()) {
-        // Treeland: dde-shell-v1 lockscreen.lock is the supported way to bring
+        // Treeland: compositor-action lockscreen is the supported way to bring
         // up the lock UI. autoStartAuth is X11-only — on Wayland Treeland's UI
         // chooses its own behavior.
         Q_UNUSED(autoStartAuth);
@@ -295,7 +295,7 @@ void PowerController::systemShutdown()
 
     if (hasShutdownInhibit() || hasMultipleDisplaySession()) {
         if (isWaylandSession()) {
-            // Treeland: route through dde-shell lockscreen.shutdown so the
+            // Treeland: trigger the compositor-action shutdown menu so the
             // compositor UI can show what is holding shutdown back, mirroring
             // the X11 ShutdownFront prompt.
             qInfo() << "PowerController: shutdown via Treeland lockscreen (inhibit/multi-session)";
@@ -401,8 +401,8 @@ void PowerController::showShutdownUI()
     qInfo() << "PowerController: show shutdown UI";
 
     if (isWaylandSession()) {
-        // Treeland removed ShutdownFront1; the dde-shell-v1 protocol's
-        // lockscreen.shutdown is the supported way to bring up the UI.
+        // Treeland removed ShutdownFront1; the compositor-action protocol's
+        // shutdown_menu is the supported way to bring up the UI.
         TreelandLockScreenManager manager;
         if (!manager.showShutdown())
             qWarning() << "PowerController: Treeland shutdown UI request failed";

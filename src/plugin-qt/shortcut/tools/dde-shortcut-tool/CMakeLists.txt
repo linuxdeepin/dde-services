@@ -8,14 +8,14 @@ include(GNUInstallDirs)
 find_package(Qt6 REQUIRED COMPONENTS Core DBus Gui WaylandClient)
 find_package(Dtk6 REQUIRED COMPONENTS Core Gui)
 find_package(PkgConfig REQUIRED)
-find_package(TreelandProtocols REQUIRED)
+find_package(TreelandProtocols 0.7.0 REQUIRED)
 
 # XCB library for X11 lock key state queries
 pkg_check_modules(XCB REQUIRED xcb xcb-keysyms)
 pkg_check_modules(WAYLAND_CLIENT REQUIRED wayland-client)
 
 # Define dde-shortcut-tool executable
-add_executable(dde-shortcut-tool
+qt_add_executable(dde-shortcut-tool
     main.cpp
     commandparser.cpp
     commandparser.h
@@ -49,14 +49,14 @@ add_executable(dde-shortcut-tool
     constant.h
 )
 
-# Generate Wayland client bindings for treeland-dde-shell-v1 (lockscreen
-# operations: lock, shutdown UI, switch_user).
+# Generate Wayland client bindings for compositor session UI actions and
+# output brightness control.
 # NO_INCLUDE_CORE_ONLY pulls in the core protocol headers so generated code
-# can reference wl_callback_interface and other core types.
+# can reference wl_output_interface and other core types.
 qt6_generate_wayland_protocol_client_sources(dde-shortcut-tool
     NO_INCLUDE_CORE_ONLY
     FILES
-        ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-dde-shell-v1.xml
+        ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-compositor-action-unstable-v1.xml
         ${TREELAND_PROTOCOLS_DATA_DIR}/treeland-output-manager-v1.xml
 )
 
