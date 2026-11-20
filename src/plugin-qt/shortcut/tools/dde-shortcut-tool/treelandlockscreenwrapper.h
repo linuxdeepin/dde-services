@@ -6,26 +6,21 @@
 #define TREELANDLOCKSCREENWRAPPER_H
 
 #include <QObject>
-#include <QScopedPointer>
 #include <QWaylandClientExtensionTemplate>
 
-#include <functional>
-
-#include "qwayland-treeland-dde-shell-v1.h"
-
-class TreelandLockScreenWorker;
+#include "qwayland-treeland-compositor-action-unstable-v1.h"
 
 /**
- * @brief Treeland dde-shell binding for the lockscreen sub-interface.
+ * @brief Treeland compositor-action binding for session UI operations.
  *
  * On Wayland the legacy ShutdownFront1 / LockFront1 D-Bus services are gone;
- * the supported path goes through this Treeland protocol. The manager binds
- * to treeland_dde_shell_manager_v1, lazily acquires a treeland_lockscreen_v1
- * worker, and routes lock / shutdown / switch_user through it.
+ * the manager binds directly to treeland_compositor_action_v1 and triggers
+ * lockscreen, shutdown_menu and show_user_switch. Successful calls indicate
+ * that a request was sent; the protocol does not acknowledge the action.
  */
 class TreelandLockScreenManager
     : public QWaylandClientExtensionTemplate<TreelandLockScreenManager>,
-      public QtWayland::treeland_dde_shell_manager_v1
+      public QtWayland::treeland_compositor_action_v1
 {
     Q_OBJECT
 public:
@@ -37,21 +32,7 @@ public:
     bool switchUser(int activateTimeoutMs = 1000);
 
 private:
-    using WorkerAction = std::function<void(TreelandLockScreenWorker *)>;
-    bool invoke(const WorkerAction &action, int activateTimeoutMs, const char *op);
-
-    TreelandLockScreenWorker *worker();
-
-    QScopedPointer<TreelandLockScreenWorker> m_worker;
-};
-
-class TreelandLockScreenWorker
-    : public QWaylandClientExtensionTemplate<TreelandLockScreenWorker>,
-      public QtWayland::treeland_lockscreen_v1
-{
-    Q_OBJECT
-public:
-    explicit TreelandLockScreenWorker(struct ::treeland_lockscreen_v1 *object);
+    bool invoke(action requestedAction, int activateTimeoutMs, const char *op);
 };
 
 #endif // TREELANDLOCKSCREENWRAPPER_H

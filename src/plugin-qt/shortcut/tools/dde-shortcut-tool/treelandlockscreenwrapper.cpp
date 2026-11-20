@@ -16,33 +16,34 @@ extern "C" {
 
 TreelandLockScreenManager::TreelandLockScreenManager(QObject *parent)
     : QWaylandClientExtensionTemplate<TreelandLockScreenManager>(
-          treeland_dde_shell_manager_v1_interface.version)
+          treeland_compositor_action_v1_interface.version)
 {
     setParent(parent);
     initialize();
 }
 
-TreelandLockScreenManager::~TreelandLockScreenManager() = default;
+TreelandLockScreenManager::~TreelandLockScreenManager()
+{
+    if (isInitialized())
+        destroy();
+}
 
 bool TreelandLockScreenManager::lock(int activateTimeoutMs)
 {
-    return invoke([](TreelandLockScreenWorker *w) { w->lock(); },
-                  activateTimeoutMs, "lock");
+    return invoke(action_lockscreen, activateTimeoutMs, "lock");
 }
 
 bool TreelandLockScreenManager::showShutdown(int activateTimeoutMs)
 {
-    return invoke([](TreelandLockScreenWorker *w) { w->shutdown(); },
-                  activateTimeoutMs, "shutdown");
+    return invoke(action_shutdown_menu, activateTimeoutMs, "shutdown");
 }
 
 bool TreelandLockScreenManager::switchUser(int activateTimeoutMs)
 {
-    return invoke([](TreelandLockScreenWorker *w) { w->switch_user(); },
-                  activateTimeoutMs, "switch_user");
+    return invoke(action_show_user_switch, activateTimeoutMs, "switch_user");
 }
 
-bool TreelandLockScreenManager::invoke(const WorkerAction &action,
+bool TreelandLockScreenManager::invoke(action requestedAction,
                                        int activateTimeoutMs, const char *op)
 {
     // The compositor binds the global asynchronously, so a freshly-constructed
@@ -59,13 +60,12 @@ bool TreelandLockScreenManager::invoke(const WorkerAction &action,
         loop.exec();
     }
 
-    auto *impl = worker();
-    if (!impl) {
+    if (!isActive()) {
         qWarning() << "TreelandLockScreenManager: protocol not active, cannot" << op;
         return false;
     }
 
-    action(impl);
+    trigger(requestedAction);
 
     // Without a window, libwayland's outgoing buffer can sit unflushed for a
     // long time. Force the flush so the compositor sees the request before
@@ -74,22 +74,4 @@ bool TreelandLockScreenManager::invoke(const WorkerAction &action,
         wl_display_flush(wlApp->display());
     }
     return true;
-}
-
-TreelandLockScreenWorker *TreelandLockScreenManager::worker()
-{
-    if (!isActive())
-        return nullptr;
-
-    if (m_worker.isNull())
-        m_worker.reset(new TreelandLockScreenWorker(get_treeland_lockscreen()));
-
-    return m_worker.get();
-}
-
-TreelandLockScreenWorker::TreelandLockScreenWorker(struct ::treeland_lockscreen_v1 *object)
-    : QWaylandClientExtensionTemplate<TreelandLockScreenWorker>(
-          treeland_lockscreen_v1_interface.version)
-    , QtWayland::treeland_lockscreen_v1(object)
-{
 }

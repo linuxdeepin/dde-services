@@ -20,7 +20,7 @@ if (Qt6WaylandClient_VERSION VERSION_GREATER_EQUAL "6.10.0")
 endif()
 find_package(Dtk6 REQUIRED COMPONENTS Core DConfig Gui)
 find_package(PkgConfig REQUIRED)
-find_package(TreelandProtocols 0.6.0 REQUIRED)
+find_package(TreelandProtocols 0.7.0 REQUIRED)
 
 pkg_check_modules(XCB REQUIRED xcb xcb-keysyms)
 pkg_check_modules(XCB_XINPUT REQUIRED xcb-xinput)
