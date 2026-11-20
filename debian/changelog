@@ -1,3 +1,9 @@
+dde-services (1.0.50.1000+pajil) unstable; urgency=medium
+
+  * fix(power): activate Power1 via dsm and fix lock stall
+
+ -- chenyuanbo <chenyuanbo@uniontech.com>  Fri, 20 Nov 2026 10:48:38 +0800
+
 dde-services (1.0.50) unstable; urgency=medium
 
   * test(shortcut): isolate capture result cases
