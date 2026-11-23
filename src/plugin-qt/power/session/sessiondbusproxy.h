@@ -153,7 +153,6 @@ private:
     DDBusInterface *m_sessionManagerInter;
     DDBusInterface *m_shutdownFrontInter;
     DDBusInterface *m_login1Inter;
-    DDBusInterface *m_lockFrontInter;
     DDBusInterface *m_blackScreenInter;
     DDBusInterface *m_displayInter;
     DDBusInterface *m_notificationsInter;
