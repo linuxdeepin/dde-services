@@ -6,7 +6,10 @@
 
 #include <QSignalSpy>
 #include <QElapsedTimer>
+#include <QScopeGuard>
 #include <QTest>
+
+#include <utility>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/XTest.h>
@@ -17,11 +20,17 @@ class TestX11RecordMonitor : public QObject
     Q_OBJECT
 
 private slots:
+    void initTestCase();
+    void cleanupTestCase();
     void recordsKeysDuringActiveGrab();
     void standaloneModifierTransportIsAvailable();
     void keymapRefreshDoesNotUseRecordDataConnection();
     void captureBoundaryDiscardsStoppedEvents();
     void xi2FallbackHandlesStandaloneModifier();
+    void pointerMappingChangesDoNotStallRecord();
+
+private:
+    Display *m_display = nullptr;
 };
 
 namespace {
@@ -31,6 +40,20 @@ void sendKey(Display *display, KeyCode keycode, bool pressed)
     XTestFakeKeyEvent(display, keycode, pressed ? True : False, CurrentTime);
 }
 
+}
+
+void TestX11RecordMonitor::initTestCase()
+{
+    // Keep one client connected so Xvfb does not reset between test cases.
+    m_display = XOpenDisplay(nullptr);
+    if (!m_display)
+        QSKIP("No X server is available");
+}
+
+void TestX11RecordMonitor::cleanupTestCase()
+{
+    if (m_display)
+        XCloseDisplay(m_display);
 }
 
 void TestX11RecordMonitor::recordsKeysDuringActiveGrab()
@@ -193,6 +216,67 @@ void TestX11RecordMonitor::captureBoundaryDiscardsStoppedEvents()
     QTRY_COMPARE_WITH_TIMEOUT(recordedSpy.size(), 2, 2000);
 
     XCloseDisplay(display);
+}
+
+void TestX11RecordMonitor::pointerMappingChangesDoNotStallRecord()
+{
+    Display *display = XOpenDisplay(nullptr);
+    if (!display)
+        QSKIP("No X server is available");
+    const auto closeDisplay = qScopeGuard([display] { XCloseDisplay(display); });
+
+    QList<unsigned char> originalMapping(256);
+    const int buttonCount = XGetPointerMapping(display, originalMapping.data(), originalMapping.size());
+    if (buttonCount < 3)
+        QSKIP("At least three pointer buttons are required");
+    originalMapping.resize(buttonCount);
+    const auto restoreMapping = qScopeGuard([&] {
+        XSetPointerMapping(display, originalMapping.data(), originalMapping.size());
+        XSync(display, False);
+    });
+
+    ModifierKeyMonitor monitor;
+    if (!monitor.supportsGrabResilientEvents())
+        QSKIP("X RECORD extension is unavailable");
+    monitor.start();
+    QTRY_VERIFY_WITH_TIMEOUT(monitor.isRunning(), 2000);
+
+    QSignalSpy recordedSpy(&monitor, &ModifierKeyMonitor::keyEventRecorded);
+    QSignalSpy modifierSpy(&monitor, &ModifierKeyMonitor::modifierKeyReleased);
+    QVERIFY(recordedSpy.isValid());
+    QVERIFY(modifierSpy.isValid());
+    const KeyCode super = XKeysymToKeycode(display, XK_Super_L);
+    QVERIFY(super != 0);
+
+    sendKey(display, super, true);
+    sendKey(display, super, false);
+    XSync(display, False);
+    QTRY_COMPARE_WITH_TIMEOUT(recordedSpy.size(), 2, 2000);
+    QTRY_COMPARE_WITH_TIMEOUT(modifierSpy.size(), 1, 2000);
+
+    QList<unsigned char> changedMapping = originalMapping;
+    std::swap(changedMapping[0], changedMapping[2]);
+    QCOMPARE(XSetPointerMapping(display, changedMapping.data(), changedMapping.size()), MappingSuccess);
+    XSync(display, False);
+    // Deliver MappingNotify before new RECORD replies arrive. Leaving this
+    // ordinary event queued makes XPending() stop reading the data socket.
+    QTest::qWait(50);
+
+    sendKey(display, super, true);
+    sendKey(display, super, false);
+    XSync(display, False);
+    QTRY_COMPARE_WITH_TIMEOUT(recordedSpy.size(), 4, 2000);
+    QTRY_COMPARE_WITH_TIMEOUT(modifierSpy.size(), 2, 2000);
+
+    // EndOfData must also remain readable so a new RECORD stream can start.
+    monitor.stop();
+    monitor.start();
+    QTRY_VERIFY_WITH_TIMEOUT(monitor.isRunning(), 2000);
+    sendKey(display, super, true);
+    sendKey(display, super, false);
+    XSync(display, False);
+    QTRY_COMPARE_WITH_TIMEOUT(recordedSpy.size(), 6, 2000);
+    QTRY_COMPARE_WITH_TIMEOUT(modifierSpy.size(), 3, 2000);
 }
 
 QTEST_MAIN(TestX11RecordMonitor)
